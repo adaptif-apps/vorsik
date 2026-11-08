@@ -32,9 +32,8 @@ import {
 
 export default function App() {
   // Unified Interactive Transformation Showroom State
-  type TransformationMode = 'spreadsheet' | 'transforming' | 'vorsik';
+  type TransformationMode = 'spreadsheet' | 'vorsik';
   const [transformationMode, setTransformationMode] = useState<TransformationMode>('spreadsheet');
-  const [transformLogStep, setTransformLogStep] = useState<number>(1);
 
   // B2B Orders and Invoicing State
   interface B2BOrder {
@@ -137,6 +136,10 @@ export default function App() {
   const [b2bFilter, setB2BFilter] = useState<'all' | 'pending' | 'transit' | 'completed'>('all');
   const [auditEventsCount, setAuditEventsCount] = useState(14);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Vorsik Subview: 'cards' (default) vs 'table' (alternative)
+  const [vorsikSubView, setVorsikSubView] = useState<'cards' | 'table'>('cards');
+  const [selectedOrderId, setSelectedOrderId] = useState<string>('ORD-8942');
 
   // ROI Calculator state
   const [employees, setEmployees] = useState(25);
@@ -284,27 +287,27 @@ export default function App() {
   };
 
   // B2B Transformation & Operations Handlers
-  const handleStartTransformation = () => {
-    setTransformationMode('transforming');
-    setTransformLogStep(1);
-    
-    setTimeout(() => setTransformLogStep(2), 600);
-    setTimeout(() => setTransformLogStep(3), 1200);
+  const triggerBuildCrewOnShowroom = () => {
     setTimeout(() => {
-      setTransformationMode('vorsik');
-      setToastMessage("✨ Transformation complete: PostgreSQL relational schema compiled. 0ms local query speed.");
-      setTimeout(() => setToastMessage(null), 3500);
-    }, 1850);
+      const bc = (window as unknown as { BuildCrew?: { buildTargets?: (elements: HTMLElement[], speed?: number) => Promise<void> } }).BuildCrew;
+      const targets = Array.from(document.querySelectorAll<HTMLElement>('[data-build-showroom]'));
+      if (bc?.buildTargets && targets.length > 0) {
+        bc.buildTargets(targets, 1.4);
+      }
+    }, 50);
+  };
+
+  const handleStartTransformation = () => {
+    setTransformationMode('vorsik');
+    setVorsikSubView('cards');
+    setToastMessage("✨ Building custom operating app with live engineering cursors...");
+    setTimeout(() => setToastMessage(null), 3000);
+    triggerBuildCrewOnShowroom();
   };
 
   const handleReplayTransformation = () => {
-    setTransformationMode('transforming');
-    setTransformLogStep(1);
-    setTimeout(() => setTransformLogStep(2), 600);
-    setTimeout(() => setTransformLogStep(3), 1200);
-    setTimeout(() => {
-      setTransformationMode('vorsik');
-    }, 1850);
+    setTransformationMode('vorsik');
+    triggerBuildCrewOnShowroom();
   };
 
   const handleApproveB2BOrder = (orderId: string) => {
@@ -360,6 +363,8 @@ export default function App() {
     if (b2bFilter === 'completed') return o.status === 'Invoiced & Completed' || o.status === 'Approved & Queued';
     return true;
   });
+
+  const selectedOrder = b2bOrders.find(o => o.id === selectedOrderId) || b2bOrders[0];
 
   // Calculations for ROI
   const saasYearly = employees * costPerUser * 12;
@@ -977,8 +982,6 @@ export default function App() {
               <span className="ml-2 font-mono text-xs text-[#717684]">
                 {transformationMode === 'spreadsheet' 
                   ? 'xlsx://local/B2B_Orders_Master_2025_FINAL_v4_copy.xlsx (Sync conflict in Row 2)' 
-                  : transformationMode === 'transforming'
-                  ? 'vorsik-compiler://normalizing-schema-to-wal...'
                   : 'vorsik-core://orders.lan (On-Premise NVMe • 0.2ms latency)'}
               </span>
             </div>
@@ -988,7 +991,6 @@ export default function App() {
               <div className="inline-flex p-0.5 rounded-lg bg-[#14161D] border border-[#20232B] text-xs font-medium">
                 <button
                   onClick={() => setTransformationMode('spreadsheet')}
-                  disabled={transformationMode === 'transforming'}
                   className={`px-3 py-1.5 rounded-md transition-all flex items-center gap-1.5 cursor-pointer ${
                     transformationMode === 'spreadsheet'
                       ? 'bg-[#1E2129] text-white shadow-sm'
@@ -1001,8 +1003,10 @@ export default function App() {
                 </button>
 
                 <button
-                  onClick={() => setTransformationMode('vorsik')}
-                  disabled={transformationMode === 'transforming'}
+                  onClick={() => {
+                    setTransformationMode('vorsik');
+                    triggerBuildCrewOnShowroom();
+                  }}
                   className={`px-3 py-1.5 rounded-md transition-all flex items-center gap-1.5 cursor-pointer ${
                     transformationMode === 'vorsik'
                       ? 'bg-[#1E2129] text-white shadow-sm'
@@ -1031,118 +1035,8 @@ export default function App() {
           {/* Interactive Screen Content Canvas */}
           <div className="relative min-h-[520px] p-4 sm:p-6 bg-[#0B0D12]">
 
-            {/* TRANSFORMATION OVERLAY (Multiplayer Cursors Sweeping across) */}
-            {transformationMode === 'transforming' && (
-              <div className="absolute inset-0 z-30 bg-[#08090C]/85 backdrop-blur-sm flex flex-col items-center justify-center p-6 overflow-hidden">
-                
-                {/* Vertical Scanning Laser Beam */}
-                <div className="absolute inset-x-0 h-1 bg-gradient-to-r from-transparent via-[#F84B11] to-transparent anim-sweep-scan shadow-[0_0_15px_#F84B11]" />
-
-                {/* Flying Multiplayer Cursor 1: Arch (Lead) */}
-                <div className="absolute top-8 left-6 sm:left-12 pointer-events-none anim-cursor-arch flex flex-col items-start z-30">
-                  <div className="flex items-start gap-1">
-                    <svg className="w-5 h-5 text-purple-400 drop-shadow-md" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M4 2l16 10-7.5 1.5L9 21z" />
-                    </svg>
-                    <div className="flex flex-col">
-                      <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-semibold bg-purple-600 text-white shadow-md">
-                        Arch (Lead)
-                      </span>
-                      <span className="text-[10px] text-purple-200 bg-[#160B24]/95 border border-purple-500/40 px-1.5 py-0.5 rounded mt-0.5 whitespace-nowrap shadow-lg">
-                        Normalizing 3NF Schema & Foreign Keys...
-                      </span>
-                    </div>
-                  </div>
-                  {/* Dashed Selection Box */}
-                  <div className="w-40 sm:w-48 h-10 border-2 border-dashed border-purple-400/80 bg-purple-500/10 rounded mt-1 anim-selection-box" />
-                </div>
-
-                {/* Flying Multiplayer Cursor 2: Postgres (DB) */}
-                <div className="absolute top-8 right-6 sm:right-12 pointer-events-none anim-cursor-postgres flex flex-col items-start z-30">
-                  <div className="flex items-start gap-1">
-                    <svg className="w-5 h-5 text-emerald-400 drop-shadow-md" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M4 2l16 10-7.5 1.5L9 21z" />
-                    </svg>
-                    <div className="flex flex-col">
-                      <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-semibold bg-emerald-600 text-white shadow-md">
-                        Postgres (DB)
-                      </span>
-                      <span className="text-[10px] text-emerald-200 bg-[#061F17]/95 border border-emerald-500/40 px-1.5 py-0.5 rounded mt-0.5 whitespace-nowrap shadow-lg">
-                        Fixing #REF! & #VALUE! → ACID WAL...
-                      </span>
-                    </div>
-                  </div>
-                  {/* Dashed Selection Box */}
-                  <div className="w-40 sm:w-48 h-10 border-2 border-dashed border-emerald-400/80 bg-emerald-500/10 rounded mt-1 anim-selection-box" />
-                </div>
-
-                {/* Flying Multiplayer Cursor 3: Engine (API) */}
-                <div className="absolute bottom-8 left-6 sm:left-12 pointer-events-none anim-cursor-engine flex flex-col items-start z-30">
-                  <div className="flex items-start gap-1">
-                    <svg className="w-5 h-5 text-amber-400 drop-shadow-md" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M4 2l16 10-7.5 1.5L9 21z" />
-                    </svg>
-                    <div className="flex flex-col">
-                      <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-semibold bg-amber-600 text-white shadow-md">
-                        Engine (FastAPI)
-                      </span>
-                      <span className="text-[10px] text-amber-200 bg-[#291705]/95 border border-amber-500/40 px-1.5 py-0.5 rounded mt-0.5 whitespace-nowrap shadow-lg">
-                        Compiling Sub-millisecond Local Endpoints...
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Flying Multiplayer Cursor 4: UI (React) */}
-                <div className="absolute bottom-8 right-6 sm:right-12 pointer-events-none anim-cursor-ui flex flex-col items-start z-30">
-                  <div className="flex items-start gap-1">
-                    <svg className="w-5 h-5 text-cyan-400 drop-shadow-md" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M4 2l16 10-7.5 1.5L9 21z" />
-                    </svg>
-                    <div className="flex flex-col">
-                      <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-semibold bg-cyan-600 text-white shadow-md">
-                        UI (React)
-                      </span>
-                      <span className="text-[10px] text-cyan-200 bg-[#061F24]/95 border border-cyan-500/40 px-1.5 py-0.5 rounded mt-0.5 whitespace-nowrap shadow-lg">
-                        Mounting Reactive High-Density Interface...
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Central Status HUD Card */}
-                <div className="relative z-10 max-w-md w-full p-6 rounded-xl border border-[#F84B11]/40 bg-[#12141C] shadow-2xl text-center">
-                  <div className="w-10 h-10 mx-auto rounded-full bg-[#F84B11]/10 border border-[#F84B11]/30 flex items-center justify-center text-[#F84B11] mb-3 animate-spin">
-                    <RefreshCw className="w-5 h-5" />
-                  </div>
-                  <div className="text-xs font-semibold uppercase tracking-wider text-[#F84B11] mb-1">
-                    Multiplayer Engineering Pipeline Active
-                  </div>
-                  <h3 className="text-base font-bold text-white mb-2">
-                    Transforming Spreadsheet to Vorsik Operating System
-                  </h3>
-                  
-                  {/* Step status logs */}
-                  <div className="text-xs text-[#94979E] h-10 flex items-center justify-center font-mono">
-                    {transformLogStep === 1 && "Parsing unnormalized rows & removing circular references..."}
-                    {transformLogStep === 2 && "Compiling ACID PostgreSQL tables, constraints & WAL..."}
-                    {transformLogStep === 3 && "Synchronizing 0ms in-memory client view & dispatchers..."}
-                  </div>
-
-                  {/* Progress Bar */}
-                  <div className="w-full bg-[#1A1D26] h-1.5 rounded-full overflow-hidden mt-2">
-                    <div 
-                      className="bg-gradient-to-r from-amber-500 via-[#F84B11] to-emerald-400 h-full transition-all duration-300"
-                      style={{ width: `${transformLogStep === 1 ? '35%' : transformLogStep === 2 ? '70%' : '95%'}` }}
-                    />
-                  </div>
-                </div>
-
-              </div>
-            )}
-
             {/* VIEW 1: THE MESSY SPREADSHEET (BEFORE) */}
-            {(transformationMode === 'spreadsheet' || transformationMode === 'transforming') && (
+            {transformationMode === 'spreadsheet' && (
               <div className="space-y-4 animate-fade-in">
                 
                 {/* Spreadsheet Alert Ribbon & Action Banner */}
@@ -1165,7 +1059,7 @@ export default function App() {
                   {/* Primary Trigger Button */}
                   <button
                     onClick={handleStartTransformation}
-                    className="px-4 py-2.5 rounded-lg bg-[#F84B11] hover:bg-[#ff5d26] active:scale-[0.98] text-white font-semibold text-xs flex items-center justify-center gap-2 transition-all duration-150 cursor-pointer shadow-lg shadow-[#F84B11]/20 hover:shadow-[#F84B11]/40 shrink-0"
+                    className="px-4 py-2.5 rounded-lg bg-[#F84B11] hover:bg-[#ff5d26] active:scale-[0.98] text-white font-semibold text-xs flex items-center justify-center gap-2 transition-all duration-150 cursor-pointer shadow-lg shadow-[#F84B11]/20 hover:shadow-[#F84B11]/40 shrink-0 animate-pulse-glow"
                   >
                     <Zap className="w-3.5 h-3.5 fill-current" />
                     <span>Transform to Vorsik Custom App</span>
@@ -1334,176 +1228,435 @@ export default function App() {
             {transformationMode === 'vorsik' && (
               <div className="space-y-5 animate-fade-in">
                 
-                {/* Real-Time KPIs Top Bar */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  <div className="p-3 rounded-lg border border-[#1F232B] bg-[#0E1015]">
+                {/* Mode Sub-Navigation: Cards (Default) vs Table */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-[#1A1D24]">
+                  <div className="inline-flex p-0.5 rounded-lg bg-[#14161D] border border-[#20232B] text-xs font-medium">
+                    <button
+                      onClick={() => setVorsikSubView('cards')}
+                      className={`px-3 py-1.5 rounded-md transition-all flex items-center gap-1.5 cursor-pointer ${
+                        vorsikSubView === 'cards'
+                          ? 'bg-[#1E2129] text-white shadow-sm font-semibold'
+                          : 'text-[#717684] hover:text-white'
+                      }`}
+                    >
+                      <Layers className="w-3.5 h-3.5 text-[#F84B11]" />
+                      <span>1. Visual Cards & Pipeline (Default)</span>
+                    </button>
+                    <button
+                      onClick={() => setVorsikSubView('table')}
+                      className={`px-3 py-1.5 rounded-md transition-all flex items-center gap-1.5 cursor-pointer ${
+                        vorsikSubView === 'table'
+                          ? 'bg-[#1E2129] text-white shadow-sm font-semibold'
+                          : 'text-[#717684] hover:text-white'
+                      }`}
+                    >
+                      <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-400" />
+                      <span>2. High-Density Table View</span>
+                    </button>
+                  </div>
+
+                  <div className="text-xs text-[#717684] flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    <span>0.2ms Perceived • ACID Local SQLite / PostgreSQL</span>
+                  </div>
+                </div>
+
+                {/* Real-Time KPIs Top Bar (Targeted by BuildCrew) */}
+                <div data-build-showroom className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  <div className="p-3.5 rounded-lg border border-[#1F232B] bg-[#0E1015]">
                     <div className="text-[11px] font-semibold uppercase tracking-wider text-[#717684] mb-0.5">Pending Approval</div>
                     <div className="text-base font-bold text-white tabular-nums">2 Orders</div>
                     <p className="text-[11px] text-amber-400 mt-0.5">$23,200 USD in queue</p>
                   </div>
 
-                  <div className="p-3 rounded-lg border border-[#1F232B] bg-[#0E1015]">
+                  <div className="p-3.5 rounded-lg border border-[#1F232B] bg-[#0E1015]">
                     <div className="text-[11px] font-semibold uppercase tracking-wider text-[#717684] mb-0.5">Active In Transit</div>
                     <div className="text-base font-bold text-white tabular-nums">1 Shipment</div>
                     <p className="text-[11px] text-blue-400 mt-0.5">Truck #04 ETA 35 mins</p>
                   </div>
 
-                  <div className="p-3 rounded-lg border border-[#1F232B] bg-[#0E1015]">
+                  <div className="p-3.5 rounded-lg border border-[#1F232B] bg-[#0E1015]">
                     <div className="text-[11px] font-semibold uppercase tracking-wider text-[#717684] mb-0.5">Collected Volume</div>
                     <div className="text-base font-bold text-white tabular-nums">$65,060 USD</div>
                     <p className="text-[11px] text-emerald-400 mt-0.5">100% Reconciled</p>
                   </div>
 
-                  <div className="p-3 rounded-lg border border-[#1F232B] bg-[#0E1015]">
+                  <div className="p-3.5 rounded-lg border border-[#1F232B] bg-[#0E1015]">
                     <div className="text-[11px] font-semibold uppercase tracking-wider text-[#717684] mb-0.5">System Latency</div>
                     <div className="text-base font-bold text-white tabular-nums">0.2ms Perceived</div>
                     <p className="text-[11px] text-emerald-400 mt-0.5">Local NVMe on LAN</p>
                   </div>
                 </div>
 
-                {/* Operational Toolbar */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  
-                  {/* Status Filters */}
-                  <div className="inline-flex p-0.5 rounded-lg bg-[#14161D] border border-[#20232B] text-xs font-medium">
-                    <button
-                      onClick={() => setB2BFilter('all')}
-                      className={`px-2.5 py-1 rounded transition-colors ${
-                        b2bFilter === 'all' ? 'bg-[#1E2129] text-white shadow-sm' : 'text-[#717684] hover:text-white'
-                      }`}
-                    >
-                      All ({b2bOrders.length})
-                    </button>
-                    <button
-                      onClick={() => setB2BFilter('pending')}
-                      className={`px-2.5 py-1 rounded transition-colors ${
-                        b2bFilter === 'pending' ? 'bg-[#1E2129] text-amber-300 shadow-sm' : 'text-[#717684] hover:text-white'
-                      }`}
-                    >
-                      Pending ({b2bOrders.filter(o => o.status === 'Pending Approval').length})
-                    </button>
-                    <button
-                      onClick={() => setB2BFilter('transit')}
-                      className={`px-2.5 py-1 rounded transition-colors ${
-                        b2bFilter === 'transit' ? 'bg-[#1E2129] text-blue-300 shadow-sm' : 'text-[#717684] hover:text-white'
-                      }`}
-                    >
-                      In Transit ({b2bOrders.filter(o => o.status === 'In Transit').length})
-                    </button>
-                    <button
-                      onClick={() => setB2BFilter('completed')}
-                      className={`px-2.5 py-1 rounded transition-colors ${
-                        b2bFilter === 'completed' ? 'bg-[#1E2129] text-emerald-300 shadow-sm' : 'text-[#717684] hover:text-white'
-                      }`}
-                    >
-                      Invoiced ({b2bOrders.filter(o => o.status === 'Invoiced & Completed' || o.status === 'Approved & Queued').length})
-                    </button>
-                  </div>
-
-                  {/* Search Bar & Quick Order Button */}
-                  <div className="flex items-center gap-2">
-                    <div className="relative">
-                      <Search className="w-3.5 h-3.5 text-[#585B64] absolute left-2.5 top-1/2 -translate-y-1/2" />
-                      <input 
-                        type="text"
-                        placeholder="Search client, SKU, or order ID..."
-                        value={b2bSearch}
-                        onChange={(e) => setB2BSearch(e.target.value)}
-                        className="bg-[#14161D] border border-[#232731] rounded-md pl-8 pr-3 py-1.5 text-xs text-white placeholder:text-[#585B64] focus:outline-none focus:border-[#F84B11] transition-colors w-52 sm:w-60"
-                      />
-                    </div>
-                    <button 
-                      onClick={handleQuickAddB2BOrder}
-                      className="px-3 py-1.5 rounded-md bg-[#161922] hover:bg-[#1E222D] active:scale-[0.97] border border-[#232731] hover:border-[#F84B11]/50 text-xs font-medium text-white flex items-center gap-1.5 transition-all duration-150 cursor-pointer"
-                    >
-                      <Plus className="w-3.5 h-3.5 text-[#F84B11]" />
-                      <span>New Order</span>
-                    </button>
-                  </div>
-
-                </div>
-
-                {/* Vorsik Production Table */}
-                <div className="overflow-x-auto border border-[#1F232B] rounded-lg bg-[#0A0C10]">
-                  <table className="w-full text-left text-xs">
-                    <thead className="border-b border-[#1F232B] text-[#585B64] bg-[#0E1015] uppercase tracking-wider font-semibold text-[11px]">
-                      <tr>
-                        <th className="py-2.5 px-4 font-medium">Order ID</th>
-                        <th className="py-2.5 px-4 font-medium">Account / Client</th>
-                        <th className="py-2.5 px-4 font-medium">SKU Breakdown</th>
-                        <th className="py-2.5 px-4 font-medium">Total Amount</th>
-                        <th className="py-2.5 px-4 font-medium">Fulfillment SLA</th>
-                        <th className="py-2.5 px-4 font-medium">Status</th>
-                        <th className="py-2.5 px-4 text-right font-medium">Operational Action</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-[#171920]">
-                      {filteredB2BOrders.map((order) => (
-                        <tr key={order.id} className="hover:bg-[#141620] transition-colors duration-150">
-                          <td className="py-3 px-4 font-mono font-semibold text-[#F84B11]">{order.id}</td>
-                          <td className="py-3 px-4 font-semibold text-white">
-                            <div>{order.client}</div>
-                            <div className="text-[10px] text-[#717684] font-normal">{order.notes}</div>
-                          </td>
-                          <td className="py-3 px-4 text-[#EDEDED]">
-                            <span>{order.items}</span>
-                            <span className="text-[#717684] ml-1.5">({order.units} units)</span>
-                          </td>
-                          <td className="py-3 px-4 tabular-nums font-semibold text-white">{order.total}</td>
-                          <td className="py-3 px-4 text-[#94979E] text-[11px]">{order.sla}</td>
-                          <td className="py-3 px-4">
-                            <span className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium transition-colors ${
-                              order.status === 'Approved & Queued' 
-                                ? 'bg-emerald-950/60 text-emerald-400 border border-emerald-800/40' 
-                                : order.status === 'In Transit'
-                                ? 'bg-blue-950/60 text-blue-400 border border-blue-800/40'
-                                : order.status === 'Invoiced & Completed'
-                                ? 'bg-zinc-800/60 text-zinc-300 border border-zinc-700/40'
-                                : 'bg-[#251A15] text-[#F84B11] border border-[#F84B11]/30'
-                            }`}>
-                              {order.status}
+                {/* SUBVIEW A: VISUAL CARDS & PIPELINE (DEFAULT) */}
+                {vorsikSubView === 'cards' ? (
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+                    
+                    {/* Pipeline Columns Container (7 cols) */}
+                    <div className="lg:col-span-7 space-y-4">
+                      
+                      {/* Stage 1: Needs Approval */}
+                      <div data-build-showroom className="p-4 rounded-xl border border-[#232731] bg-[#0E1015] space-y-3">
+                        <div className="flex items-center justify-between pb-2 border-b border-[#1A1D24]">
+                          <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 rounded-full bg-amber-400" />
+                            <span className="text-xs font-bold uppercase tracking-wider text-white">Stage 1: Needs Approval</span>
+                            <span className="px-1.5 py-0.2 rounded bg-amber-950/80 text-amber-300 font-mono text-[10px] border border-amber-800/40">
+                              {b2bOrders.filter(o => o.status === 'Pending Approval').length} Orders
                             </span>
-                          </td>
-                          <td className="py-3 px-4 text-right">
-                            {order.status === 'Pending Approval' ? (
-                              <button
-                                onClick={() => handleApproveB2BOrder(order.id)}
-                                className="px-2.5 py-1 rounded bg-[#F84B11] hover:bg-[#ff5d26] active:scale-[0.95] text-white font-medium text-[11px] transition-all duration-150 cursor-pointer shadow-sm hover:shadow-[#F84B11]/30 hover:-translate-y-0.5 inline-flex items-center gap-1"
-                              >
-                                <Zap className="w-3 h-3 fill-current" />
-                                <span>Approve & Dispatch</span>
-                              </button>
-                            ) : order.status === 'Approved & Queued' ? (
-                              <button
-                                onClick={() => handleGenerateB2BInvoice(order.id)}
-                                className="px-2.5 py-1 rounded bg-emerald-950/70 hover:bg-emerald-900/80 active:scale-[0.95] text-emerald-300 border border-emerald-700/50 font-medium text-[11px] transition-all duration-150 cursor-pointer inline-flex items-center gap-1"
-                              >
-                                <FileText className="w-3 h-3" />
-                                <span>Issue Invoice</span>
-                              </button>
-                            ) : order.status === 'In Transit' ? (
-                              <button
-                                onClick={() => {
-                                  setToastMessage(`Truck #04 en route to ${order.client}. GPS ping: 0.1ms.`);
-                                  setTimeout(() => setToastMessage(null), 3000);
-                                }}
-                                className="px-2.5 py-1 rounded bg-blue-950/70 hover:bg-blue-900/80 active:scale-[0.95] text-blue-300 border border-blue-700/50 font-medium text-[11px] transition-all duration-150 cursor-pointer inline-flex items-center gap-1"
-                              >
-                                <Truck className="w-3 h-3" />
-                                <span>Track Truck</span>
-                              </button>
-                            ) : (
-                              <span className="inline-flex items-center gap-1 text-[11px] text-emerald-400 font-medium">
-                                <CheckCircle2 className="w-3 h-3" />
-                                <span>Invoiced & Audited</span>
+                          </div>
+                          <span className="text-[11px] text-amber-400 font-semibold">$23,200 USD</span>
+                        </div>
+
+                        <div className="space-y-2.5">
+                          {b2bOrders.filter(o => o.status === 'Pending Approval').map(order => (
+                            <div
+                              key={order.id}
+                              onClick={() => setSelectedOrderId(order.id)}
+                              className={`p-3.5 rounded-lg border transition-all cursor-pointer ${
+                                selectedOrderId === order.id
+                                  ? 'border-[#F84B11] bg-[#141620] shadow-md shadow-[#F84B11]/10'
+                                  : 'border-[#1E222A] bg-[#0A0C10] hover:border-[#2C303B]'
+                              }`}
+                            >
+                              <div className="flex items-start justify-between gap-2 mb-1.5">
+                                <div>
+                                  <span className="font-mono text-xs font-semibold text-[#F84B11] mr-2">{order.id}</span>
+                                  <span className="font-semibold text-white text-xs">{order.client}</span>
+                                </div>
+                                <span className="tabular-nums font-bold text-white text-xs">{order.total}</span>
+                              </div>
+
+                              <p className="text-[11px] text-[#94979E] mb-3">{order.items}</p>
+
+                              <div className="flex items-center justify-between text-[11px]">
+                                <span className="text-[#717684] flex items-center gap-1">
+                                  <Clock3 className="w-3 h-3 text-amber-400" />
+                                  <span>SLA: {order.sla}</span>
+                                </span>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleApproveB2BOrder(order.id);
+                                  }}
+                                  className="px-2.5 py-1 rounded bg-[#F84B11] hover:bg-[#ff5d26] active:scale-[0.95] text-white font-medium text-[11px] transition-all flex items-center gap-1 shadow-sm cursor-pointer"
+                                >
+                                  <Zap className="w-3 h-3 fill-current" />
+                                  <span>Authorize & Queue</span>
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Stage 2: Active Dispatch & In Transit */}
+                      <div data-build-showroom className="p-4 rounded-xl border border-[#232731] bg-[#0E1015] space-y-3">
+                        <div className="flex items-center justify-between pb-2 border-b border-[#1A1D24]">
+                          <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 rounded-full bg-blue-400" />
+                            <span className="text-xs font-bold uppercase tracking-wider text-white">Stage 2: In Transit / Fulfillment</span>
+                            <span className="px-1.5 py-0.2 rounded bg-blue-950/80 text-blue-300 font-mono text-[10px] border border-blue-800/40">
+                              {b2bOrders.filter(o => o.status === 'In Transit').length} En Route
+                            </span>
+                          </div>
+                          <span className="text-[11px] text-blue-400 font-semibold">$28,400 USD</span>
+                        </div>
+
+                        <div className="space-y-2.5">
+                          {b2bOrders.filter(o => o.status === 'In Transit').map(order => (
+                            <div
+                              key={order.id}
+                              onClick={() => setSelectedOrderId(order.id)}
+                              className={`p-3.5 rounded-lg border transition-all cursor-pointer ${
+                                selectedOrderId === order.id
+                                  ? 'border-[#F84B11] bg-[#141620] shadow-md shadow-[#F84B11]/10'
+                                  : 'border-[#1E222A] bg-[#0A0C10] hover:border-[#2C303B]'
+                              }`}
+                            >
+                              <div className="flex items-start justify-between gap-2 mb-1.5">
+                                <div>
+                                  <span className="font-mono text-xs font-semibold text-[#F84B11] mr-2">{order.id}</span>
+                                  <span className="font-semibold text-white text-xs">{order.client}</span>
+                                </div>
+                                <span className="tabular-nums font-bold text-white text-xs">{order.total}</span>
+                              </div>
+
+                              <p className="text-[11px] text-[#94979E] mb-2">{order.items}</p>
+
+                              {/* Visual Route Progress */}
+                              <div className="p-2.5 rounded bg-[#12141C] border border-[#1C2028] mb-2.5">
+                                <div className="flex items-center justify-between text-[10px] text-[#94979E] mb-1">
+                                  <span className="text-white font-medium">Truck #04 • Regional Corridor</span>
+                                  <span className="text-blue-400 font-semibold">68% Dispatched</span>
+                                </div>
+                                <div className="w-full bg-[#1C2028] h-1.5 rounded-full overflow-hidden">
+                                  <div className="bg-blue-500 h-full w-[68%] rounded-full" />
+                                </div>
+                                <div className="flex items-center justify-between text-[10px] text-[#717684] mt-1.5">
+                                  <span>Waypoint: Highway Interlink 4</span>
+                                  <span className="text-emerald-400 font-medium">ETA 35 mins</span>
+                                </div>
+                              </div>
+
+                              <div className="flex items-center justify-between text-[11px]">
+                                <span className="text-[#717684] text-[10px]">{order.notes}</span>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setToastMessage(`Truck #04 GPS ping: 1.4 miles to delivery dock. Telemetry synced (0.1ms).`);
+                                    setTimeout(() => setToastMessage(null), 3000);
+                                  }}
+                                  className="px-2.5 py-1 rounded bg-blue-950/70 hover:bg-blue-900/80 active:scale-[0.95] text-blue-300 border border-blue-700/50 font-medium text-[11px] transition-all flex items-center gap-1 cursor-pointer"
+                                >
+                                  <Truck className="w-3 h-3" />
+                                  <span>Track Driver</span>
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                    </div>
+
+                    {/* Right: Live Order Inspector & One-Click Billing Console (5 cols) */}
+                    <div data-build-showroom className="lg:col-span-5 p-4 sm:p-5 rounded-xl border border-[#232731] bg-[#0E1015] flex flex-col justify-between">
+                      <div>
+                        <div className="flex items-center justify-between pb-3 border-b border-[#1A1D24] mb-4">
+                          <div>
+                            <span className="text-[11px] font-semibold uppercase tracking-wider text-[#F84B11]">Live Order Inspector</span>
+                            <h4 className="text-base font-bold text-white flex items-center gap-2 mt-0.5">
+                              <span>{selectedOrder.id}</span>
+                              <span className={`px-2 py-0.5 rounded text-[10px] font-medium border ${
+                                selectedOrder.status === 'Pending Approval'
+                                  ? 'bg-amber-950/70 text-amber-300 border-amber-800/40'
+                                  : selectedOrder.status === 'In Transit'
+                                  ? 'bg-blue-950/70 text-blue-300 border-blue-800/40'
+                                  : 'bg-emerald-950/70 text-emerald-300 border-emerald-800/40'
+                              }`}>
+                                {selectedOrder.status}
                               </span>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                            </h4>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-[10px] text-[#717684]">Total Order Net</div>
+                            <div className="text-base font-bold text-white tabular-nums">{selectedOrder.total}</div>
+                          </div>
+                        </div>
+
+                        {/* Account Profile Card */}
+                        <div className="p-3 rounded-lg bg-[#0A0C10] border border-[#1A1D24] mb-4 space-y-2 text-xs">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[#717684]">Client Account:</span>
+                            <span className="font-semibold text-white truncate max-w-[200px]">{selectedOrder.client}</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-[#717684]">Account Executive:</span>
+                            <span className="text-[#EDEDED]">{selectedOrder.rep}</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-[#717684]">Payment Terms:</span>
+                            <span className="text-emerald-400 font-medium">Net-30 (Approved Credit)</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-[#717684]">Delivery SLA:</span>
+                            <span className="text-[#EDEDED]">{selectedOrder.sla}</span>
+                          </div>
+                        </div>
+
+                        {/* SKU Breakdown Visual List */}
+                        <div className="space-y-2 mb-4">
+                          <div className="text-[11px] font-semibold uppercase tracking-wider text-[#717684]">Verified Line Items</div>
+                          <div className="p-3 rounded-lg bg-[#0A0C10] border border-[#1A1D24]">
+                            <div className="flex items-center justify-between text-xs font-semibold text-white mb-1">
+                              <span>{selectedOrder.items}</span>
+                              <span className="tabular-nums">{selectedOrder.total}</span>
+                            </div>
+                            <div className="text-[10px] text-[#717684] flex items-center justify-between">
+                              <span>Quantity: {selectedOrder.units} units</span>
+                              <span className="text-emerald-400 font-medium">Barcode Verified (0ms)</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* One-Click Tactical Actions */}
+                      <div className="space-y-2 pt-3 border-t border-[#1A1D24]">
+                        {selectedOrder.status === 'Pending Approval' ? (
+                          <button
+                            onClick={() => handleApproveB2BOrder(selectedOrder.id)}
+                            className="w-full py-2.5 rounded-lg bg-[#F84B11] hover:bg-[#ff5d26] active:scale-[0.98] text-white font-semibold text-xs transition-all flex items-center justify-center gap-2 shadow-lg shadow-[#F84B11]/20 cursor-pointer"
+                          >
+                            <Zap className="w-4 h-4 fill-current" />
+                            <span>Authorize Order & Queue Dispatch</span>
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => handleGenerateB2BInvoice(selectedOrder.id)}
+                            className="w-full py-2.5 rounded-lg bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-700/60 active:scale-[0.98] text-emerald-300 font-semibold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm"
+                          >
+                            <FileText className="w-4 h-4" />
+                            <span>{selectedOrder.invoiced ? 'Re-Issue Encrypted Invoice' : 'Generate & Send PDF Invoice'}</span>
+                          </button>
+                        )}
+
+                        <div className="text-[10px] text-[#585B64] text-center pt-1">
+                          Cryptographic local WAL hash: 0x8f2a...99c4 • Synchronized
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                ) : (
+                  /* SUBVIEW B: HIGH-DENSITY TABLE VIEW (ALTERNATIVE) */
+                  <div className="space-y-4 animate-fade-in">
+                    
+                    {/* Operational Toolbar */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      
+                      {/* Status Filters */}
+                      <div className="inline-flex p-0.5 rounded-lg bg-[#14161D] border border-[#20232B] text-xs font-medium">
+                        <button
+                          onClick={() => setB2BFilter('all')}
+                          className={`px-2.5 py-1 rounded transition-colors ${
+                            b2bFilter === 'all' ? 'bg-[#1E2129] text-white shadow-sm' : 'text-[#717684] hover:text-white'
+                          }`}
+                        >
+                          All ({b2bOrders.length})
+                        </button>
+                        <button
+                          onClick={() => setB2BFilter('pending')}
+                          className={`px-2.5 py-1 rounded transition-colors ${
+                            b2bFilter === 'pending' ? 'bg-[#1E2129] text-amber-300 shadow-sm' : 'text-[#717684] hover:text-white'
+                          }`}
+                        >
+                          Pending ({b2bOrders.filter(o => o.status === 'Pending Approval').length})
+                        </button>
+                        <button
+                          onClick={() => setB2BFilter('transit')}
+                          className={`px-2.5 py-1 rounded transition-colors ${
+                            b2bFilter === 'transit' ? 'bg-[#1E2129] text-blue-300 shadow-sm' : 'text-[#717684] hover:text-white'
+                          }`}
+                        >
+                          In Transit ({b2bOrders.filter(o => o.status === 'In Transit').length})
+                        </button>
+                        <button
+                          onClick={() => setB2BFilter('completed')}
+                          className={`px-2.5 py-1 rounded transition-colors ${
+                            b2bFilter === 'completed' ? 'bg-[#1E2129] text-emerald-300 shadow-sm' : 'text-[#717684] hover:text-white'
+                          }`}
+                        >
+                          Invoiced ({b2bOrders.filter(o => o.status === 'Invoiced & Completed' || o.status === 'Approved & Queued').length})
+                        </button>
+                      </div>
+
+                      {/* Search Bar & Quick Order Button */}
+                      <div className="flex items-center gap-2">
+                        <div className="relative">
+                          <Search className="w-3.5 h-3.5 text-[#585B64] absolute left-2.5 top-1/2 -translate-y-1/2" />
+                          <input 
+                            type="text"
+                            placeholder="Search client, SKU, or order ID..."
+                            value={b2bSearch}
+                            onChange={(e) => setB2BSearch(e.target.value)}
+                            className="bg-[#14161D] border border-[#232731] rounded-md pl-8 pr-3 py-1.5 text-xs text-white placeholder:text-[#585B64] focus:outline-none focus:border-[#F84B11] transition-colors w-52 sm:w-60"
+                          />
+                        </div>
+                        <button 
+                          onClick={handleQuickAddB2BOrder}
+                          className="px-3 py-1.5 rounded-md bg-[#161922] hover:bg-[#1E222D] active:scale-[0.97] border border-[#232731] hover:border-[#F84B11]/50 text-xs font-medium text-white flex items-center gap-1.5 transition-all duration-150 cursor-pointer"
+                        >
+                          <Plus className="w-3.5 h-3.5 text-[#F84B11]" />
+                          <span>New Order</span>
+                        </button>
+                      </div>
+
+                    </div>
+
+                    {/* Vorsik Production Table */}
+                    <div className="overflow-x-auto border border-[#1F232B] rounded-lg bg-[#0A0C10]">
+                      <table className="w-full text-left text-xs">
+                        <thead className="border-b border-[#1F232B] text-[#585B64] bg-[#0E1015] uppercase tracking-wider font-semibold text-[11px]">
+                          <tr>
+                            <th className="py-2.5 px-4 font-medium">Order ID</th>
+                            <th className="py-2.5 px-4 font-medium">Account / Client</th>
+                            <th className="py-2.5 px-4 font-medium">SKU Breakdown</th>
+                            <th className="py-2.5 px-4 font-medium">Total Amount</th>
+                            <th className="py-2.5 px-4 font-medium">Fulfillment SLA</th>
+                            <th className="py-2.5 px-4 font-medium">Status</th>
+                            <th className="py-2.5 px-4 text-right font-medium">Operational Action</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-[#171920]">
+                          {filteredB2BOrders.map((order) => (
+                            <tr key={order.id} className="hover:bg-[#141620] transition-colors duration-150">
+                              <td className="py-3 px-4 font-mono font-semibold text-[#F84B11]">{order.id}</td>
+                              <td className="py-3 px-4 font-semibold text-white">
+                                <div>{order.client}</div>
+                                <div className="text-[10px] text-[#717684] font-normal">{order.notes}</div>
+                              </td>
+                              <td className="py-3 px-4 text-[#EDEDED]">
+                                <span>{order.items}</span>
+                                <span className="text-[#717684] ml-1.5">({order.units} units)</span>
+                              </td>
+                              <td className="py-3 px-4 tabular-nums font-semibold text-white">{order.total}</td>
+                              <td className="py-3 px-4 text-[#94979E] text-[11px]">{order.sla}</td>
+                              <td className="py-3 px-4">
+                                <span className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium transition-colors ${
+                                  order.status === 'Approved & Queued' 
+                                    ? 'bg-emerald-950/60 text-emerald-400 border border-emerald-800/40' 
+                                    : order.status === 'In Transit'
+                                    ? 'bg-blue-950/60 text-blue-400 border border-blue-800/40'
+                                    : order.status === 'Invoiced & Completed'
+                                    ? 'bg-zinc-800/60 text-zinc-300 border border-zinc-700/40'
+                                    : 'bg-[#251A15] text-[#F84B11] border border-[#F84B11]/30'
+                                }`}>
+                                  {order.status}
+                                </span>
+                              </td>
+                              <td className="py-3 px-4 text-right">
+                                {order.status === 'Pending Approval' ? (
+                                  <button
+                                    onClick={() => handleApproveB2BOrder(order.id)}
+                                    className="px-2.5 py-1 rounded bg-[#F84B11] hover:bg-[#ff5d26] active:scale-[0.95] text-white font-medium text-[11px] transition-all duration-150 cursor-pointer shadow-sm hover:shadow-[#F84B11]/30 hover:-translate-y-0.5 inline-flex items-center gap-1"
+                                  >
+                                    <Zap className="w-3 h-3 fill-current" />
+                                    <span>Approve & Dispatch</span>
+                                  </button>
+                                ) : order.status === 'Approved & Queued' ? (
+                                  <button
+                                    onClick={() => handleGenerateB2BInvoice(order.id)}
+                                    className="px-2.5 py-1 rounded bg-emerald-950/70 hover:bg-emerald-900/80 active:scale-[0.95] text-emerald-300 border border-emerald-700/50 font-medium text-[11px] transition-all duration-150 cursor-pointer inline-flex items-center gap-1"
+                                  >
+                                    <FileText className="w-3 h-3" />
+                                    <span>Issue Invoice</span>
+                                  </button>
+                                ) : order.status === 'In Transit' ? (
+                                  <button
+                                    onClick={() => {
+                                      setToastMessage(`Truck #04 en route to ${order.client}. GPS ping: 0.1ms.`);
+                                      setTimeout(() => setToastMessage(null), 3000);
+                                    }}
+                                    className="px-2.5 py-1 rounded bg-blue-950/70 hover:bg-blue-900/80 active:scale-[0.95] text-blue-300 border border-blue-700/50 font-medium text-[11px] transition-all duration-150 cursor-pointer inline-flex items-center gap-1"
+                                  >
+                                    <Truck className="w-3 h-3" />
+                                    <span>Track Truck</span>
+                                  </button>
+                                ) : (
+                                  <span className="inline-flex items-center gap-1 text-[11px] text-emerald-400 font-medium">
+                                    <CheckCircle2 className="w-3 h-3" />
+                                    <span>Invoiced & Audited</span>
+                                  </span>
+                                )}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
 
                 {/* Vorsik System Audit & Integrity Footer */}
                 <div className="flex flex-wrap items-center justify-between text-[11px] text-[#717684] pt-1">

@@ -514,6 +514,109 @@
     });
   }
 
+  async function buildTargets(elements, customSpeed) {
+    if (!elements || !elements.length) return;
+    
+    elements.forEach(el => {
+      el.removeAttribute(BUILT);
+      el.style.opacity = '0';
+      el.style.visibility = 'hidden';
+    });
+
+    const layer = createOverlay();
+    const speed = customSpeed || 1.4;
+
+    const queue = elements
+      .map(element => ({ element, ...box(element) }))
+      .sort((a, b) => (Math.abs(a.y - b.y) < 24 ? a.x - b.x : a.y - b.y))
+      .map(item => item.element);
+
+    const activeCrew = crew();
+    const agentCount = Math.min(queue.length, 4);
+
+    const tasks = Array.from({ length: agentCount }, async (_, index) => {
+      const agent = activeCrew[index % activeCrew.length];
+      const cursor = document.createElement("div");
+      cursor.className = "agent";
+      cursor.style.color = agent.color;
+      cursor.innerHTML = ARROW;
+
+      const label = document.createElement("span");
+      label.className = "name";
+      label.textContent = agent.name;
+      label.style.cssText = `background:${agent.color};color:${agent.ink}`;
+      cursor.appendChild(label);
+      layer.appendChild(cursor);
+
+      let position = edgePoint();
+      cursor.style.transform = `translate(${position.x}px,${position.y}px)`;
+      await sleep((index * 80) / speed);
+
+      async function flyTo(next, fixedDuration) {
+        const distance = Math.hypot(next.x - position.x, next.y - position.y);
+        const duration = fixedDuration !== undefined ? fixedDuration : Math.min(600, 200 + distance * 0.45) / speed;
+        await play(
+          cursor,
+          [
+            { transform: `translate(${position.x}px,${position.y}px)` },
+            { transform: `translate(${next.x}px,${next.y}px)` },
+          ],
+          { duration, easing: "cubic-bezier(.45,0,.2,1)" }
+        );
+        position = next;
+      }
+
+      while (queue.length > 0) {
+        const element = queue.shift();
+        if (!element) break;
+
+        const start = box(element);
+        await flyTo({ x: start.x - 4, y: start.y - 4 });
+
+        const { x, y, w, h } = box(element);
+        const frame = document.createElement("div");
+        frame.className = "frame";
+        frame.style.cssText = `left:${x}px;top:${y}px;width:0;height:0;--c:${agent.color};--ink:${agent.ink}`;
+        frame.innerHTML = "<i></i><i></i><i></i><i></i>";
+        const size = document.createElement("span");
+        size.className = "size";
+        size.textContent = `${Math.round(w)} × ${Math.round(h)}`;
+        frame.appendChild(size);
+        layer.insertBefore(frame, layer.firstChild);
+
+        const drawMs = Math.min(500, 220 + Math.hypot(w, h) * 0.4) / speed;
+        position = { x: x - 4, y: y - 4 };
+        await Promise.all([
+          play(frame, [{ width: "0px", height: "0px" }, { width: `${w}px`, height: `${h}px` }], {
+            duration: drawMs,
+            easing: "cubic-bezier(.3,0,.2,1)",
+          }),
+          flyTo({ x: x + w - 4, y: y + h - 4 }, drawMs),
+          play(size, [{ opacity: 0 }, { opacity: 1 }], { duration: drawMs * 0.3, delay: drawMs * 0.6 }),
+        ]);
+
+        element.style.visibility = 'visible';
+        element.style.opacity = '1';
+        element.style.transition = 'opacity 0.25s ease';
+        element.setAttribute(BUILT, "");
+
+        play(frame, [{ opacity: 1 }, { opacity: 0 }], { duration: 300 / speed, delay: 100 / speed }).then(() =>
+          frame.remove()
+        );
+        await sleep(50 / speed);
+      }
+
+      await Promise.all([
+        flyTo(edgePoint(), 550 / speed),
+        play(cursor, [{ opacity: 1 }, { opacity: 0 }], { duration: 400 / speed, delay: 150 / speed }),
+      ]);
+      cursor.remove();
+    });
+
+    await Promise.all(tasks);
+    if (host) host.remove();
+  }
+
   function start(force = false) {
     if (force) return replay();
     if (running) return;
@@ -530,6 +633,7 @@
     start,
     replay,
     finish,
+    buildTargets,
     whenBuilt,
     isRunning: () => running,
     config,
