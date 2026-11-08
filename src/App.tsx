@@ -4,19 +4,14 @@ import {
   ArrowRight, 
   CheckCircle2, 
   XCircle, 
-  Activity, 
   FileSpreadsheet, 
-  HardDrive, 
   RefreshCw, 
-  Download, 
   Code2, 
   Building2, 
   Clock3, 
   Cpu, 
   HelpCircle,
   Truck,
-  Wrench,
-  ShieldCheck,
   ChevronDown,
   Check,
   Menu,
@@ -25,36 +20,127 @@ import {
   ChevronRight,
   Calculator,
   GripVertical,
-  Layers
+  Layers,
+  Zap,
+  RotateCcw,
+  AlertTriangle,
+  FileText,
+  Database,
+  Search,
+  Plus
 } from 'lucide-react';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'client-app' | 'admin-hub'>('client-app');
-  
-  // Interactive client app state
-  const [searchQuery, setSearchQuery] = useState('');
-  const [orders, setOrders] = useState([
-    { id: 'ORD-8942', client: 'Northern Distribution Logistics Inc.', total: '$14,250 USD', status: 'Pending', items: 120, date: 'Today, 10:14 AM' },
-    { id: 'ORD-8941', client: 'St. Mary Surgical Center', total: '$6,800 USD', status: 'Approved', items: 45, date: 'Today, 09:42 AM' },
-    { id: 'ORD-8940', client: 'Pacific Heavy Contracting LLC', total: '$28,400 USD', status: 'In Transit', items: 310, date: 'Yesterday, 06:20 PM' },
-    { id: 'ORD-8939', client: 'Global Freight Systems Corp.', total: '$4,120 USD', status: 'Approved', items: 18, date: 'Yesterday, 04:05 PM' },
-  ]);
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  // Unified Interactive Transformation Showroom State
+  type TransformationMode = 'spreadsheet' | 'transforming' | 'vorsik';
+  const [transformationMode, setTransformationMode] = useState<TransformationMode>('spreadsheet');
+  const [transformLogStep, setTransformLogStep] = useState<number>(1);
 
-  // Interactive backups state (Vorsik Core Hub)
-  const [backups, setBackups] = useState([
-    { id: 'SNAP-20261107-0300', date: 'Today, 03:00 AM', size: '48.2 MB', type: 'Automated', status: 'AES-256 Encrypted' },
-    { id: 'SNAP-20261106-0300', date: 'Nov 06, 03:00 AM', size: '47.9 MB', type: 'Automated', status: 'AES-256 Encrypted' },
-    { id: 'SNAP-20261105-0300', date: 'Nov 05, 03:00 AM', size: '47.1 MB', type: 'Automated', status: 'AES-256 Encrypted' },
-  ]);
-  const [isBackingUp, setIsBackingUp] = useState(false);
+  // B2B Orders and Invoicing State
+  interface B2BOrder {
+    id: string;
+    client: string;
+    items: string;
+    units: number;
+    total: string;
+    amount: number;
+    status: 'Pending Approval' | 'Approved & Queued' | 'In Transit' | 'Invoiced & Completed';
+    sla: string;
+    rep: string;
+    invoiced: boolean;
+    notes: string;
+  }
+
+  const initialB2BOrders: B2BOrder[] = [
+    {
+      id: 'ORD-8942',
+      client: 'Northern Distribution Logistics Inc.',
+      items: '120x High-Pressure Hydraulic Valve Seals',
+      units: 120,
+      total: '$14,250.00',
+      amount: 14250,
+      status: 'Pending Approval',
+      sla: 'Today, 04:00 PM',
+      rep: 'M. Chen',
+      invoiced: false,
+      notes: 'Credit verified via local accounting bridge'
+    },
+    {
+      id: 'ORD-8941',
+      client: 'St. Mary Surgical Center',
+      items: '45x HEPA Medical Grade Filter Kits',
+      units: 45,
+      total: '$6,800.00',
+      amount: 6800,
+      status: 'Approved & Queued',
+      sla: 'Tomorrow, 10:00 AM',
+      rep: 'A. Vance',
+      invoiced: true,
+      notes: 'Priority clinical delivery with tamper seal'
+    },
+    {
+      id: 'ORD-8940',
+      client: 'Pacific Heavy Contracting LLC',
+      items: '310x Heavy Industrial Drive Bearings',
+      units: 310,
+      total: '$28,400.00',
+      amount: 28400,
+      status: 'In Transit',
+      sla: 'Today, 06:30 PM (Truck #04)',
+      rep: 'E. Morales',
+      invoiced: true,
+      notes: 'Driver dispatch confirmed with GPS waypoint'
+    },
+    {
+      id: 'ORD-8939',
+      client: 'Apex Commercial Systems Corp.',
+      items: '18x Digital Manifold Regulators',
+      units: 18,
+      total: '$4,120.00',
+      amount: 4120,
+      status: 'Invoiced & Completed',
+      sla: 'Delivered (Signature #8891)',
+      rep: 'M. Chen',
+      invoiced: true,
+      notes: 'Cryptographic receipt archived locally'
+    },
+    {
+      id: 'ORD-8938',
+      client: 'Vanguard Manufacturing Supply',
+      items: '90x Reinforced Hose Quick-Couplings',
+      units: 90,
+      total: '$8,950.00',
+      amount: 8950,
+      status: 'Pending Approval',
+      sla: 'Tomorrow, 02:00 PM',
+      rep: 'D. Ross',
+      invoiced: false,
+      notes: 'Warehouse pallet allocation confirmed'
+    },
+    {
+      id: 'ORD-8937',
+      client: 'Cascade Industrial Works LLC',
+      items: '240x Precision Machined Steel Flanges',
+      units: 240,
+      total: '$25,740.00',
+      amount: 25740,
+      status: 'Invoiced & Completed',
+      sla: 'Delivered (Dock #2)',
+      rep: 'E. Morales',
+      invoiced: true,
+      notes: 'Recurring monthly purchase agreement'
+    }
+  ];
+
+  const [b2bOrders, setB2BOrders] = useState<B2BOrder[]>(initialB2BOrders);
+  const [b2bSearch, setB2BSearch] = useState('');
+  const [b2bFilter, setB2BFilter] = useState<'all' | 'pending' | 'transit' | 'completed'>('all');
+  const [auditEventsCount, setAuditEventsCount] = useState(14);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // ROI Calculator state
   const [employees, setEmployees] = useState(25);
   const [costPerUser, setCostPerUser] = useState(65);
-
-  // Solutions / Industry archetypes state
-  const [selectedSolution, setSelectedSolution] = useState<number>(0);
 
   // FAQ Accordion state
   const [expandedFaq, setExpandedFaq] = useState<number | null>(0);
@@ -197,28 +283,83 @@ export default function App() {
     }
   };
 
-  // Trigger optimistic action (0ms latency UI)
-  const handleApproveOrder = (orderId: string) => {
-    setOrders(prev => prev.map(ord => ord.id === orderId ? { ...ord, status: 'Approved' } : ord));
-    setToastMessage(`Instant state update (0ms). Local persistence verified (12ms).`);
-    setTimeout(() => setToastMessage(null), 3500);
+  // B2B Transformation & Operations Handlers
+  const handleStartTransformation = () => {
+    setTransformationMode('transforming');
+    setTransformLogStep(1);
+    
+    setTimeout(() => setTransformLogStep(2), 600);
+    setTimeout(() => setTransformLogStep(3), 1200);
+    setTimeout(() => {
+      setTransformationMode('vorsik');
+      setToastMessage("✨ Transformation complete: PostgreSQL relational schema compiled. 0ms local query speed.");
+      setTimeout(() => setToastMessage(null), 3500);
+    }, 1850);
   };
 
-  // Trigger manual backup
-  const handleTriggerBackup = () => {
-    setIsBackingUp(true);
+  const handleReplayTransformation = () => {
+    setTransformationMode('transforming');
+    setTransformLogStep(1);
+    setTimeout(() => setTransformLogStep(2), 600);
+    setTimeout(() => setTransformLogStep(3), 1200);
     setTimeout(() => {
-      const now = new Date();
-      const timeStr = `Today, ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
-      setBackups(prev => [
-        { id: `SNAP-${now.getTime().toString().slice(-8)}`, date: timeStr, size: '48.8 MB', type: 'Manual', status: 'AES-256 Encrypted' },
-        ...prev
-      ]);
-      setIsBackingUp(false);
-      setToastMessage('Database snapshot generated and verified in local storage.');
-      setTimeout(() => setToastMessage(null), 3500);
-    }, 500);
+      setTransformationMode('vorsik');
+    }, 1850);
   };
+
+  const handleApproveB2BOrder = (orderId: string) => {
+    setB2BOrders(prev => prev.map(ord => 
+      ord.id === orderId ? { ...ord, status: 'Approved & Queued' } : ord
+    ));
+    setAuditEventsCount(c => c + 1);
+    setToastMessage(`Order ${orderId} approved (0.1ms). Dispatched to warehouse local queue.`);
+    setTimeout(() => setToastMessage(null), 3000);
+  };
+
+  const handleGenerateB2BInvoice = (orderId: string) => {
+    setB2BOrders(prev => prev.map(ord => 
+      ord.id === orderId ? { ...ord, status: 'Invoiced & Completed', invoiced: true } : ord
+    ));
+    setAuditEventsCount(c => c + 1);
+    setToastMessage(`Invoice #${orderId}-INV generated & encrypted (AES-256). Sent to accounting.`);
+    setTimeout(() => setToastMessage(null), 3000);
+  };
+
+  const handleQuickAddB2BOrder = () => {
+    const nextNum = b2bOrders.length + 43;
+    const nextId = `ORD-89${nextNum}`;
+    const newOrder: B2BOrder = {
+      id: nextId,
+      client: 'Apex Industrial Parts Ltd.',
+      items: '50x Sensor Assemblies',
+      units: 50,
+      total: '$5,400.00',
+      amount: 5400,
+      status: 'Pending Approval',
+      sla: 'Tomorrow, 09:00 AM',
+      rep: 'M. Chen',
+      invoiced: false,
+      notes: 'Direct client portal submission'
+    };
+    setB2BOrders(prev => [newOrder, ...prev]);
+    setAuditEventsCount(c => c + 1);
+    setToastMessage(`New order ${nextId} created in 0.1ms. Local WAL updated.`);
+    setTimeout(() => setToastMessage(null), 3000);
+  };
+
+  // Filtered B2B orders for the Vorsik view
+  const filteredB2BOrders = b2bOrders.filter(o => {
+    const matchesSearch = 
+      o.client.toLowerCase().includes(b2bSearch.toLowerCase()) || 
+      o.id.toLowerCase().includes(b2bSearch.toLowerCase()) ||
+      o.items.toLowerCase().includes(b2bSearch.toLowerCase());
+    
+    if (!matchesSearch) return false;
+    if (b2bFilter === 'pending') return o.status === 'Pending Approval';
+    if (b2bFilter === 'transit') return o.status === 'In Transit';
+    if (b2bFilter === 'completed') return o.status === 'Invoiced & Completed' || o.status === 'Approved & Queued';
+    return true;
+  });
 
   // Calculations for ROI
   const saasYearly = employees * costPerUser * 12;
@@ -228,35 +369,6 @@ export default function App() {
   const vorsikTotalThreeYears = vorsikInitial + vorsikMaintenanceThreeYears;
   const totalSavings = saasThreeYears - vorsikTotalThreeYears;
   const paybackMonths = Math.max(1, Math.ceil((vorsikInitial / (employees * costPerUser))));
-
-  const filteredOrders = orders.filter(o => 
-    o.client.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    o.id.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const solutions = [
-    {
-      title: 'Wholesale, Warehousing & Fleet Dispatch',
-      icon: Truck,
-      problem: 'Enterprise ERPs like SAP and NetSuite charge $120+/user/month and require 8-month implementation cycles. Team defaults to chaotic shared Excel sheets that cause order duplication.',
-      solution: 'A hardened, local-first inventory and dispatch portal. 0ms barcode scanning, real-time pick/pack validation, driver routing, and automated PDF delivery manifests.',
-      impact: '100% elimination of double-entry errors. Saves $38,000/year in seat licenses for a 30-person logistics team.'
-    },
-    {
-      title: 'Contracting, Construction & Field Job Costing',
-      icon: Wrench,
-      problem: 'Field supervisors struggle with rigid software on mobile. Subcontractor time logs, equipment rentals, and change orders get lost in WhatsApp chats and email threads.',
-      solution: 'Custom operational field portal. Offline-first daily logs, photo milestone verification, subcontractor work orders, and automatic material budget reconciliation.',
-      impact: 'Immediate cash-flow acceleration with same-day client billing instead of 3-week manual reconciliations.'
-    },
-    {
-      title: 'Clinical Operations & Secure Patient Portals',
-      icon: ShieldCheck,
-      problem: 'Commercial healthcare management tools lock records in proprietary clouds, restrict custom intake workflows, and charge aggressive per-practitioner fees.',
-      solution: 'Self-hosted clinical records, appointment dispatch, and HIPAA-compliant on-premise document vault. Zero patient data ever touches commercial third-party clouds.',
-      impact: 'Total data sovereignty, sub-second chart retrieval, and zero recurring practitioner subscription bills.'
-    }
-  ];
 
   const faqs = [
     {
@@ -307,8 +419,10 @@ export default function App() {
 
           <nav data-build="fade" className="hidden md:flex items-center gap-6 text-xs font-medium text-[#94979E]">
             <a href="#financial-model" className="hover:text-white transition-colors">Financial Model</a>
-            <a href="#demo" className="hover:text-white transition-colors">Vorsik Core Hub</a>
-            <a href="#solutions" className="hover:text-white transition-colors">Solutions</a>
+            <a href="#transformation" className="hover:text-white transition-colors flex items-center gap-1">
+              <span>Showroom</span>
+              <span className="px-1.5 py-0.2 rounded bg-[#F84B11]/20 text-[#F84B11] text-[10px] font-semibold border border-[#F84B11]/30">Live</span>
+            </a>
             <a href="#engineering" className="hover:text-white transition-colors">Engineering</a>
             <a href="#calculator" className="hover:text-white transition-colors">ROI Calculator</a>
             <a href="#faq" className="hover:text-white transition-colors">FAQ</a>
@@ -346,19 +460,14 @@ export default function App() {
                 <ArrowRight className="w-3.5 h-3.5 opacity-40" />
               </a>
               <a 
-                href="#demo" 
+                href="#transformation" 
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="px-3 py-2 rounded-md hover:bg-[#161922] hover:text-white transition-colors flex items-center justify-between"
+                className="px-3 py-2 rounded-md hover:bg-[#161922] hover:text-white transition-colors flex items-center justify-between text-[#EDEDED]"
               >
-                <span>Vorsik Core Hub</span>
-                <ArrowRight className="w-3.5 h-3.5 opacity-40" />
-              </a>
-              <a 
-                href="#solutions" 
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="px-3 py-2 rounded-md hover:bg-[#161922] hover:text-white transition-colors flex items-center justify-between"
-              >
-                <span>Solutions</span>
+                <span className="flex items-center gap-2">
+                  <Zap className="w-3.5 h-3.5 text-[#F84B11] fill-current" />
+                  <span>Showroom (Transformation)</span>
+                </span>
                 <ArrowRight className="w-3.5 h-3.5 opacity-40" />
               </a>
               <a 
@@ -833,134 +942,561 @@ export default function App() {
         </div>
       </section>
 
-      {/* The Live Interactive System (Showcase) */}
-      <section id="demo" className="py-16 px-4 sm:px-6 max-w-6xl mx-auto">
-        <div className="mb-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-          <div>
-            <div className="text-xs font-semibold uppercase tracking-wider text-[#F84B11] mb-1">Delivery Standard</div>
-            <h2 className="text-2xl font-bold text-white tracking-tight">The Vorsik System in Production</h2>
+      {/* Scroll anchors for navigation compatibility */}
+      <div id="demo" className="scroll-mt-24"></div>
+      <div id="solutions" className="scroll-mt-24"></div>
+
+      {/* Unified Interactive Transformation Showroom */}
+      <section id="transformation" className="py-20 px-4 sm:px-6 max-w-6xl mx-auto border-t border-[#1F232B]">
+        
+        {/* Section Header */}
+        <div className="mb-10 max-w-3xl">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#181B22] border border-[#272B36] text-[11px] font-semibold text-[#F84B11] tracking-wider uppercase mb-3">
+            <Zap className="w-3.5 h-3.5 fill-current" />
+            <span>Interactive Workflow Transformation</span>
           </div>
-          <div className="text-xs text-[#94979E]">
-            Interactive sandbox: test actions below to inspect sub-millisecond local response.
-          </div>
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white tracking-tight">
+            From Spreadsheet Chaos to Custom Operating System
+          </h2>
+          <p className="text-[#94979E] text-sm mt-3 leading-relaxed">
+            Most mid-sized businesses run on fragile, color-coded spreadsheets full of formula errors and untracked WhatsApp notes. Watch how Vorsik transforms manual B2B order dispatch into an owned, sub-millisecond custom operational application.
+          </p>
         </div>
 
-        <div className="rounded-xl border border-[#20232B] bg-[#0E1015] shadow-2xl overflow-hidden">
+        {/* Showroom Interactive Shell */}
+        <div className="rounded-xl border border-[#20232B] bg-[#0E1015] shadow-2xl overflow-hidden transition-all duration-300">
           
-          {/* System Frame Header */}
+          {/* Workstation Frame Header */}
           <div className="border-b border-[#1F232B] bg-[#0A0C10] px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+            
+            {/* Window Controls & State Protocol */}
             <div className="flex items-center gap-2">
-              <div className="w-2.5 h-2.5 rounded-full bg-[#20232B]" />
-              <div className="w-2.5 h-2.5 rounded-full bg-[#20232B]" />
-              <div className="w-2.5 h-2.5 rounded-full bg-[#20232B]" />
-              <span className="ml-2 tabular-nums text-xs text-[#585B64]">vorsik-engine://node-01.local</span>
+              <div className="w-2.5 h-2.5 rounded-full bg-[#2A2E39]" />
+              <div className="w-2.5 h-2.5 rounded-full bg-[#2A2E39]" />
+              <div className="w-2.5 h-2.5 rounded-full bg-[#2A2E39]" />
+              <span className="ml-2 font-mono text-xs text-[#717684]">
+                {transformationMode === 'spreadsheet' 
+                  ? 'xlsx://local/B2B_Orders_Master_2025_FINAL_v4_copy.xlsx (Sync conflict in Row 2)' 
+                  : transformationMode === 'transforming'
+                  ? 'vorsik-compiler://normalizing-schema-to-wal...'
+                  : 'vorsik-core://orders.lan (On-Premise NVMe • 0.2ms latency)'}
+              </span>
             </div>
 
-            {/* Layer Switcher */}
-            <div className="inline-flex w-full sm:w-auto p-0.5 rounded-lg bg-[#14161D] border border-[#20232B] text-xs font-medium">
-              <button
-                onClick={() => setActiveTab('client-app')}
-                className={`flex-1 sm:flex-initial px-3 py-1.5 rounded-md transition-all flex items-center justify-center gap-1.5 ${
-                  activeTab === 'client-app' 
-                    ? 'bg-[#1E2129] text-white shadow-sm' 
-                    : 'text-[#94979E] hover:text-white'
-                }`}
-              >
-                <Building2 className="w-3.5 h-3.5 text-[#F84B11]" />
-                <span className="sm:inline hidden">1. Application Layer (Operations)</span>
-                <span className="sm:hidden inline">1. App View</span>
-              </button>
-              <button
-                onClick={() => setActiveTab('admin-hub')}
-                className={`flex-1 sm:flex-initial px-3 py-1.5 rounded-md transition-all flex items-center justify-center gap-1.5 ${
-                  activeTab === 'admin-hub' 
-                    ? 'bg-[#1E2129] text-white shadow-sm' 
-                    : 'text-[#94979E] hover:text-white'
-                }`}
-              >
-                <Activity className="w-3.5 h-3.5 text-emerald-400" />
-                <span className="sm:inline hidden">2. Infrastructure Layer (Vorsik Core)</span>
-                <span className="sm:hidden inline">2. Core Hub</span>
-              </button>
+            {/* View Switcher / Interactive Trigger Pill */}
+            <div className="flex items-center gap-2">
+              <div className="inline-flex p-0.5 rounded-lg bg-[#14161D] border border-[#20232B] text-xs font-medium">
+                <button
+                  onClick={() => setTransformationMode('spreadsheet')}
+                  disabled={transformationMode === 'transforming'}
+                  className={`px-3 py-1.5 rounded-md transition-all flex items-center gap-1.5 cursor-pointer ${
+                    transformationMode === 'spreadsheet'
+                      ? 'bg-[#1E2129] text-white shadow-sm'
+                      : 'text-[#94979E] hover:text-white'
+                  }`}
+                >
+                  <FileSpreadsheet className="w-3.5 h-3.5 text-amber-400" />
+                  <span className="hidden sm:inline">1. Messy Spreadsheet (Before)</span>
+                  <span className="sm:hidden inline">1. Spreadsheet</span>
+                </button>
+
+                <button
+                  onClick={() => setTransformationMode('vorsik')}
+                  disabled={transformationMode === 'transforming'}
+                  className={`px-3 py-1.5 rounded-md transition-all flex items-center gap-1.5 cursor-pointer ${
+                    transformationMode === 'vorsik'
+                      ? 'bg-[#1E2129] text-white shadow-sm'
+                      : 'text-[#94979E] hover:text-white'
+                  }`}
+                >
+                  <Zap className="w-3.5 h-3.5 text-[#F84B11] fill-current" />
+                  <span className="hidden sm:inline">2. Vorsik Custom OS (After)</span>
+                  <span className="sm:hidden inline">2. Vorsik OS</span>
+                </button>
+              </div>
+
+              {transformationMode === 'vorsik' && (
+                <button
+                  onClick={handleReplayTransformation}
+                  className="px-2.5 py-1.5 rounded-lg border border-[#262B36] bg-[#14161D] hover:bg-[#1E222D] hover:border-[#F84B11]/50 text-xs text-[#EDEDED] flex items-center gap-1.5 transition-all cursor-pointer active:scale-95"
+                  title="Replay multiplayer build animation"
+                >
+                  <RotateCcw className="w-3.5 h-3.5 text-[#F84B11]" />
+                  <span className="hidden md:inline">Replay Build</span>
+                </button>
+              )}
             </div>
           </div>
 
-          {/* Screen Content */}
-          <div className="p-5 sm:p-7 min-h-[440px]">
-            {activeTab === 'client-app' ? (
-              <div key="client-app" className="animate-fade-in">
-                {/* Controls */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-                  <div>
-                    <h3 className="text-base font-semibold text-white flex items-center gap-2">
-                      <span>Order Fulfillment & Dispatch Module</span>
-                      <span className="text-[10px] font-medium px-2 py-0.5 rounded bg-emerald-950/60 text-emerald-400 border border-emerald-800/40">In Sync</span>
-                    </h3>
-                    <p className="text-xs text-[#94979E] mt-0.5">Designed with proper data density for administrative, operations, and logistics teams.</p>
-                  </div>
+          {/* Interactive Screen Content Canvas */}
+          <div className="relative min-h-[520px] p-4 sm:p-6 bg-[#0B0D12]">
 
-                  <div className="flex items-center gap-2">
-                    <input 
-                      type="text"
-                      placeholder="Filter by account or order ID..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="bg-[#14161D] border border-[#232731] rounded-md px-3 py-1.5 text-xs text-white placeholder:text-[#585B64] focus:outline-none focus:border-[#F84B11] transition-colors"
-                    />
-                    <button 
-                      onClick={() => {
-                        setToastMessage("Consolidated report exported to XLSX.");
-                        setTimeout(() => setToastMessage(null), 2500);
-                      }}
-                      className="px-3 py-1.5 rounded-md bg-[#161922] hover:bg-[#1E222D] active:scale-[0.97] border border-[#232731] hover:border-[#F84B11]/40 text-xs font-medium text-[#EDEDED] flex items-center gap-1.5 transition-all duration-150 cursor-pointer"
-                    >
-                      <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-400" />
-                      <span>Export XLSX</span>
-                    </button>
+            {/* TRANSFORMATION OVERLAY (Multiplayer Cursors Sweeping across) */}
+            {transformationMode === 'transforming' && (
+              <div className="absolute inset-0 z-30 bg-[#08090C]/85 backdrop-blur-sm flex flex-col items-center justify-center p-6 overflow-hidden">
+                
+                {/* Vertical Scanning Laser Beam */}
+                <div className="absolute inset-x-0 h-1 bg-gradient-to-r from-transparent via-[#F84B11] to-transparent anim-sweep-scan shadow-[0_0_15px_#F84B11]" />
+
+                {/* Flying Multiplayer Cursor 1: Arch (Lead) */}
+                <div className="absolute top-8 left-6 sm:left-12 pointer-events-none anim-cursor-arch flex flex-col items-start z-30">
+                  <div className="flex items-start gap-1">
+                    <svg className="w-5 h-5 text-purple-400 drop-shadow-md" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M4 2l16 10-7.5 1.5L9 21z" />
+                    </svg>
+                    <div className="flex flex-col">
+                      <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-semibold bg-purple-600 text-white shadow-md">
+                        Arch (Lead)
+                      </span>
+                      <span className="text-[10px] text-purple-200 bg-[#160B24]/95 border border-purple-500/40 px-1.5 py-0.5 rounded mt-0.5 whitespace-nowrap shadow-lg">
+                        Normalizing 3NF Schema & Foreign Keys...
+                      </span>
+                    </div>
+                  </div>
+                  {/* Dashed Selection Box */}
+                  <div className="w-40 sm:w-48 h-10 border-2 border-dashed border-purple-400/80 bg-purple-500/10 rounded mt-1 anim-selection-box" />
+                </div>
+
+                {/* Flying Multiplayer Cursor 2: Postgres (DB) */}
+                <div className="absolute top-8 right-6 sm:right-12 pointer-events-none anim-cursor-postgres flex flex-col items-start z-30">
+                  <div className="flex items-start gap-1">
+                    <svg className="w-5 h-5 text-emerald-400 drop-shadow-md" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M4 2l16 10-7.5 1.5L9 21z" />
+                    </svg>
+                    <div className="flex flex-col">
+                      <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-semibold bg-emerald-600 text-white shadow-md">
+                        Postgres (DB)
+                      </span>
+                      <span className="text-[10px] text-emerald-200 bg-[#061F17]/95 border border-emerald-500/40 px-1.5 py-0.5 rounded mt-0.5 whitespace-nowrap shadow-lg">
+                        Fixing #REF! & #VALUE! → ACID WAL...
+                      </span>
+                    </div>
+                  </div>
+                  {/* Dashed Selection Box */}
+                  <div className="w-40 sm:w-48 h-10 border-2 border-dashed border-emerald-400/80 bg-emerald-500/10 rounded mt-1 anim-selection-box" />
+                </div>
+
+                {/* Flying Multiplayer Cursor 3: Engine (API) */}
+                <div className="absolute bottom-8 left-6 sm:left-12 pointer-events-none anim-cursor-engine flex flex-col items-start z-30">
+                  <div className="flex items-start gap-1">
+                    <svg className="w-5 h-5 text-amber-400 drop-shadow-md" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M4 2l16 10-7.5 1.5L9 21z" />
+                    </svg>
+                    <div className="flex flex-col">
+                      <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-semibold bg-amber-600 text-white shadow-md">
+                        Engine (FastAPI)
+                      </span>
+                      <span className="text-[10px] text-amber-200 bg-[#291705]/95 border border-amber-500/40 px-1.5 py-0.5 rounded mt-0.5 whitespace-nowrap shadow-lg">
+                        Compiling Sub-millisecond Local Endpoints...
+                      </span>
+                    </div>
                   </div>
                 </div>
 
-                {/* Table */}
+                {/* Flying Multiplayer Cursor 4: UI (React) */}
+                <div className="absolute bottom-8 right-6 sm:right-12 pointer-events-none anim-cursor-ui flex flex-col items-start z-30">
+                  <div className="flex items-start gap-1">
+                    <svg className="w-5 h-5 text-cyan-400 drop-shadow-md" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M4 2l16 10-7.5 1.5L9 21z" />
+                    </svg>
+                    <div className="flex flex-col">
+                      <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-semibold bg-cyan-600 text-white shadow-md">
+                        UI (React)
+                      </span>
+                      <span className="text-[10px] text-cyan-200 bg-[#061F24]/95 border border-cyan-500/40 px-1.5 py-0.5 rounded mt-0.5 whitespace-nowrap shadow-lg">
+                        Mounting Reactive High-Density Interface...
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Central Status HUD Card */}
+                <div className="relative z-10 max-w-md w-full p-6 rounded-xl border border-[#F84B11]/40 bg-[#12141C] shadow-2xl text-center">
+                  <div className="w-10 h-10 mx-auto rounded-full bg-[#F84B11]/10 border border-[#F84B11]/30 flex items-center justify-center text-[#F84B11] mb-3 animate-spin">
+                    <RefreshCw className="w-5 h-5" />
+                  </div>
+                  <div className="text-xs font-semibold uppercase tracking-wider text-[#F84B11] mb-1">
+                    Multiplayer Engineering Pipeline Active
+                  </div>
+                  <h3 className="text-base font-bold text-white mb-2">
+                    Transforming Spreadsheet to Vorsik Operating System
+                  </h3>
+                  
+                  {/* Step status logs */}
+                  <div className="text-xs text-[#94979E] h-10 flex items-center justify-center font-mono">
+                    {transformLogStep === 1 && "Parsing unnormalized rows & removing circular references..."}
+                    {transformLogStep === 2 && "Compiling ACID PostgreSQL tables, constraints & WAL..."}
+                    {transformLogStep === 3 && "Synchronizing 0ms in-memory client view & dispatchers..."}
+                  </div>
+
+                  {/* Progress Bar */}
+                  <div className="w-full bg-[#1A1D26] h-1.5 rounded-full overflow-hidden mt-2">
+                    <div 
+                      className="bg-gradient-to-r from-amber-500 via-[#F84B11] to-emerald-400 h-full transition-all duration-300"
+                      style={{ width: `${transformLogStep === 1 ? '35%' : transformLogStep === 2 ? '70%' : '95%'}` }}
+                    />
+                  </div>
+                </div>
+
+              </div>
+            )}
+
+            {/* VIEW 1: THE MESSY SPREADSHEET (BEFORE) */}
+            {(transformationMode === 'spreadsheet' || transformationMode === 'transforming') && (
+              <div className="space-y-4 animate-fade-in">
+                
+                {/* Spreadsheet Alert Ribbon & Action Banner */}
+                <div className="p-3.5 sm:p-4 rounded-lg bg-[#18130B] border border-amber-500/30 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 rounded bg-amber-500/10 border border-amber-500/20 text-amber-400 shrink-0">
+                      <AlertTriangle className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-amber-300">Sync Conflicts & Formula Breakage Detected</span>
+                        <span className="px-1.5 py-0.2 rounded bg-red-950 text-red-400 font-mono text-[10px] border border-red-800/40">2 Cells Corrupted</span>
+                      </div>
+                      <p className="text-xs text-amber-200/80 mt-0.5">
+                        Formula dependencies broke when Column D was deleted. Multiple users editing via shared folder without role permissions.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Primary Trigger Button */}
+                  <button
+                    onClick={handleStartTransformation}
+                    className="px-4 py-2.5 rounded-lg bg-[#F84B11] hover:bg-[#ff5d26] active:scale-[0.98] text-white font-semibold text-xs flex items-center justify-center gap-2 transition-all duration-150 cursor-pointer shadow-lg shadow-[#F84B11]/20 hover:shadow-[#F84B11]/40 shrink-0"
+                  >
+                    <Zap className="w-3.5 h-3.5 fill-current" />
+                    <span>Transform to Vorsik Custom App</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+
+                {/* Formula Bar Simulation */}
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded border border-[#1F232B] bg-[#0E1015] text-xs font-mono text-[#94979E]">
+                  <span className="text-[#585B64] font-semibold">fx</span>
+                  <div className="w-px h-3.5 bg-[#20232B]" />
+                  <span className="text-amber-300 truncate">
+                    =IFERROR(VLOOKUP(C14, 'Precios_2024'!$A$2:$F$500, 4, FALSE) * G14, "#REF!")
+                  </span>
+                </div>
+
+                {/* Spreadsheet Raw Grid Table */}
+                <div className="overflow-x-auto border border-[#1F232B] rounded-lg bg-[#08090C]">
+                  <table className="w-full text-left text-xs border-collapse">
+                    <thead className="border-b border-[#1F232B] bg-[#0E1015] text-[#585B64] font-mono text-[11px]">
+                      <tr>
+                        <th className="py-2 px-3 border-r border-[#1F232B] w-8 text-center bg-[#0A0C10]">#</th>
+                        <th className="py-2 px-3 border-r border-[#1F232B] font-semibold">A: Order ID</th>
+                        <th className="py-2 px-3 border-r border-[#1F232B] font-semibold">B: Account / Client</th>
+                        <th className="py-2 px-3 border-r border-[#1F232B] font-semibold">C: SKU Breakdown</th>
+                        <th className="py-2 px-3 border-r border-[#1F232B] font-semibold">D: Net Total</th>
+                        <th className="py-2 px-3 border-r border-[#1F232B] font-semibold">E: Payment Status</th>
+                        <th className="py-2 px-3 border-r border-[#1F232B] font-semibold">F: Delivery SLA</th>
+                        <th className="py-2 px-3 font-semibold text-amber-400/90">G: Internal Notes (WhatsApp / Post-its)</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-[#171920] font-sans">
+                      <tr className="hover:bg-[#101218] transition-colors">
+                        <td className="py-2.5 px-3 border-r border-[#1F232B] font-mono text-[11px] text-[#585B64] text-center bg-[#0A0C10]">2</td>
+                        <td className="py-2.5 px-3 border-r border-[#1F232B] font-mono font-medium text-white">ORD-8942</td>
+                        <td className="py-2.5 px-3 border-r border-[#1F232B] text-white">Northern Distribution Logistics Inc.</td>
+                        <td className="py-2.5 px-3 border-r border-[#1F232B] text-[#94979E]">120x Hyd-Valve Seals</td>
+                        <td className="py-2.5 px-3 border-r border-[#1F232B] tabular-nums font-semibold text-[#EDEDED]">$14,250.00</td>
+                        <td className="py-2.5 px-3 border-r border-[#1F232B]">
+                          <span className="px-1.5 py-0.5 rounded bg-amber-950/70 border border-amber-600/40 text-amber-300 font-mono text-[10px]">
+                            PENDING ⚠️
+                          </span>
+                        </td>
+                        <td className="py-2.5 px-3 border-r border-[#1F232B] text-[#94979E]">Today 04:00 PM</td>
+                        <td className="py-2.5 px-3 text-amber-300/90 text-[11px] bg-amber-950/20">
+                          ⚠️ Cheque rebotó en banco - avisar a finanzas urgente
+                        </td>
+                      </tr>
+
+                      <tr className="hover:bg-[#101218] transition-colors">
+                        <td className="py-2.5 px-3 border-r border-[#1F232B] font-mono text-[11px] text-[#585B64] text-center bg-[#0A0C10]">3</td>
+                        <td className="py-2.5 px-3 border-r border-[#1F232B] font-mono font-medium text-white">ORD-8941</td>
+                        <td className="py-2.5 px-3 border-r border-[#1F232B] text-white">St. Mary Surgical Center</td>
+                        <td className="py-2.5 px-3 border-r border-[#1F232B] text-[#94979E]">45x HEPA Filters</td>
+                        <td className="py-2.5 px-3 border-r border-[#1F232B] bg-red-950/40">
+                          <span className="px-2 py-0.5 rounded bg-red-900/60 text-red-300 font-mono font-bold text-[11px] border border-red-700/50">
+                            #VALUE!
+                          </span>
+                        </td>
+                        <td className="py-2.5 px-3 border-r border-[#1F232B]">
+                          <span className="px-1.5 py-0.5 rounded bg-emerald-950/40 border border-emerald-800/40 text-emerald-400 font-mono text-[10px]">
+                            PAID
+                          </span>
+                        </td>
+                        <td className="py-2.5 px-3 border-r border-[#1F232B] text-[#94979E]">Tomorrow 10:00 AM</td>
+                        <td className="py-2.5 px-3 text-[#7E8390] text-[11px]">
+                          Factura hecha a mano en PDF viejo (sin numeración fiscal)
+                        </td>
+                      </tr>
+
+                      <tr className="hover:bg-[#101218] transition-colors">
+                        <td className="py-2.5 px-3 border-r border-[#1F232B] font-mono text-[11px] text-[#585B64] text-center bg-[#0A0C10]">4</td>
+                        <td className="py-2.5 px-3 border-r border-[#1F232B] font-mono font-medium text-white">ORD-8940</td>
+                        <td className="py-2.5 px-3 border-r border-[#1F232B] text-white">Pacific Heavy Contracting LLC</td>
+                        <td className="py-2.5 px-3 border-r border-[#1F232B] text-[#94979E]">310x Heavy Bearings</td>
+                        <td className="py-2.5 px-3 border-r border-[#1F232B] tabular-nums font-semibold text-[#EDEDED]">$28,400.00</td>
+                        <td className="py-2.5 px-3 border-r border-[#1F232B]">
+                          <span className="px-1.5 py-0.5 rounded bg-blue-950/40 border border-blue-800/40 text-blue-400 font-mono text-[10px]">
+                            IN TRANSIT
+                          </span>
+                        </td>
+                        <td className="py-2.5 px-3 border-r border-[#1F232B] bg-red-950/40">
+                          <span className="px-2 py-0.5 rounded bg-red-900/60 text-red-300 font-mono font-bold text-[11px] border border-red-700/50">
+                            #REF!
+                          </span>
+                        </td>
+                        <td className="py-2.5 px-3 text-[#7E8390] text-[11px]">
+                          Chofer mandó foto de remito arrugado por chat de WhatsApp
+                        </td>
+                      </tr>
+
+                      <tr className="hover:bg-[#101218] transition-colors">
+                        <td className="py-2.5 px-3 border-r border-[#1F232B] font-mono text-[11px] text-[#585B64] text-center bg-[#0A0C10]">5</td>
+                        <td className="py-2.5 px-3 border-r border-[#1F232B] font-mono font-medium text-white">ORD-8939</td>
+                        <td className="py-2.5 px-3 border-r border-[#1F232B] text-white">Apex Commercial Systems Corp.</td>
+                        <td className="py-2.5 px-3 border-r border-[#1F232B] text-[#94979E]">18x Regulators</td>
+                        <td className="py-2.5 px-3 border-r border-[#1F232B] tabular-nums font-semibold text-[#EDEDED]">$4,120.00</td>
+                        <td className="py-2.5 px-3 border-r border-[#1F232B]">
+                          <span className="px-1.5 py-0.5 rounded bg-emerald-950/40 border border-emerald-800/40 text-emerald-400 font-mono text-[10px]">
+                            PAID
+                          </span>
+                        </td>
+                        <td className="py-2.5 px-3 border-r border-[#1F232B] text-[#94979E]">Delivered</td>
+                        <td className="py-2.5 px-3 text-amber-300/90 text-[11px] bg-amber-950/20">
+                          ¿Quién autorizó este 15% de descuento sin firmar?
+                        </td>
+                      </tr>
+
+                      <tr className="hover:bg-[#101218] transition-colors">
+                        <td className="py-2.5 px-3 border-r border-[#1F232B] font-mono text-[11px] text-[#585B64] text-center bg-[#0A0C10]">6</td>
+                        <td className="py-2.5 px-3 border-r border-[#1F232B] font-mono font-medium text-white">ORD-8938</td>
+                        <td className="py-2.5 px-3 border-r border-[#1F232B] text-white">Vanguard Manufacturing Supply</td>
+                        <td className="py-2.5 px-3 border-r border-[#1F232B] text-[#94979E]">90x Quick Couplings</td>
+                        <td className="py-2.5 px-3 border-r border-[#1F232B] tabular-nums font-semibold text-[#EDEDED]">$8,950.00</td>
+                        <td className="py-2.5 px-3 border-r border-[#1F232B]">
+                          <span className="px-1.5 py-0.5 rounded bg-amber-950/70 border border-amber-600/40 text-amber-300 font-mono text-[10px]">
+                            PENDING ⚠️
+                          </span>
+                        </td>
+                        <td className="py-2.5 px-3 border-r border-[#1F232B] text-[#94979E]">Tomorrow 02:00 PM</td>
+                        <td className="py-2.5 px-3 text-red-300 text-[11px] bg-red-950/20">
+                          Bodega dice que faltan 12 unidades físicas en estante B
+                        </td>
+                      </tr>
+
+                      <tr className="hover:bg-[#101218] transition-colors">
+                        <td className="py-2.5 px-3 border-r border-[#1F232B] font-mono text-[11px] text-[#585B64] text-center bg-[#0A0C10]">7</td>
+                        <td className="py-2.5 px-3 border-r border-[#1F232B] font-mono font-medium text-white">ORD-8937</td>
+                        <td className="py-2.5 px-3 border-r border-[#1F232B] text-white">Cascade Industrial Works LLC</td>
+                        <td className="py-2.5 px-3 border-r border-[#1F232B] text-[#94979E]">240x Steel Flanges</td>
+                        <td className="py-2.5 px-3 border-r border-[#1F232B] bg-red-950/40">
+                          <span className="px-2 py-0.5 rounded bg-red-900/60 text-red-300 font-mono font-bold text-[11px] border border-red-700/50">
+                            #REF!
+                          </span>
+                        </td>
+                        <td className="py-2.5 px-3 border-r border-[#1F232B]">
+                          <span className="px-1.5 py-0.5 rounded bg-emerald-950/40 border border-emerald-800/40 text-emerald-400 font-mono text-[10px]">
+                            PAID
+                          </span>
+                        </td>
+                        <td className="py-2.5 px-3 border-r border-[#1F232B] text-[#94979E]">Delivered</td>
+                        <td className="py-2.5 px-3 text-[#7E8390] text-[11px]">
+                          No tocar esta celda - rompe la fórmula de totalización general
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Spreadsheet Summary Warnings Bar */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-[#717684] pt-1">
+                  <div className="flex items-center gap-2 font-mono text-[11px]">
+                    <span className="text-red-400 font-bold">SUM(D2:D7) = #REF!</span>
+                    <span>(Corrupted calculation: team cannot verify weekly billing volume)</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-[11px]">
+                    <span className="text-amber-400">● 0 Role-based permissions</span>
+                    <span className="text-red-400">● Zero immutable audit trail</span>
+                  </div>
+                </div>
+
+              </div>
+            )}
+
+            {/* VIEW 2: VORSIK CUSTOM OPERATING SYSTEM (AFTER) */}
+            {transformationMode === 'vorsik' && (
+              <div className="space-y-5 animate-fade-in">
+                
+                {/* Real-Time KPIs Top Bar */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  <div className="p-3 rounded-lg border border-[#1F232B] bg-[#0E1015]">
+                    <div className="text-[11px] font-semibold uppercase tracking-wider text-[#717684] mb-0.5">Pending Approval</div>
+                    <div className="text-base font-bold text-white tabular-nums">2 Orders</div>
+                    <p className="text-[11px] text-amber-400 mt-0.5">$23,200 USD in queue</p>
+                  </div>
+
+                  <div className="p-3 rounded-lg border border-[#1F232B] bg-[#0E1015]">
+                    <div className="text-[11px] font-semibold uppercase tracking-wider text-[#717684] mb-0.5">Active In Transit</div>
+                    <div className="text-base font-bold text-white tabular-nums">1 Shipment</div>
+                    <p className="text-[11px] text-blue-400 mt-0.5">Truck #04 ETA 35 mins</p>
+                  </div>
+
+                  <div className="p-3 rounded-lg border border-[#1F232B] bg-[#0E1015]">
+                    <div className="text-[11px] font-semibold uppercase tracking-wider text-[#717684] mb-0.5">Collected Volume</div>
+                    <div className="text-base font-bold text-white tabular-nums">$65,060 USD</div>
+                    <p className="text-[11px] text-emerald-400 mt-0.5">100% Reconciled</p>
+                  </div>
+
+                  <div className="p-3 rounded-lg border border-[#1F232B] bg-[#0E1015]">
+                    <div className="text-[11px] font-semibold uppercase tracking-wider text-[#717684] mb-0.5">System Latency</div>
+                    <div className="text-base font-bold text-white tabular-nums">0.2ms Perceived</div>
+                    <p className="text-[11px] text-emerald-400 mt-0.5">Local NVMe on LAN</p>
+                  </div>
+                </div>
+
+                {/* Operational Toolbar */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  
+                  {/* Status Filters */}
+                  <div className="inline-flex p-0.5 rounded-lg bg-[#14161D] border border-[#20232B] text-xs font-medium">
+                    <button
+                      onClick={() => setB2BFilter('all')}
+                      className={`px-2.5 py-1 rounded transition-colors ${
+                        b2bFilter === 'all' ? 'bg-[#1E2129] text-white shadow-sm' : 'text-[#717684] hover:text-white'
+                      }`}
+                    >
+                      All ({b2bOrders.length})
+                    </button>
+                    <button
+                      onClick={() => setB2BFilter('pending')}
+                      className={`px-2.5 py-1 rounded transition-colors ${
+                        b2bFilter === 'pending' ? 'bg-[#1E2129] text-amber-300 shadow-sm' : 'text-[#717684] hover:text-white'
+                      }`}
+                    >
+                      Pending ({b2bOrders.filter(o => o.status === 'Pending Approval').length})
+                    </button>
+                    <button
+                      onClick={() => setB2BFilter('transit')}
+                      className={`px-2.5 py-1 rounded transition-colors ${
+                        b2bFilter === 'transit' ? 'bg-[#1E2129] text-blue-300 shadow-sm' : 'text-[#717684] hover:text-white'
+                      }`}
+                    >
+                      In Transit ({b2bOrders.filter(o => o.status === 'In Transit').length})
+                    </button>
+                    <button
+                      onClick={() => setB2BFilter('completed')}
+                      className={`px-2.5 py-1 rounded transition-colors ${
+                        b2bFilter === 'completed' ? 'bg-[#1E2129] text-emerald-300 shadow-sm' : 'text-[#717684] hover:text-white'
+                      }`}
+                    >
+                      Invoiced ({b2bOrders.filter(o => o.status === 'Invoiced & Completed' || o.status === 'Approved & Queued').length})
+                    </button>
+                  </div>
+
+                  {/* Search Bar & Quick Order Button */}
+                  <div className="flex items-center gap-2">
+                    <div className="relative">
+                      <Search className="w-3.5 h-3.5 text-[#585B64] absolute left-2.5 top-1/2 -translate-y-1/2" />
+                      <input 
+                        type="text"
+                        placeholder="Search client, SKU, or order ID..."
+                        value={b2bSearch}
+                        onChange={(e) => setB2BSearch(e.target.value)}
+                        className="bg-[#14161D] border border-[#232731] rounded-md pl-8 pr-3 py-1.5 text-xs text-white placeholder:text-[#585B64] focus:outline-none focus:border-[#F84B11] transition-colors w-52 sm:w-60"
+                      />
+                    </div>
+                    <button 
+                      onClick={handleQuickAddB2BOrder}
+                      className="px-3 py-1.5 rounded-md bg-[#161922] hover:bg-[#1E222D] active:scale-[0.97] border border-[#232731] hover:border-[#F84B11]/50 text-xs font-medium text-white flex items-center gap-1.5 transition-all duration-150 cursor-pointer"
+                    >
+                      <Plus className="w-3.5 h-3.5 text-[#F84B11]" />
+                      <span>New Order</span>
+                    </button>
+                  </div>
+
+                </div>
+
+                {/* Vorsik Production Table */}
                 <div className="overflow-x-auto border border-[#1F232B] rounded-lg bg-[#0A0C10]">
                   <table className="w-full text-left text-xs">
                     <thead className="border-b border-[#1F232B] text-[#585B64] bg-[#0E1015] uppercase tracking-wider font-semibold text-[11px]">
                       <tr>
                         <th className="py-2.5 px-4 font-medium">Order ID</th>
                         <th className="py-2.5 px-4 font-medium">Account / Client</th>
-                        <th className="py-2.5 px-4 font-medium">Amount</th>
-                        <th className="py-2.5 px-4 font-medium">Units</th>
+                        <th className="py-2.5 px-4 font-medium">SKU Breakdown</th>
+                        <th className="py-2.5 px-4 font-medium">Total Amount</th>
+                        <th className="py-2.5 px-4 font-medium">Fulfillment SLA</th>
                         <th className="py-2.5 px-4 font-medium">Status</th>
                         <th className="py-2.5 px-4 text-right font-medium">Operational Action</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[#171920]">
-                      {filteredOrders.map((order) => (
-                        <tr key={order.id} className="hover:bg-[#141620] transition-colors duration-150 cursor-pointer">
-                          <td className="py-3 px-4 tabular-nums font-semibold text-[#F84B11]">{order.id}</td>
-                          <td className="py-3 px-4 font-medium text-white">{order.client}</td>
-                          <td className="py-3 px-4 tabular-nums font-semibold text-[#EDEDED]">{order.total}</td>
-                          <td className="py-3 px-4 text-[#94979E]">{order.items} units</td>
+                      {filteredB2BOrders.map((order) => (
+                        <tr key={order.id} className="hover:bg-[#141620] transition-colors duration-150">
+                          <td className="py-3 px-4 font-mono font-semibold text-[#F84B11]">{order.id}</td>
+                          <td className="py-3 px-4 font-semibold text-white">
+                            <div>{order.client}</div>
+                            <div className="text-[10px] text-[#717684] font-normal">{order.notes}</div>
+                          </td>
+                          <td className="py-3 px-4 text-[#EDEDED]">
+                            <span>{order.items}</span>
+                            <span className="text-[#717684] ml-1.5">({order.units} units)</span>
+                          </td>
+                          <td className="py-3 px-4 tabular-nums font-semibold text-white">{order.total}</td>
+                          <td className="py-3 px-4 text-[#94979E] text-[11px]">{order.sla}</td>
                           <td className="py-3 px-4">
                             <span className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium transition-colors ${
-                              order.status === 'Approved' 
-                                ? 'bg-emerald-950/40 text-emerald-400 border border-emerald-800/40' 
+                              order.status === 'Approved & Queued' 
+                                ? 'bg-emerald-950/60 text-emerald-400 border border-emerald-800/40' 
                                 : order.status === 'In Transit'
-                                ? 'bg-blue-950/40 text-blue-400 border border-blue-800/40'
+                                ? 'bg-blue-950/60 text-blue-400 border border-blue-800/40'
+                                : order.status === 'Invoiced & Completed'
+                                ? 'bg-zinc-800/60 text-zinc-300 border border-zinc-700/40'
                                 : 'bg-[#251A15] text-[#F84B11] border border-[#F84B11]/30'
                             }`}>
                               {order.status}
                             </span>
                           </td>
                           <td className="py-3 px-4 text-right">
-                            {order.status === 'Pending' ? (
+                            {order.status === 'Pending Approval' ? (
                               <button
-                                onClick={() => handleApproveOrder(order.id)}
-                                className="px-2.5 py-1 rounded bg-[#F84B11] hover:bg-[#ff5d26] active:scale-[0.95] text-white font-medium text-[11px] transition-all duration-150 cursor-pointer shadow-sm hover:shadow-[#F84B11]/30 hover:-translate-y-0.5"
+                                onClick={() => handleApproveB2BOrder(order.id)}
+                                className="px-2.5 py-1 rounded bg-[#F84B11] hover:bg-[#ff5d26] active:scale-[0.95] text-white font-medium text-[11px] transition-all duration-150 cursor-pointer shadow-sm hover:shadow-[#F84B11]/30 hover:-translate-y-0.5 inline-flex items-center gap-1"
                               >
-                                Approve (Instant)
+                                <Zap className="w-3 h-3 fill-current" />
+                                <span>Approve & Dispatch</span>
+                              </button>
+                            ) : order.status === 'Approved & Queued' ? (
+                              <button
+                                onClick={() => handleGenerateB2BInvoice(order.id)}
+                                className="px-2.5 py-1 rounded bg-emerald-950/70 hover:bg-emerald-900/80 active:scale-[0.95] text-emerald-300 border border-emerald-700/50 font-medium text-[11px] transition-all duration-150 cursor-pointer inline-flex items-center gap-1"
+                              >
+                                <FileText className="w-3 h-3" />
+                                <span>Issue Invoice</span>
+                              </button>
+                            ) : order.status === 'In Transit' ? (
+                              <button
+                                onClick={() => {
+                                  setToastMessage(`Truck #04 en route to ${order.client}. GPS ping: 0.1ms.`);
+                                  setTimeout(() => setToastMessage(null), 3000);
+                                }}
+                                className="px-2.5 py-1 rounded bg-blue-950/70 hover:bg-blue-900/80 active:scale-[0.95] text-blue-300 border border-blue-700/50 font-medium text-[11px] transition-all duration-150 cursor-pointer inline-flex items-center gap-1"
+                              >
+                                <Truck className="w-3 h-3" />
+                                <span>Track Truck</span>
                               </button>
                             ) : (
-                              <span className="text-[#585B64] text-[11px] font-medium">Audited</span>
+                              <span className="inline-flex items-center gap-1 text-[11px] text-emerald-400 font-medium">
+                                <CheckCircle2 className="w-3 h-3" />
+                                <span>Invoiced & Audited</span>
+                              </span>
                             )}
                           </td>
                         </tr>
@@ -969,164 +1505,58 @@ export default function App() {
                   </table>
                 </div>
 
-                <div className="mt-4 flex flex-wrap items-center justify-between text-[11px] text-[#585B64]">
-                  <span>Cryptographic audit log: 4 immutable events committed</span>
+                {/* Vorsik System Audit & Integrity Footer */}
+                <div className="flex flex-wrap items-center justify-between text-[11px] text-[#717684] pt-1">
+                  <span>Cryptographic audit log: {auditEventsCount} immutable events committed to local storage</span>
                   <span className="text-emerald-400 flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    Local database transactions synchronized
+                    Local database transactions synchronized (0.1ms WAL commit)
                   </span>
                 </div>
-              </div>
-            ) : (
-              <div key="admin-hub" className="animate-fade-in">
-                {/* Admin Hub Controls */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-                  <div>
-                    <h3 className="text-base font-semibold text-white flex items-center gap-2">
-                      <HardDrive className="w-4 h-4 text-emerald-400" />
-                      <span>Server Health & Infrastructure Control (Vorsik Core Hub)</span>
-                    </h3>
-                    <p className="text-xs text-[#94979E] mt-0.5">Real-time visibility into local host vitals and database backups without terminal commands.</p>
-                  </div>
 
-                  <button 
-                    onClick={handleTriggerBackup}
-                    disabled={isBackingUp}
-                    className="px-3.5 py-1.5 rounded-md bg-[#161922] hover:bg-[#1E222D] active:scale-[0.97] border border-[#2C303B] hover:border-[#F84B11]/50 text-white font-medium text-xs flex items-center gap-2 transition-all duration-200 cursor-pointer disabled:opacity-50"
-                  >
-                    <RefreshCw className={`w-3.5 h-3.5 ${isBackingUp ? 'animate-spin text-[#F84B11]' : 'text-emerald-400'}`} />
-                    <span>{isBackingUp ? 'Generating Snapshot...' : 'Create Snapshot Now'}</span>
-                  </button>
-                </div>
-
-                {/* 3 Metric Cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
-                  <div className="p-4 rounded-lg border border-[#1F232B] bg-[#0A0C10] interactive-card cursor-pointer">
-                    <div className="flex items-center justify-between text-xs text-[#94979E] mb-2 ">
-                      <span>Local PostgreSQL</span>
-                      <span className="text-emerald-400">1.2ms latency</span>
-                    </div>
-                    <div className="text-lg font-bold text-white tracking-tight">100% OPERATIONAL</div>
-                    <p className="text-[11px] text-[#585B64] mt-1">Declarative migrations fully in sync</p>
-                  </div>
-
-                  <div className="p-4 rounded-lg border border-[#1F232B] bg-[#0A0C10] interactive-card cursor-pointer">
-                    <div className="flex items-center justify-between text-xs text-[#94979E] mb-2 ">
-                      <span>Physical Storage</span>
-                      <span className="text-[#EDEDED]">18% utilized</span>
-                    </div>
-                    <div className="text-lg font-bold text-white tracking-tight">142 GB Available</div>
-                    <p className="text-[11px] text-[#585B64] mt-1">Encrypted NVMe volume on client server</p>
-                  </div>
-
-                  <div className="p-4 rounded-lg border border-[#1F232B] bg-[#0A0C10] interactive-card cursor-pointer">
-                    <div className="flex items-center justify-between text-xs text-[#94979E] mb-2 ">
-                      <span>Technical Architecture</span>
-                      <span className="text-[#F84B11]">OpenAPI v3</span>
-                    </div>
-                    <div className="text-lg font-bold text-white tracking-tight">OPEN BLUEPRINT</div>
-                    <p className="text-[11px] text-[#585B64] mt-1">Transferable and auditable by third parties</p>
-                  </div>
-                </div>
-
-                {/* Backups List */}
-                <div className="border border-[#1F232B] rounded-lg bg-[#0A0C10] p-4">
-                  <div className="flex items-center justify-between mb-3 text-xs tabular-nums font-medium text-[#585B64]">
-                    <span>SCHEDULED ENCRYPTED BACKUPS (AES-256)</span>
-                    <span className="text-emerald-400">Retention: 30 Days</span>
-                  </div>
-                  <div className="space-y-2">
-                    {backups.map(b => (
-                      <div key={b.id} className="flex items-center justify-between p-2.5 rounded border border-[#181A22] hover:border-[#2C303B] bg-[#0E1015] text-xs transition-colors duration-150">
-                        <div className="flex items-center gap-3">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                          <span className="tabular-nums font-semibold text-[#EDEDED]">{b.id}</span>
-                          <span className="text-[#94979E]">{b.date}</span>
-                          <span className="px-1.5 py-0.2 rounded bg-[#181A22] text-[10px] text-[#94979E] font-medium">{b.type}</span>
-                        </div>
-                        <div className="flex items-center gap-4 tabular-nums text-xs">
-                          <span className="text-[#585B64]">{b.size}</span>
-                          <button 
-                            onClick={() => {
-                              setToastMessage(`Downloading compressed archive ${b.id}...`);
-                              setTimeout(() => setToastMessage(null), 2500);
-                            }}
-                            className="text-[#EDEDED] hover:text-[#F84B11] active:scale-[0.95] flex items-center gap-1 transition-all duration-150 cursor-pointer"
-                          >
-                            <Download className="w-3.5 h-3.5" />
-                            <span>Download</span>
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
               </div>
             )}
+
+          </div>
+
+        </div>
+
+        {/* 3 Architectural & Economic Value Fact Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
+          <div className="p-5 rounded-xl border border-[#1F232B] bg-[#0E1015] interactive-card cursor-default">
+            <div className="flex items-center gap-2 mb-2 text-[#F84B11]">
+              <Database className="w-4 h-4" />
+              <div className="text-[11px] font-semibold uppercase tracking-wider">Relational Integrity</div>
+            </div>
+            <h3 className="text-sm font-bold text-white mb-1">Zero Formula Breakage</h3>
+            <p className="text-xs text-[#94979E] leading-relaxed">
+              Spreadsheets fail when someone accidentally deletes a column or overwrites a formula. Vorsik enforces strict PostgreSQL types and constraints that make data corruption impossible.
+            </p>
+          </div>
+
+          <div className="p-5 rounded-xl border border-[#1F232B] bg-[#0E1015] interactive-card cursor-default">
+            <div className="flex items-center gap-2 mb-2 text-emerald-400">
+              <Zap className="w-4 h-4 fill-current" />
+              <div className="text-[11px] font-semibold uppercase tracking-wider">Sub-Millisecond Execution</div>
+            </div>
+            <h3 className="text-sm font-bold text-white mb-1">&lt; 1ms Tactical Speed</h3>
+            <p className="text-xs text-[#94979E] leading-relaxed">
+              No spinning web loaders or commercial cloud lag. Instant pick, pack, dispatch approval, and billing reconciliation running on your local office network hardware.
+            </p>
+          </div>
+
+          <div className="p-5 rounded-xl border border-[#1F232B] bg-[#0E1015] interactive-card cursor-default">
+            <div className="flex items-center gap-2 mb-2 text-blue-400">
+              <Building2 className="w-4 h-4" />
+              <div className="text-[11px] font-semibold uppercase tracking-wider">Owned Capital Asset</div>
+            </div>
+            <h3 className="text-sm font-bold text-white mb-1">Zero Per-User Seat Rent</h3>
+            <p className="text-xs text-[#94979E] leading-relaxed">
+              Commercial ERPs bill $120+ USD per user each month. Vorsik is delivered as a capitalized corporate software asset—you own the source code, hardware deployment, and client data forever.
+            </p>
           </div>
         </div>
-      </section>
 
-      {/* Solutions / Real-World Archetypes Section */}
-      <section id="solutions" className="py-20 px-4 sm:px-6 max-w-6xl mx-auto border-t border-[#1F232B]">
-        <div className="max-w-3xl mb-12">
-          <div className="text-xs font-semibold uppercase tracking-wider text-[#F84B11] mb-2">Application Archetypes</div>
-          <h2 className="text-3xl font-bold text-white tracking-tight">
-            Engineered for High-Stakes Operational Workflows
-          </h2>
-          <p className="text-[#94979E] text-sm mt-3">
-            We replace fragile spreadsheets and restrictive SaaS portals with tailor-made corporate operating systems.
-          </p>
-        </div>
-
-        {/* Interactive Tabs */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
-          {solutions.map((sol, idx) => {
-            const Icon = sol.icon;
-            const isSelected = selectedSolution === idx;
-            return (
-              <button
-                key={sol.title}
-                onClick={() => setSelectedSolution(idx)}
-                className={`p-4 rounded-lg border text-left transition-all duration-200 cursor-pointer active:scale-[0.99] ${
-                  isSelected 
-                    ? 'border-[#F84B11] bg-[#12141A] text-white shadow-lg shadow-[#F84B11]/10' 
-                    : 'border-[#1F232B] bg-[#0A0C10] text-[#94979E] hover:border-[#2C303B] hover:-translate-y-0.5'
-                }`}
-              >
-                <div className="flex items-center gap-2 mb-2">
-                  <Icon className={`w-4 h-4 transition-colors duration-200 ${isSelected ? 'text-[#F84B11]' : 'text-[#585B64]'}`} />
-                  <span className="text-xs font-semibold tracking-wider uppercase">USE CASE 0{idx + 1}</span>
-                </div>
-                <h3 className="text-sm font-semibold text-white leading-snug">{sol.title}</h3>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Selected Solution Detail Card */}
-        <div key={selectedSolution} className="p-6 sm:p-8 rounded-xl border border-[#1F232B] bg-[#0E1015] animate-fade-in shadow-xl">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div>
-              <div className="text-xs font-semibold text-red-400 uppercase tracking-wider mb-2">The SaaS & Spreadsheet Bottleneck</div>
-              <p className="text-xs text-[#94979E] leading-relaxed">
-                {solutions[selectedSolution].problem}
-              </p>
-            </div>
-            <div>
-              <div className="text-xs font-semibold text-[#F84B11] uppercase tracking-wider mb-2">The Custom Vorsik System</div>
-              <p className="text-xs text-[#EDEDED] leading-relaxed">
-                {solutions[selectedSolution].solution}
-              </p>
-            </div>
-            <div>
-              <div className="text-xs font-semibold text-emerald-400 uppercase tracking-wider mb-2">Demonstrated Economic Impact</div>
-              <p className="text-xs text-[#94979E] leading-relaxed">
-                {solutions[selectedSolution].impact}
-              </p>
-            </div>
-          </div>
-        </div>
       </section>
 
       {/* Financial Arbitrage Section */}
