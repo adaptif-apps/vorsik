@@ -27,10 +27,16 @@ import {
   FileText,
   Database,
   Search,
-  Plus
+  Plus,
+  Sun,
+  Moon
 } from 'lucide-react';
 
 export default function App() {
+  // Sandbox Light / Dark Theme State (Light Mode by default)
+  const [sandboxTheme, setSandboxTheme] = useState<'light' | 'dark'>('light');
+  const isLight = sandboxTheme === 'light';
+
   // Unified Interactive Transformation Showroom State
   type TransformationMode = 'spreadsheet' | 'vorsik';
   const [transformationMode, setTransformationMode] = useState<TransformationMode>('spreadsheet');
@@ -969,37 +975,55 @@ export default function App() {
         </div>
 
         {/* Showroom Interactive Shell */}
-        <div className="rounded-xl border border-[#20232B] bg-[#0E1015] shadow-2xl overflow-hidden transition-all duration-300">
+        <div className={`rounded-xl border shadow-2xl overflow-hidden transition-all duration-300 ${
+          isLight 
+            ? 'border-slate-300/90 bg-white shadow-2xl shadow-black/30 ring-1 ring-slate-900/5' 
+            : 'border-[#20232B] bg-[#0E1015] shadow-2xl'
+        }`}>
           
           {/* Workstation Frame Header */}
-          <div className="border-b border-[#1F232B] bg-[#0A0C10] px-4 h-14 flex items-center justify-between gap-3">
+          <div className={`border-b px-3 sm:px-4 min-h-[56px] py-2 sm:py-0 flex flex-wrap sm:flex-nowrap items-center justify-between gap-2.5 sm:gap-3 transition-colors ${
+            isLight 
+              ? 'border-slate-200 bg-slate-100/95' 
+              : 'border-[#1F232B] bg-[#0A0C10]'
+          }`}>
             
             {/* Window Controls & State Protocol */}
             <div className="flex items-center gap-2 min-w-0">
               <div className="flex items-center gap-1.5 shrink-0">
-                <div className="w-2.5 h-2.5 rounded-full bg-[#2A2E39]" />
-                <div className="w-2.5 h-2.5 rounded-full bg-[#2A2E39]" />
-                <div className="w-2.5 h-2.5 rounded-full bg-[#2A2E39]" />
+                <div className={`w-2.5 h-2.5 rounded-full transition-colors ${isLight ? 'bg-[#FF5F56]' : 'bg-[#2A2E39]'}`} />
+                <div className={`w-2.5 h-2.5 rounded-full transition-colors ${isLight ? 'bg-[#FFBD2E]' : 'bg-[#2A2E39]'}`} />
+                <div className={`w-2.5 h-2.5 rounded-full transition-colors ${isLight ? 'bg-[#27C93F]' : 'bg-[#2A2E39]'}`} />
               </div>
-              <span className="ml-2 font-mono text-xs text-[#717684] truncate">
+              <span className={`ml-1.5 sm:ml-2 font-mono text-xs truncate transition-colors ${
+                isLight ? 'text-slate-600 font-medium' : 'text-[#717684]'
+              }`}>
                 {transformationMode === 'spreadsheet' 
                   ? 'orders_master.xlsx (Manual)' 
                   : 'vorsik-os://orders (Automated)'}
               </span>
             </div>
 
-            {/* View Switcher / Interactive Trigger Pill */}
-            <div className="flex items-center gap-2 shrink-0">
-              <div className="inline-flex p-0.5 rounded-lg bg-[#14161D] border border-[#20232B] text-xs font-medium whitespace-nowrap">
+            {/* View Switcher, Replay & Sandbox Theme Toggle */}
+            <div className="flex items-center gap-2 shrink-0 flex-wrap sm:flex-nowrap">
+              <div className={`inline-flex p-0.5 rounded-lg border text-xs font-medium whitespace-nowrap transition-colors ${
+                isLight 
+                  ? 'bg-slate-200/90 border-slate-300' 
+                  : 'bg-[#14161D] border-[#20232B]'
+              }`}>
                 <button
                   onClick={() => setTransformationMode('spreadsheet')}
                   className={`px-3 py-1.5 rounded-md transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
                     transformationMode === 'spreadsheet'
-                      ? 'bg-[#1E2129] text-white shadow-sm'
-                      : 'text-[#94979E] hover:text-white'
+                      ? isLight
+                        ? 'bg-white text-slate-900 shadow-sm font-semibold'
+                        : 'bg-[#1E2129] text-white shadow-sm'
+                      : isLight
+                        ? 'text-slate-600 hover:text-slate-900'
+                        : 'text-[#94979E] hover:text-white'
                   }`}
                 >
-                  <FileSpreadsheet className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                  <FileSpreadsheet className={`w-3.5 h-3.5 shrink-0 ${isLight ? 'text-amber-600' : 'text-amber-400'}`} />
                   <span className="hidden sm:inline">1. Messy Spreadsheet (Before)</span>
                   <span className="sm:hidden inline">1. Spreadsheet</span>
                 </button>
@@ -1011,8 +1035,12 @@ export default function App() {
                   }}
                   className={`px-3 py-1.5 rounded-md transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
                     transformationMode === 'vorsik'
-                      ? 'bg-[#1E2129] text-white shadow-sm'
-                      : 'text-[#94979E] hover:text-white'
+                      ? isLight
+                        ? 'bg-white text-slate-900 shadow-sm font-semibold'
+                        : 'bg-[#1E2129] text-white shadow-sm'
+                      : isLight
+                        ? 'text-slate-600 hover:text-slate-900'
+                        : 'text-[#94979E] hover:text-white'
                   }`}
                 >
                   <Zap className="w-3.5 h-3.5 text-[#F84B11] fill-current shrink-0" />
@@ -1024,35 +1052,91 @@ export default function App() {
               {transformationMode === 'vorsik' && (
                 <button
                   onClick={handleReplayTransformation}
-                  className="px-2.5 py-1.5 rounded-lg border border-[#262B36] bg-[#14161D] hover:bg-[#1E222D] hover:border-[#F84B11]/50 text-xs text-[#EDEDED] flex items-center gap-1.5 transition-all cursor-pointer active:scale-95 whitespace-nowrap shrink-0"
+                  className={`px-2.5 py-1.5 rounded-lg border text-xs flex items-center gap-1.5 transition-all cursor-pointer active:scale-95 whitespace-nowrap shrink-0 ${
+                    isLight
+                      ? 'border-slate-300 bg-white hover:bg-slate-50 hover:border-[#F84B11]/50 text-slate-700 shadow-xs'
+                      : 'border-[#262B36] bg-[#14161D] hover:bg-[#1E222D] hover:border-[#F84B11]/50 text-[#EDEDED]'
+                  }`}
                   title="Replay multiplayer build animation"
                 >
                   <RotateCcw className="w-3.5 h-3.5 text-[#F84B11] shrink-0" />
                   <span className="hidden md:inline">Replay Build</span>
                 </button>
               )}
+
+              {/* Theme Toggle: Light Mode by default / Dark Mode option */}
+              <div className={`inline-flex p-0.5 rounded-lg border text-xs font-medium whitespace-nowrap shrink-0 transition-colors ${
+                isLight ? 'bg-slate-200/90 border-slate-300' : 'bg-[#14161D] border-[#20232B]'
+              }`}>
+                <button
+                  type="button"
+                  onClick={() => setSandboxTheme('light')}
+                  className={`px-2 py-1 rounded-md transition-all flex items-center gap-1.5 cursor-pointer ${
+                    isLight
+                      ? 'bg-white text-slate-900 shadow-xs font-semibold'
+                      : 'text-[#717684] hover:text-white'
+                  }`}
+                  title="Light mode (Default)"
+                  aria-label="Light mode"
+                >
+                  <Sun className={`w-3.5 h-3.5 ${isLight ? 'text-amber-500 fill-amber-500/20' : 'text-slate-400'}`} />
+                  <span className="hidden sm:inline text-[11px]">Light</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSandboxTheme('dark')}
+                  className={`px-2 py-1 rounded-md transition-all flex items-center gap-1.5 cursor-pointer ${
+                    !isLight
+                      ? 'bg-[#1E2129] text-white shadow-xs font-semibold'
+                      : 'text-slate-500 hover:text-slate-900'
+                  }`}
+                  title="Dark mode"
+                  aria-label="Dark mode"
+                >
+                  <Moon className={`w-3.5 h-3.5 ${!isLight ? 'text-blue-400 fill-blue-400/20' : 'text-slate-500'}`} />
+                  <span className="hidden sm:inline text-[11px]">Dark</span>
+                </button>
+              </div>
             </div>
           </div>
 
           {/* Interactive Screen Content Canvas */}
-          <div className="relative min-h-[520px] p-4 sm:p-6 bg-[#0B0D12]">
+          <div className={`relative min-h-[520px] p-4 sm:p-6 transition-colors duration-200 ${
+            isLight ? 'bg-[#F8FAFC]' : 'bg-[#0B0D12]'
+          }`}>
 
             {/* VIEW 1: THE MESSY SPREADSHEET (BEFORE) */}
             {transformationMode === 'spreadsheet' && (
               <div className="space-y-4 animate-fade-in">
                 
                 {/* Spreadsheet Alert Ribbon & Action Banner */}
-                <div className="p-3.5 sm:p-4 rounded-lg bg-[#18130B] border border-amber-500/30 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className={`p-3.5 sm:p-4 rounded-lg border flex flex-col md:flex-row md:items-center justify-between gap-4 transition-colors ${
+                  isLight
+                    ? 'bg-amber-50/90 border-amber-300/80 shadow-xs'
+                    : 'bg-[#18130B] border-amber-500/30'
+                }`}>
                   <div className="flex items-start gap-3">
-                    <div className="p-2 rounded bg-amber-500/10 border border-amber-500/20 text-amber-400 shrink-0">
+                    <div className={`p-2 rounded border shrink-0 ${
+                      isLight
+                        ? 'bg-amber-100 border-amber-300 text-amber-700'
+                        : 'bg-amber-500/10 border-amber-500/20 text-amber-400'
+                    }`}>
                       <AlertTriangle className="w-4 h-4" />
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-amber-300">Sync Conflicts & Formula Breakage Detected</span>
-                        <span className="px-1.5 py-0.2 rounded bg-red-950 text-red-400 font-mono text-[10px] border border-red-800/40">2 Cells Corrupted</span>
+                        <span className={`text-xs font-bold ${isLight ? 'text-amber-900' : 'text-amber-300'}`}>
+                          Sync Conflicts & Formula Breakage Detected
+                        </span>
+                        <span className={`px-1.5 py-0.2 rounded font-mono text-[10px] border ${
+                          isLight
+                            ? 'bg-red-100 text-red-700 border-red-300 font-semibold'
+                            : 'bg-red-950 text-red-400 border-red-800/40'
+                        }`}>
+                          2 Cells Corrupted
+                        </span>
                       </div>
-                      <p className="text-xs text-amber-200/80 mt-0.5">
+                      <p className={`text-xs mt-0.5 ${isLight ? 'text-amber-800' : 'text-amber-200/80'}`}>
                         Formula dependencies broke when Column D was deleted. Multiple users editing via shared folder without role permissions.
                       </p>
                     </div>
@@ -1070,140 +1154,204 @@ export default function App() {
                 </div>
 
                 {/* Formula Bar Simulation */}
-                <div className="flex items-center gap-2 px-3 py-1.5 rounded border border-[#1F232B] bg-[#0E1015] text-xs font-mono text-[#94979E]">
-                  <span className="text-[#585B64] font-semibold">fx</span>
-                  <div className="w-px h-3.5 bg-[#20232B]" />
-                  <span className="text-amber-300 truncate">
+                <div className={`flex items-center gap-2 px-3 py-1.5 rounded border text-xs font-mono transition-colors ${
+                  isLight
+                    ? 'border-slate-300 bg-white text-slate-700 shadow-xs'
+                    : 'border-[#1F232B] bg-[#0E1015] text-[#94979E]'
+                }`}>
+                  <span className={`font-semibold ${isLight ? 'text-slate-400' : 'text-[#585B64]'}`}>fx</span>
+                  <div className={`w-px h-3.5 ${isLight ? 'bg-slate-200' : 'bg-[#20232B]'}`} />
+                  <span className={`truncate ${isLight ? 'text-amber-700 font-semibold' : 'text-amber-300'}`}>
                     =IFERROR(VLOOKUP(C14, 'Precios_2024'!$A$2:$F$500, 4, FALSE) * G14, "#REF!")
                   </span>
                 </div>
 
                 {/* Spreadsheet Raw Grid Table */}
-                <div className="overflow-x-auto border border-[#1F232B] rounded-lg bg-[#08090C]">
+                <div className={`overflow-x-auto border rounded-lg transition-colors ${
+                  isLight
+                    ? 'border-slate-300 bg-white shadow-xs'
+                    : 'border-[#1F232B] bg-[#08090C]'
+                }`}>
                   <table className="w-full text-left text-xs border-collapse min-w-[880px]">
-                    <thead className="border-b border-[#1F232B] bg-[#0E1015] text-[#585B64] font-mono text-[11px] whitespace-nowrap">
+                    <thead className={`border-b font-mono text-[11px] whitespace-nowrap transition-colors ${
+                      isLight
+                        ? 'border-slate-300 bg-slate-100 text-slate-600'
+                        : 'border-[#1F232B] bg-[#0E1015] text-[#585B64]'
+                    }`}>
                       <tr>
-                        <th className="py-2 px-3 border-r border-[#1F232B] w-8 text-center bg-[#0A0C10] whitespace-nowrap">#</th>
-                        <th className="py-2 px-3 border-r border-[#1F232B] font-semibold whitespace-nowrap">A: Order ID</th>
-                        <th className="py-2 px-3 border-r border-[#1F232B] font-semibold whitespace-nowrap">B: Account / Client</th>
-                        <th className="py-2 px-3 border-r border-[#1F232B] font-semibold whitespace-nowrap">C: SKU Breakdown</th>
-                        <th className="py-2 px-3 border-r border-[#1F232B] font-semibold whitespace-nowrap">D: Net Total</th>
-                        <th className="py-2 px-3 border-r border-[#1F232B] font-semibold whitespace-nowrap">E: Payment Status</th>
-                        <th className="py-2 px-3 border-r border-[#1F232B] font-semibold whitespace-nowrap">F: Delivery SLA</th>
-                        <th className="py-2 px-3 font-semibold text-amber-400/90 whitespace-nowrap">G: Internal Notes (WhatsApp / Post-its)</th>
+                        <th className={`py-2 px-3 border-r w-8 text-center whitespace-nowrap ${
+                          isLight ? 'border-slate-300 bg-slate-200/70 text-slate-600 font-semibold' : 'border-[#1F232B] bg-[#0A0C10]'
+                        }`}>#</th>
+                        <th className={`py-2 px-3 border-r font-semibold whitespace-nowrap ${isLight ? 'border-slate-300' : 'border-[#1F232B]'}`}>A: Order ID</th>
+                        <th className={`py-2 px-3 border-r font-semibold whitespace-nowrap ${isLight ? 'border-slate-300' : 'border-[#1F232B]'}`}>B: Account / Client</th>
+                        <th className={`py-2 px-3 border-r font-semibold whitespace-nowrap ${isLight ? 'border-slate-300' : 'border-[#1F232B]'}`}>C: SKU Breakdown</th>
+                        <th className={`py-2 px-3 border-r font-semibold whitespace-nowrap ${isLight ? 'border-slate-300' : 'border-[#1F232B]'}`}>D: Net Total</th>
+                        <th className={`py-2 px-3 border-r font-semibold whitespace-nowrap ${isLight ? 'border-slate-300' : 'border-[#1F232B]'}`}>E: Payment Status</th>
+                        <th className={`py-2 px-3 border-r font-semibold whitespace-nowrap ${isLight ? 'border-slate-300' : 'border-[#1F232B]'}`}>F: Delivery SLA</th>
+                        <th className={`py-2 px-3 font-semibold whitespace-nowrap ${isLight ? 'text-amber-800' : 'text-amber-400/90'}`}>G: Internal Notes (WhatsApp / Post-its)</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[#171920] font-sans whitespace-nowrap">
-                      <tr className="hover:bg-[#101218] transition-colors">
-                        <td className="py-2.5 px-3 border-r border-[#1F232B] font-mono text-[11px] text-[#585B64] text-center bg-[#0A0C10]">2</td>
-                        <td className="py-2.5 px-3 border-r border-[#1F232B] font-mono font-medium text-white">ORD-8942</td>
-                        <td className="py-2.5 px-3 border-r border-[#1F232B] text-white">Northern Distribution Logistics Inc.</td>
-                        <td className="py-2.5 px-3 border-r border-[#1F232B] text-[#94979E]">120x Hyd-Valve Seals</td>
-                        <td className="py-2.5 px-3 border-r border-[#1F232B] tabular-nums font-semibold text-[#EDEDED]">$14,250.00</td>
-                        <td className="py-2.5 px-3 border-r border-[#1F232B]">
-                          <span className="px-1.5 py-0.5 rounded bg-amber-950/70 border border-amber-600/40 text-amber-300 font-mono text-[10px]">
+                    <tbody className={`divide-y font-sans whitespace-nowrap transition-colors ${
+                      isLight ? 'divide-slate-200 text-slate-700' : 'divide-[#171920]'
+                    }`}>
+                      <tr className={`transition-colors ${isLight ? 'hover:bg-slate-50' : 'hover:bg-[#101218]'}`}>
+                        <td className={`py-2.5 px-3 border-r font-mono text-[11px] text-center ${
+                          isLight ? 'border-slate-300 text-slate-500 bg-slate-50 font-medium' : 'border-[#1F232B] text-[#585B64] bg-[#0A0C10]'
+                        }`}>2</td>
+                        <td className={`py-2.5 px-3 border-r font-mono font-medium ${isLight ? 'border-slate-300 text-slate-900' : 'border-[#1F232B] text-white'}`}>ORD-8942</td>
+                        <td className={`py-2.5 px-3 border-r ${isLight ? 'border-slate-300 text-slate-800 font-medium' : 'border-[#1F232B] text-white'}`}>Northern Distribution Logistics Inc.</td>
+                        <td className={`py-2.5 px-3 border-r ${isLight ? 'border-slate-300 text-slate-600' : 'border-[#1F232B] text-[#94979E]'}`}>120x Hyd-Valve Seals</td>
+                        <td className={`py-2.5 px-3 border-r tabular-nums font-semibold ${isLight ? 'border-slate-300 text-slate-900' : 'border-[#1F232B] text-[#EDEDED]'}`}>$14,250.00</td>
+                        <td className={`py-2.5 px-3 border-r ${isLight ? 'border-slate-300' : 'border-[#1F232B]'}`}>
+                          <span className={`px-1.5 py-0.5 rounded font-mono text-[10px] border ${
+                            isLight
+                              ? 'bg-amber-100 border-amber-300 text-amber-800 font-semibold'
+                              : 'bg-amber-950/70 border-amber-600/40 text-amber-300'
+                          }`}>
                             PENDING ⚠️
                           </span>
                         </td>
-                        <td className="py-2.5 px-3 border-r border-[#1F232B] text-[#94979E]">Today 04:00 PM</td>
-                        <td className="py-2.5 px-3 text-amber-300/90 text-[11px] bg-amber-950/20">
+                        <td className={`py-2.5 px-3 border-r ${isLight ? 'border-slate-300 text-slate-600' : 'border-[#1F232B] text-[#94979E]'}`}>Today 04:00 PM</td>
+                        <td className={`py-2.5 px-3 text-[11px] ${
+                          isLight ? 'text-amber-900 bg-amber-50 font-medium' : 'text-amber-300/90 bg-amber-950/20'
+                        }`}>
                           ⚠️ Cheque rebotó en banco - avisar a finanzas urgente
                         </td>
                       </tr>
 
-                      <tr className="hover:bg-[#101218] transition-colors">
-                        <td className="py-2.5 px-3 border-r border-[#1F232B] font-mono text-[11px] text-[#585B64] text-center bg-[#0A0C10]">3</td>
-                        <td className="py-2.5 px-3 border-r border-[#1F232B] font-mono font-medium text-white">ORD-8941</td>
-                        <td className="py-2.5 px-3 border-r border-[#1F232B] text-white">St. Mary Surgical Center</td>
-                        <td className="py-2.5 px-3 border-r border-[#1F232B] text-[#94979E]">45x HEPA Filters</td>
-                        <td className="py-2.5 px-3 border-r border-[#1F232B] bg-red-950/40">
-                          <span className="px-2 py-0.5 rounded bg-red-900/60 text-red-300 font-mono font-bold text-[11px] border border-red-700/50">
+                      <tr className={`transition-colors ${isLight ? 'hover:bg-slate-50' : 'hover:bg-[#101218]'}`}>
+                        <td className={`py-2.5 px-3 border-r font-mono text-[11px] text-center ${
+                          isLight ? 'border-slate-300 text-slate-500 bg-slate-50 font-medium' : 'border-[#1F232B] text-[#585B64] bg-[#0A0C10]'
+                        }`}>3</td>
+                        <td className={`py-2.5 px-3 border-r font-mono font-medium ${isLight ? 'border-slate-300 text-slate-900' : 'border-[#1F232B] text-white'}`}>ORD-8941</td>
+                        <td className={`py-2.5 px-3 border-r ${isLight ? 'border-slate-300 text-slate-800 font-medium' : 'border-[#1F232B] text-white'}`}>St. Mary Surgical Center</td>
+                        <td className={`py-2.5 px-3 border-r ${isLight ? 'border-slate-300 text-slate-600' : 'border-[#1F232B] text-[#94979E]'}`}>45x HEPA Filters</td>
+                        <td className={`py-2.5 px-3 border-r ${isLight ? 'border-slate-300 bg-red-50/80' : 'border-[#1F232B] bg-red-950/40'}`}>
+                          <span className={`px-2 py-0.5 rounded font-mono font-bold text-[11px] border ${
+                            isLight ? 'bg-red-100 text-red-700 border-red-300' : 'bg-red-900/60 text-red-300 border-red-700/50'
+                          }`}>
                             #VALUE!
                           </span>
                         </td>
-                        <td className="py-2.5 px-3 border-r border-[#1F232B]">
-                          <span className="px-1.5 py-0.5 rounded bg-emerald-950/40 border border-emerald-800/40 text-emerald-400 font-mono text-[10px]">
+                        <td className={`py-2.5 px-3 border-r ${isLight ? 'border-slate-300' : 'border-[#1F232B]'}`}>
+                          <span className={`px-1.5 py-0.5 rounded font-mono text-[10px] border ${
+                            isLight
+                              ? 'bg-emerald-100 border-emerald-300 text-emerald-800 font-semibold'
+                              : 'bg-emerald-950/40 border-emerald-800/40 text-emerald-400'
+                          }`}>
                             PAID
                           </span>
                         </td>
-                        <td className="py-2.5 px-3 border-r border-[#1F232B] text-[#94979E]">Tomorrow 10:00 AM</td>
-                        <td className="py-2.5 px-3 text-[#7E8390] text-[11px]">
+                        <td className={`py-2.5 px-3 border-r ${isLight ? 'border-slate-300 text-slate-600' : 'border-[#1F232B] text-[#94979E]'}`}>Tomorrow 10:00 AM</td>
+                        <td className={`py-2.5 px-3 text-[11px] ${isLight ? 'text-slate-500' : 'text-[#7E8390]'}`}>
                           Factura hecha a mano en PDF viejo (sin numeración fiscal)
                         </td>
                       </tr>
 
-                      <tr className="hover:bg-[#101218] transition-colors">
-                        <td className="py-2.5 px-3 border-r border-[#1F232B] font-mono text-[11px] text-[#585B64] text-center bg-[#0A0C10]">4</td>
-                        <td className="py-2.5 px-3 border-r border-[#1F232B] font-mono font-medium text-white">ORD-8940</td>
-                        <td className="py-2.5 px-3 border-r border-[#1F232B] text-white">Pacific Heavy Contracting LLC</td>
-                        <td className="py-2.5 px-3 border-r border-[#1F232B] text-[#94979E]">310x Heavy Bearings</td>
-                        <td className="py-2.5 px-3 border-r border-[#1F232B] tabular-nums font-semibold text-[#EDEDED]">$28,400.00</td>
-                        <td className="py-2.5 px-3 border-r border-[#1F232B]">
-                          <span className="px-1.5 py-0.5 rounded bg-blue-950/40 border border-blue-800/40 text-blue-400 font-mono text-[10px]">
+                      <tr className={`transition-colors ${isLight ? 'hover:bg-slate-50' : 'hover:bg-[#101218]'}`}>
+                        <td className={`py-2.5 px-3 border-r font-mono text-[11px] text-center ${
+                          isLight ? 'border-slate-300 text-slate-500 bg-slate-50 font-medium' : 'border-[#1F232B] text-[#585B64] bg-[#0A0C10]'
+                        }`}>4</td>
+                        <td className={`py-2.5 px-3 border-r font-mono font-medium ${isLight ? 'border-slate-300 text-slate-900' : 'border-[#1F232B] text-white'}`}>ORD-8940</td>
+                        <td className={`py-2.5 px-3 border-r ${isLight ? 'border-slate-300 text-slate-800 font-medium' : 'border-[#1F232B] text-white'}`}>Pacific Heavy Contracting LLC</td>
+                        <td className={`py-2.5 px-3 border-r ${isLight ? 'border-slate-300 text-slate-600' : 'border-[#1F232B] text-[#94979E]'}`}>310x Heavy Bearings</td>
+                        <td className={`py-2.5 px-3 border-r tabular-nums font-semibold ${isLight ? 'border-slate-300 text-slate-900' : 'border-[#1F232B] text-[#EDEDED]'}`}>$28,400.00</td>
+                        <td className={`py-2.5 px-3 border-r ${isLight ? 'border-slate-300' : 'border-[#1F232B]'}`}>
+                          <span className={`px-1.5 py-0.5 rounded font-mono text-[10px] border ${
+                            isLight
+                              ? 'bg-blue-100 border-blue-300 text-blue-800 font-semibold'
+                              : 'bg-blue-950/40 border-blue-800/40 text-blue-400'
+                          }`}>
                             IN TRANSIT
                           </span>
                         </td>
-                        <td className="py-2.5 px-3 border-r border-[#1F232B] bg-red-950/40">
-                          <span className="px-2 py-0.5 rounded bg-red-900/60 text-red-300 font-mono font-bold text-[11px] border border-red-700/50">
+                        <td className={`py-2.5 px-3 border-r ${isLight ? 'border-slate-300 bg-red-50/80' : 'border-[#1F232B] bg-red-950/40'}`}>
+                          <span className={`px-2 py-0.5 rounded font-mono font-bold text-[11px] border ${
+                            isLight ? 'bg-red-100 text-red-700 border-red-300' : 'bg-red-900/60 text-red-300 border-red-700/50'
+                          }`}>
                             #REF!
                           </span>
                         </td>
-                        <td className="py-2.5 px-3 text-[#7E8390] text-[11px]">
+                        <td className={`py-2.5 px-3 text-[11px] ${isLight ? 'text-slate-500' : 'text-[#7E8390]'}`}>
                           Chofer mandó foto de remito arrugado por chat de WhatsApp
                         </td>
                       </tr>
 
-                      <tr className="hover:bg-[#101218] transition-colors">
-                        <td className="py-2.5 px-3 border-r border-[#1F232B] font-mono text-[11px] text-[#585B64] text-center bg-[#0A0C10]">5</td>
-                        <td className="py-2.5 px-3 border-r border-[#1F232B] font-mono font-medium text-white">ORD-8939</td>
-                        <td className="py-2.5 px-3 border-r border-[#1F232B] text-white">Apex Commercial Systems Corp.</td>
-                        <td className="py-2.5 px-3 border-r border-[#1F232B] text-[#94979E]">18x Regulators</td>
-                        <td className="py-2.5 px-3 border-r border-[#1F232B] tabular-nums font-semibold text-[#EDEDED]">$4,120.00</td>
-                        <td className="py-2.5 px-3 border-r border-[#1F232B]">
-                          <span className="px-1.5 py-0.5 rounded bg-emerald-950/40 border border-emerald-800/40 text-emerald-400 font-mono text-[10px]">
+                      <tr className={`transition-colors ${isLight ? 'hover:bg-slate-50' : 'hover:bg-[#101218]'}`}>
+                        <td className={`py-2.5 px-3 border-r font-mono text-[11px] text-center ${
+                          isLight ? 'border-slate-300 text-slate-500 bg-slate-50 font-medium' : 'border-[#1F232B] text-[#585B64] bg-[#0A0C10]'
+                        }`}>5</td>
+                        <td className={`py-2.5 px-3 border-r font-mono font-medium ${isLight ? 'border-slate-300 text-slate-900' : 'border-[#1F232B] text-white'}`}>ORD-8939</td>
+                        <td className={`py-2.5 px-3 border-r ${isLight ? 'border-slate-300 text-slate-800 font-medium' : 'border-[#1F232B] text-white'}`}>Apex Commercial Systems Corp.</td>
+                        <td className={`py-2.5 px-3 border-r ${isLight ? 'border-slate-300 text-slate-600' : 'border-[#1F232B] text-[#94979E]'}`}>18x Regulators</td>
+                        <td className={`py-2.5 px-3 border-r tabular-nums font-semibold ${isLight ? 'border-slate-300 text-slate-900' : 'border-[#1F232B] text-[#EDEDED]'}`}>$4,120.00</td>
+                        <td className={`py-2.5 px-3 border-r ${isLight ? 'border-slate-300' : 'border-[#1F232B]'}`}>
+                          <span className={`px-1.5 py-0.5 rounded font-mono text-[10px] border ${
+                            isLight
+                              ? 'bg-emerald-100 border-emerald-300 text-emerald-800 font-semibold'
+                              : 'bg-emerald-950/40 border-emerald-800/40 text-emerald-400'
+                          }`}>
                             PAID
                           </span>
                         </td>
-                        <td className="py-2.5 px-3 border-r border-[#1F232B] text-[#94979E]">Delivered</td>
-                        <td className="py-2.5 px-3 text-amber-300/90 text-[11px] bg-amber-950/20">
+                        <td className={`py-2.5 px-3 border-r ${isLight ? 'border-slate-300 text-slate-600' : 'border-[#1F232B] text-[#94979E]'}`}>Delivered</td>
+                        <td className={`py-2.5 px-3 text-[11px] ${
+                          isLight ? 'text-amber-900 bg-amber-50 font-medium' : 'text-amber-300/90 bg-amber-950/20'
+                        }`}>
                           ¿Quién autorizó este 15% de descuento sin firmar?
                         </td>
                       </tr>
 
-                      <tr className="hover:bg-[#101218] transition-colors">
-                        <td className="py-2.5 px-3 border-r border-[#1F232B] font-mono text-[11px] text-[#585B64] text-center bg-[#0A0C10]">6</td>
-                        <td className="py-2.5 px-3 border-r border-[#1F232B] font-mono font-medium text-white">ORD-8938</td>
-                        <td className="py-2.5 px-3 border-r border-[#1F232B] text-white">Vanguard Manufacturing Supply</td>
-                        <td className="py-2.5 px-3 border-r border-[#1F232B] text-[#94979E]">90x Quick Couplings</td>
-                        <td className="py-2.5 px-3 border-r border-[#1F232B] tabular-nums font-semibold text-[#EDEDED]">$8,950.00</td>
-                        <td className="py-2.5 px-3 border-r border-[#1F232B]">
-                          <span className="px-1.5 py-0.5 rounded bg-amber-950/70 border border-amber-600/40 text-amber-300 font-mono text-[10px]">
+                      <tr className={`transition-colors ${isLight ? 'hover:bg-slate-50' : 'hover:bg-[#101218]'}`}>
+                        <td className={`py-2.5 px-3 border-r font-mono text-[11px] text-center ${
+                          isLight ? 'border-slate-300 text-slate-500 bg-slate-50 font-medium' : 'border-[#1F232B] text-[#585B64] bg-[#0A0C10]'
+                        }`}>6</td>
+                        <td className={`py-2.5 px-3 border-r font-mono font-medium ${isLight ? 'border-slate-300 text-slate-900' : 'border-[#1F232B] text-white'}`}>ORD-8938</td>
+                        <td className={`py-2.5 px-3 border-r ${isLight ? 'border-slate-300 text-slate-800 font-medium' : 'border-[#1F232B] text-white'}`}>Vanguard Manufacturing Supply</td>
+                        <td className={`py-2.5 px-3 border-r ${isLight ? 'border-slate-300 text-slate-600' : 'border-[#1F232B] text-[#94979E]'}`}>90x Quick Couplings</td>
+                        <td className={`py-2.5 px-3 border-r tabular-nums font-semibold ${isLight ? 'border-slate-300 text-slate-900' : 'border-[#1F232B] text-[#EDEDED]'}`}>$8,950.00</td>
+                        <td className={`py-2.5 px-3 border-r ${isLight ? 'border-slate-300' : 'border-[#1F232B]'}`}>
+                          <span className={`px-1.5 py-0.5 rounded font-mono text-[10px] border ${
+                            isLight
+                              ? 'bg-amber-100 border-amber-300 text-amber-800 font-semibold'
+                              : 'bg-amber-950/70 border-amber-600/40 text-amber-300'
+                          }`}>
                             PENDING ⚠️
                           </span>
                         </td>
-                        <td className="py-2.5 px-3 border-r border-[#1F232B] text-[#94979E]">Tomorrow 02:00 PM</td>
-                        <td className="py-2.5 px-3 text-red-300 text-[11px] bg-red-950/20">
+                        <td className={`py-2.5 px-3 border-r ${isLight ? 'border-slate-300 text-slate-600' : 'border-[#1F232B] text-[#94979E]'}`}>Tomorrow 02:00 PM</td>
+                        <td className={`py-2.5 px-3 text-[11px] ${
+                          isLight ? 'text-red-800 bg-red-50 font-medium' : 'text-red-300 bg-red-950/20'
+                        }`}>
                           Bodega dice que faltan 12 unidades físicas en estante B
                         </td>
                       </tr>
 
-                      <tr className="hover:bg-[#101218] transition-colors">
-                        <td className="py-2.5 px-3 border-r border-[#1F232B] font-mono text-[11px] text-[#585B64] text-center bg-[#0A0C10]">7</td>
-                        <td className="py-2.5 px-3 border-r border-[#1F232B] font-mono font-medium text-white">ORD-8937</td>
-                        <td className="py-2.5 px-3 border-r border-[#1F232B] text-white">Cascade Industrial Works LLC</td>
-                        <td className="py-2.5 px-3 border-r border-[#1F232B] text-[#94979E]">240x Steel Flanges</td>
-                        <td className="py-2.5 px-3 border-r border-[#1F232B] bg-red-950/40">
-                          <span className="px-2 py-0.5 rounded bg-red-900/60 text-red-300 font-mono font-bold text-[11px] border border-red-700/50">
+                      <tr className={`transition-colors ${isLight ? 'hover:bg-slate-50' : 'hover:bg-[#101218]'}`}>
+                        <td className={`py-2.5 px-3 border-r font-mono text-[11px] text-center ${
+                          isLight ? 'border-slate-300 text-slate-500 bg-slate-50 font-medium' : 'border-[#1F232B] text-[#585B64] bg-[#0A0C10]'
+                        }`}>7</td>
+                        <td className={`py-2.5 px-3 border-r font-mono font-medium ${isLight ? 'border-slate-300 text-slate-900' : 'border-[#1F232B] text-white'}`}>ORD-8937</td>
+                        <td className={`py-2.5 px-3 border-r ${isLight ? 'border-slate-300 text-slate-800 font-medium' : 'border-[#1F232B] text-white'}`}>Cascade Industrial Works LLC</td>
+                        <td className={`py-2.5 px-3 border-r ${isLight ? 'border-slate-300 text-slate-600' : 'border-[#1F232B] text-[#94979E]'}`}>240x Steel Flanges</td>
+                        <td className={`py-2.5 px-3 border-r ${isLight ? 'border-slate-300 bg-red-50/80' : 'border-[#1F232B] bg-red-950/40'}`}>
+                          <span className={`px-2 py-0.5 rounded font-mono font-bold text-[11px] border ${
+                            isLight ? 'bg-red-100 text-red-700 border-red-300' : 'bg-red-900/60 text-red-300 border-red-700/50'
+                          }`}>
                             #REF!
                           </span>
                         </td>
-                        <td className="py-2.5 px-3 border-r border-[#1F232B]">
-                          <span className="px-1.5 py-0.5 rounded bg-emerald-950/40 border border-emerald-800/40 text-emerald-400 font-mono text-[10px]">
+                        <td className={`py-2.5 px-3 border-r ${isLight ? 'border-slate-300' : 'border-[#1F232B]'}`}>
+                          <span className={`px-1.5 py-0.5 rounded font-mono text-[10px] border ${
+                            isLight
+                              ? 'bg-emerald-100 border-emerald-300 text-emerald-800 font-semibold'
+                              : 'bg-emerald-950/40 border-emerald-800/40 text-emerald-400'
+                          }`}>
                             PAID
                           </span>
                         </td>
-                        <td className="py-2.5 px-3 border-r border-[#1F232B] text-[#94979E]">Delivered</td>
-                        <td className="py-2.5 px-3 text-[#7E8390] text-[11px]">
+                        <td className={`py-2.5 px-3 border-r ${isLight ? 'border-slate-300 text-slate-600' : 'border-[#1F232B] text-[#94979E]'}`}>Delivered</td>
+                        <td className={`py-2.5 px-3 text-[11px] ${isLight ? 'text-slate-500' : 'text-[#7E8390]'}`}>
                           No tocar esta celda - rompe la fórmula de totalización general
                         </td>
                       </tr>
@@ -1212,14 +1360,16 @@ export default function App() {
                 </div>
 
                 {/* Spreadsheet Summary Warnings Bar */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-[#717684] pt-1">
+                <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs pt-1 ${
+                  isLight ? 'text-slate-600' : 'text-[#717684]'
+                }`}>
                   <div className="flex items-center gap-2 font-mono text-[11px]">
-                    <span className="text-red-400 font-bold">SUM(D2:D7) = #REF!</span>
+                    <span className={`font-bold ${isLight ? 'text-red-600' : 'text-red-400'}`}>SUM(D2:D7) = #REF!</span>
                     <span>(Corrupted calculation: team cannot verify weekly billing volume)</span>
                   </div>
                   <div className="flex items-center gap-3 text-[11px]">
-                    <span className="text-amber-400">● 0 Role-based permissions</span>
-                    <span className="text-red-400">● Zero immutable audit trail</span>
+                    <span className={isLight ? 'text-amber-700 font-medium' : 'text-amber-400'}>● 0 Role-based permissions</span>
+                    <span className={isLight ? 'text-red-600 font-medium' : 'text-red-400'}>● Zero immutable audit trail</span>
                   </div>
                 </div>
 
@@ -1231,14 +1381,22 @@ export default function App() {
               <div className="space-y-5 animate-fade-in">
                 
                 {/* Mode Sub-Navigation: Cards (Default) vs Table */}
-                <div className="flex items-center justify-between gap-3 pb-2 border-b border-[#1A1D24] flex-nowrap overflow-x-auto">
-                  <div className="inline-flex p-0.5 rounded-lg bg-[#14161D] border border-[#20232B] text-xs font-medium whitespace-nowrap shrink-0">
+                <div className={`flex items-center justify-between gap-3 pb-2 border-b flex-nowrap overflow-x-auto ${
+                  isLight ? 'border-slate-200' : 'border-[#1A1D24]'
+                }`}>
+                  <div className={`inline-flex p-0.5 rounded-lg border text-xs font-medium whitespace-nowrap shrink-0 ${
+                    isLight ? 'bg-slate-200/80 border-slate-300' : 'bg-[#14161D] border-[#20232B]'
+                  }`}>
                     <button
                       onClick={() => setVorsikSubView('cards')}
                       className={`px-3 py-1.5 rounded-md transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
                         vorsikSubView === 'cards'
-                          ? 'bg-[#1E2129] text-white shadow-sm font-semibold'
-                          : 'text-[#717684] hover:text-white'
+                          ? isLight
+                            ? 'bg-white text-slate-900 shadow-sm font-semibold'
+                            : 'bg-[#1E2129] text-white shadow-sm font-semibold'
+                          : isLight
+                            ? 'text-slate-600 hover:text-slate-900'
+                            : 'text-[#717684] hover:text-white'
                       }`}
                     >
                       <Layers className="w-3.5 h-3.5 text-[#F84B11] shrink-0" />
@@ -1249,17 +1407,23 @@ export default function App() {
                       onClick={() => setVorsikSubView('table')}
                       className={`px-3 py-1.5 rounded-md transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
                         vorsikSubView === 'table'
-                          ? 'bg-[#1E2129] text-white shadow-sm font-semibold'
-                          : 'text-[#717684] hover:text-white'
+                          ? isLight
+                            ? 'bg-white text-slate-900 shadow-sm font-semibold'
+                            : 'bg-[#1E2129] text-white shadow-sm font-semibold'
+                          : isLight
+                            ? 'text-slate-600 hover:text-slate-900'
+                            : 'text-[#717684] hover:text-white'
                       }`}
                     >
-                      <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                      <FileSpreadsheet className={`w-3.5 h-3.5 shrink-0 ${isLight ? 'text-emerald-600' : 'text-emerald-400'}`} />
                       <span className="hidden sm:inline">2. High-Density Table View</span>
                       <span className="sm:hidden inline">2. Table View</span>
                     </button>
                   </div>
 
-                  <div className="text-xs text-[#717684] flex items-center gap-2 whitespace-nowrap shrink-0">
+                  <div className={`text-xs flex items-center gap-2 whitespace-nowrap shrink-0 ${
+                    isLight ? 'text-slate-600 font-medium' : 'text-[#717684]'
+                  }`}>
                     <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
                     <span className="hidden md:inline">0.2ms Perceived • ACID Local SQLite / PostgreSQL</span>
                     <span className="md:hidden inline">0.2ms Perceived</span>
@@ -1268,28 +1432,44 @@ export default function App() {
 
                 {/* Real-Time KPIs Top Bar (Targeted by BuildCrew) */}
                 <div data-build-showroom className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  <div className="p-3.5 rounded-lg border border-[#1F232B] bg-[#0E1015]">
-                    <div className="text-[11px] font-semibold uppercase tracking-wider text-[#717684] mb-0.5">Pending Approval</div>
-                    <div className="text-base font-bold text-white tabular-nums">2 Orders</div>
-                    <p className="text-[11px] text-amber-400 mt-0.5">$23,200 USD in queue</p>
+                  <div className={`p-3.5 rounded-lg border transition-colors ${
+                    isLight ? 'border-slate-200 bg-white shadow-xs' : 'border-[#1F232B] bg-[#0E1015]'
+                  }`}>
+                    <div className={`text-[11px] font-semibold uppercase tracking-wider mb-0.5 ${
+                      isLight ? 'text-slate-500 font-medium' : 'text-[#717684]'
+                    }`}>Pending Approval</div>
+                    <div className={`text-base font-bold tabular-nums ${isLight ? 'text-slate-900' : 'text-white'}`}>2 Orders</div>
+                    <p className={`text-[11px] mt-0.5 ${isLight ? 'text-amber-700 font-medium' : 'text-amber-400'}`}>$23,200 USD in queue</p>
                   </div>
 
-                  <div className="p-3.5 rounded-lg border border-[#1F232B] bg-[#0E1015]">
-                    <div className="text-[11px] font-semibold uppercase tracking-wider text-[#717684] mb-0.5">Active In Transit</div>
-                    <div className="text-base font-bold text-white tabular-nums">1 Shipment</div>
-                    <p className="text-[11px] text-blue-400 mt-0.5">Truck #04 ETA 35 mins</p>
+                  <div className={`p-3.5 rounded-lg border transition-colors ${
+                    isLight ? 'border-slate-200 bg-white shadow-xs' : 'border-[#1F232B] bg-[#0E1015]'
+                  }`}>
+                    <div className={`text-[11px] font-semibold uppercase tracking-wider mb-0.5 ${
+                      isLight ? 'text-slate-500 font-medium' : 'text-[#717684]'
+                    }`}>Active In Transit</div>
+                    <div className={`text-base font-bold tabular-nums ${isLight ? 'text-slate-900' : 'text-white'}`}>1 Shipment</div>
+                    <p className={`text-[11px] mt-0.5 ${isLight ? 'text-blue-700 font-medium' : 'text-blue-400'}`}>Truck #04 ETA 35 mins</p>
                   </div>
 
-                  <div className="p-3.5 rounded-lg border border-[#1F232B] bg-[#0E1015]">
-                    <div className="text-[11px] font-semibold uppercase tracking-wider text-[#717684] mb-0.5">Collected Volume</div>
-                    <div className="text-base font-bold text-white tabular-nums">$65,060 USD</div>
-                    <p className="text-[11px] text-emerald-400 mt-0.5">100% Reconciled</p>
+                  <div className={`p-3.5 rounded-lg border transition-colors ${
+                    isLight ? 'border-slate-200 bg-white shadow-xs' : 'border-[#1F232B] bg-[#0E1015]'
+                  }`}>
+                    <div className={`text-[11px] font-semibold uppercase tracking-wider mb-0.5 ${
+                      isLight ? 'text-slate-500 font-medium' : 'text-[#717684]'
+                    }`}>Collected Volume</div>
+                    <div className={`text-base font-bold tabular-nums ${isLight ? 'text-slate-900' : 'text-white'}`}>$65,060 USD</div>
+                    <p className={`text-[11px] mt-0.5 ${isLight ? 'text-emerald-700 font-medium' : 'text-emerald-400'}`}>100% Reconciled</p>
                   </div>
 
-                  <div className="p-3.5 rounded-lg border border-[#1F232B] bg-[#0E1015]">
-                    <div className="text-[11px] font-semibold uppercase tracking-wider text-[#717684] mb-0.5">System Latency</div>
-                    <div className="text-base font-bold text-white tabular-nums">0.2ms Perceived</div>
-                    <p className="text-[11px] text-emerald-400 mt-0.5">Local NVMe on LAN</p>
+                  <div className={`p-3.5 rounded-lg border transition-colors ${
+                    isLight ? 'border-slate-200 bg-white shadow-xs' : 'border-[#1F232B] bg-[#0E1015]'
+                  }`}>
+                    <div className={`text-[11px] font-semibold uppercase tracking-wider mb-0.5 ${
+                      isLight ? 'text-slate-500 font-medium' : 'text-[#717684]'
+                    }`}>System Latency</div>
+                    <div className={`text-base font-bold tabular-nums ${isLight ? 'text-slate-900' : 'text-white'}`}>0.2ms Perceived</div>
+                    <p className={`text-[11px] mt-0.5 ${isLight ? 'text-emerald-700 font-medium' : 'text-emerald-400'}`}>Local NVMe on LAN</p>
                   </div>
                 </div>
 
@@ -1301,16 +1481,26 @@ export default function App() {
                     <div className="lg:col-span-7 space-y-4">
                       
                       {/* Stage 1: Needs Approval */}
-                      <div data-build-showroom className="p-4 rounded-xl border border-[#232731] bg-[#0E1015] space-y-3">
-                        <div className="flex items-center justify-between pb-2 border-b border-[#1A1D24]">
+                      <div data-build-showroom className={`p-4 rounded-xl border space-y-3 transition-colors ${
+                        isLight ? 'border-slate-200 bg-white shadow-xs' : 'border-[#232731] bg-[#0E1015]'
+                      }`}>
+                        <div className={`flex items-center justify-between pb-2 border-b ${
+                          isLight ? 'border-slate-100' : 'border-[#1A1D24]'
+                        }`}>
                           <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 rounded-full bg-amber-400" />
-                            <span className="text-xs font-bold uppercase tracking-wider text-white">Stage 1: Needs Approval</span>
-                            <span className="px-1.5 py-0.2 rounded bg-amber-950/80 text-amber-300 font-mono text-[10px] border border-amber-800/40">
+                            <div className={`w-2 h-2 rounded-full ${isLight ? 'bg-amber-500' : 'bg-amber-400'}`} />
+                            <span className={`text-xs font-bold uppercase tracking-wider ${isLight ? 'text-slate-900' : 'text-white'}`}>
+                              Stage 1: Needs Approval
+                            </span>
+                            <span className={`px-1.5 py-0.2 rounded font-mono text-[10px] border ${
+                              isLight
+                                ? 'bg-amber-100 text-amber-800 border-amber-300 font-semibold'
+                                : 'bg-amber-950/80 text-amber-300 border-amber-800/40'
+                            }`}>
                               {b2bOrders.filter(o => o.status === 'Pending Approval').length} Orders
                             </span>
                           </div>
-                          <span className="text-[11px] text-amber-400 font-semibold">$23,200 USD</span>
+                          <span className={`text-[11px] font-semibold ${isLight ? 'text-amber-700' : 'text-amber-400'}`}>$23,200 USD</span>
                         </div>
 
                         <div className="space-y-2.5">
@@ -1320,23 +1510,27 @@ export default function App() {
                               onClick={() => setSelectedOrderId(order.id)}
                               className={`p-3.5 rounded-lg border transition-all cursor-pointer ${
                                 selectedOrderId === order.id
-                                  ? 'border-[#F84B11] bg-[#141620] shadow-md shadow-[#F84B11]/10'
-                                  : 'border-[#1E222A] bg-[#0A0C10] hover:border-[#2C303B]'
+                                  ? isLight
+                                    ? 'border-[#F84B11] bg-orange-50/60 shadow-md shadow-[#F84B11]/15 ring-1 ring-[#F84B11]/30'
+                                    : 'border-[#F84B11] bg-[#141620] shadow-md shadow-[#F84B11]/10'
+                                  : isLight
+                                    ? 'border-slate-200 bg-slate-50/70 hover:border-slate-300 hover:bg-slate-100/70'
+                                    : 'border-[#1E222A] bg-[#0A0C10] hover:border-[#2C303B]'
                               }`}
                             >
                               <div className="flex items-start justify-between gap-2 mb-1.5">
                                 <div>
                                   <span className="font-mono text-xs font-semibold text-[#F84B11] mr-2">{order.id}</span>
-                                  <span className="font-semibold text-white text-xs">{order.client}</span>
+                                  <span className={`font-semibold text-xs ${isLight ? 'text-slate-900' : 'text-white'}`}>{order.client}</span>
                                 </div>
-                                <span className="tabular-nums font-bold text-white text-xs">{order.total}</span>
+                                <span className={`tabular-nums font-bold text-xs ${isLight ? 'text-slate-900' : 'text-white'}`}>{order.total}</span>
                               </div>
 
-                              <p className="text-[11px] text-[#94979E] mb-3">{order.items}</p>
+                              <p className={`text-[11px] mb-3 ${isLight ? 'text-slate-600' : 'text-[#94979E]'}`}>{order.items}</p>
 
                               <div className="flex items-center justify-between text-[11px]">
-                                <span className="text-[#717684] flex items-center gap-1">
-                                  <Clock3 className="w-3 h-3 text-amber-400" />
+                                <span className={`flex items-center gap-1 ${isLight ? 'text-slate-500' : 'text-[#717684]'}`}>
+                                  <Clock3 className={`w-3 h-3 ${isLight ? 'text-amber-600' : 'text-amber-400'}`} />
                                   <span>SLA: {order.sla}</span>
                                 </span>
                                 <button
@@ -1356,16 +1550,26 @@ export default function App() {
                       </div>
 
                       {/* Stage 2: Active Dispatch & In Transit */}
-                      <div data-build-showroom className="p-4 rounded-xl border border-[#232731] bg-[#0E1015] space-y-3">
-                        <div className="flex items-center justify-between pb-2 border-b border-[#1A1D24]">
+                      <div data-build-showroom className={`p-4 rounded-xl border space-y-3 transition-colors ${
+                        isLight ? 'border-slate-200 bg-white shadow-xs' : 'border-[#232731] bg-[#0E1015]'
+                      }`}>
+                        <div className={`flex items-center justify-between pb-2 border-b ${
+                          isLight ? 'border-slate-100' : 'border-[#1A1D24]'
+                        }`}>
                           <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 rounded-full bg-blue-400" />
-                            <span className="text-xs font-bold uppercase tracking-wider text-white">Stage 2: In Transit / Fulfillment</span>
-                            <span className="px-1.5 py-0.2 rounded bg-blue-950/80 text-blue-300 font-mono text-[10px] border border-blue-800/40">
+                            <div className={`w-2 h-2 rounded-full ${isLight ? 'bg-blue-500' : 'bg-blue-400'}`} />
+                            <span className={`text-xs font-bold uppercase tracking-wider ${isLight ? 'text-slate-900' : 'text-white'}`}>
+                              Stage 2: In Transit / Fulfillment
+                            </span>
+                            <span className={`px-1.5 py-0.2 rounded font-mono text-[10px] border ${
+                              isLight
+                                ? 'bg-blue-100 text-blue-800 border-blue-300 font-semibold'
+                                : 'bg-blue-950/80 text-blue-300 border-blue-800/40'
+                            }`}>
                               {b2bOrders.filter(o => o.status === 'In Transit').length} En Route
                             </span>
                           </div>
-                          <span className="text-[11px] text-blue-400 font-semibold">$28,400 USD</span>
+                          <span className={`text-[11px] font-semibold ${isLight ? 'text-blue-700' : 'text-blue-400'}`}>$28,400 USD</span>
                         </div>
 
                         <div className="space-y-2.5">
@@ -1375,44 +1579,54 @@ export default function App() {
                               onClick={() => setSelectedOrderId(order.id)}
                               className={`p-3.5 rounded-lg border transition-all cursor-pointer ${
                                 selectedOrderId === order.id
-                                  ? 'border-[#F84B11] bg-[#141620] shadow-md shadow-[#F84B11]/10'
-                                  : 'border-[#1E222A] bg-[#0A0C10] hover:border-[#2C303B]'
+                                  ? isLight
+                                    ? 'border-[#F84B11] bg-orange-50/60 shadow-md shadow-[#F84B11]/15 ring-1 ring-[#F84B11]/30'
+                                    : 'border-[#F84B11] bg-[#141620] shadow-md shadow-[#F84B11]/10'
+                                  : isLight
+                                    ? 'border-slate-200 bg-slate-50/70 hover:border-slate-300 hover:bg-slate-100/70'
+                                    : 'border-[#1E222A] bg-[#0A0C10] hover:border-[#2C303B]'
                               }`}
                             >
                               <div className="flex items-start justify-between gap-2 mb-1.5">
                                 <div>
                                   <span className="font-mono text-xs font-semibold text-[#F84B11] mr-2">{order.id}</span>
-                                  <span className="font-semibold text-white text-xs">{order.client}</span>
+                                  <span className={`font-semibold text-xs ${isLight ? 'text-slate-900' : 'text-white'}`}>{order.client}</span>
                                 </div>
-                                <span className="tabular-nums font-bold text-white text-xs">{order.total}</span>
+                                <span className={`tabular-nums font-bold text-xs ${isLight ? 'text-slate-900' : 'text-white'}`}>{order.total}</span>
                               </div>
 
-                              <p className="text-[11px] text-[#94979E] mb-2">{order.items}</p>
+                              <p className={`text-[11px] mb-2 ${isLight ? 'text-slate-600' : 'text-[#94979E]'}`}>{order.items}</p>
 
                               {/* Visual Route Progress */}
-                              <div className="p-2.5 rounded bg-[#12141C] border border-[#1C2028] mb-2.5">
-                                <div className="flex items-center justify-between text-[10px] text-[#94979E] mb-1">
-                                  <span className="text-white font-medium">Truck #04 • Regional Corridor</span>
-                                  <span className="text-blue-400 font-semibold">68% Dispatched</span>
+                              <div className={`p-2.5 rounded border mb-2.5 transition-colors ${
+                                isLight ? 'bg-white border-slate-200 shadow-xs' : 'bg-[#12141C] border-[#1C2028]'
+                              }`}>
+                                <div className="flex items-center justify-between text-[10px] mb-1">
+                                  <span className={`font-medium ${isLight ? 'text-slate-900' : 'text-white'}`}>Truck #04 • Regional Corridor</span>
+                                  <span className={`font-semibold ${isLight ? 'text-blue-700' : 'text-blue-400'}`}>68% Dispatched</span>
                                 </div>
-                                <div className="w-full bg-[#1C2028] h-1.5 rounded-full overflow-hidden">
+                                <div className={`w-full h-1.5 rounded-full overflow-hidden ${isLight ? 'bg-slate-200' : 'bg-[#1C2028]'}`}>
                                   <div className="bg-blue-500 h-full w-[68%] rounded-full" />
                                 </div>
-                                <div className="flex items-center justify-between text-[10px] text-[#717684] mt-1.5">
+                                <div className={`flex items-center justify-between text-[10px] mt-1.5 ${isLight ? 'text-slate-500' : 'text-[#717684]'}`}>
                                   <span>Waypoint: Highway Interlink 4</span>
-                                  <span className="text-emerald-400 font-medium">ETA 35 mins</span>
+                                  <span className={`font-medium ${isLight ? 'text-emerald-700' : 'text-emerald-400'}`}>ETA 35 mins</span>
                                 </div>
                               </div>
 
                               <div className="flex items-center justify-between text-[11px]">
-                                <span className="text-[#717684] text-[10px]">{order.notes}</span>
+                                <span className={`text-[10px] ${isLight ? 'text-slate-500' : 'text-[#717684]'}`}>{order.notes}</span>
                                 <button
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     setToastMessage(`Truck #04 GPS ping: 1.4 miles to delivery dock. Telemetry synced (0.1ms).`);
                                     setTimeout(() => setToastMessage(null), 3000);
                                   }}
-                                  className="px-2.5 py-1 rounded bg-blue-950/70 hover:bg-blue-900/80 active:scale-[0.95] text-blue-300 border border-blue-700/50 font-medium text-[11px] transition-all flex items-center gap-1 cursor-pointer"
+                                  className={`px-2.5 py-1 rounded border font-medium text-[11px] transition-all flex items-center gap-1 cursor-pointer ${
+                                    isLight
+                                      ? 'bg-blue-50 hover:bg-blue-100 active:scale-[0.95] text-blue-700 border-blue-200 shadow-xs'
+                                      : 'bg-blue-950/70 hover:bg-blue-900/80 active:scale-[0.95] text-blue-300 border-blue-700/50'
+                                  }`}
                                 >
                                   <Truck className="w-3 h-3" />
                                   <span>Track Driver</span>
@@ -1426,68 +1640,78 @@ export default function App() {
                     </div>
 
                     {/* Right: Live Order Inspector & One-Click Billing Console (5 cols) */}
-                    <div data-build-showroom className="lg:col-span-5 p-4 sm:p-5 rounded-xl border border-[#232731] bg-[#0E1015] flex flex-col justify-between">
+                    <div data-build-showroom className={`lg:col-span-5 p-4 sm:p-5 rounded-xl border flex flex-col justify-between transition-colors ${
+                      isLight ? 'border-slate-200 bg-white shadow-xs' : 'border-[#232731] bg-[#0E1015]'
+                    }`}>
                       <div>
-                        <div className="flex items-center justify-between pb-3 border-b border-[#1A1D24] mb-4">
+                        <div className={`flex items-center justify-between pb-3 border-b mb-4 ${
+                          isLight ? 'border-slate-100' : 'border-[#1A1D24]'
+                        }`}>
                           <div>
                             <span className="text-[11px] font-semibold uppercase tracking-wider text-[#F84B11]">Live Order Inspector</span>
-                            <h4 className="text-base font-bold text-white flex items-center gap-2 mt-0.5">
+                            <h4 className={`text-base font-bold flex items-center gap-2 mt-0.5 ${isLight ? 'text-slate-900' : 'text-white'}`}>
                               <span>{selectedOrder.id}</span>
                               <span className={`px-2 py-0.5 rounded text-[10px] font-medium border ${
                                 selectedOrder.status === 'Pending Approval'
-                                  ? 'bg-amber-950/70 text-amber-300 border-amber-800/40'
+                                  ? isLight ? 'bg-amber-100 text-amber-800 border-amber-300' : 'bg-amber-950/70 text-amber-300 border-amber-800/40'
                                   : selectedOrder.status === 'In Transit'
-                                  ? 'bg-blue-950/70 text-blue-300 border-blue-800/40'
-                                  : 'bg-emerald-950/70 text-emerald-300 border-emerald-800/40'
+                                  ? isLight ? 'bg-blue-100 text-blue-800 border-blue-300' : 'bg-blue-950/70 text-blue-300 border-blue-800/40'
+                                  : isLight ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : 'bg-emerald-950/70 text-emerald-300 border-emerald-800/40'
                               }`}>
                                 {selectedOrder.status}
                               </span>
                             </h4>
                           </div>
                           <div className="text-right">
-                            <div className="text-[10px] text-[#717684]">Total Order Net</div>
-                            <div className="text-base font-bold text-white tabular-nums">{selectedOrder.total}</div>
+                            <div className={`text-[10px] ${isLight ? 'text-slate-500' : 'text-[#717684]'}`}>Total Order Net</div>
+                            <div className={`text-base font-bold tabular-nums ${isLight ? 'text-slate-900' : 'text-white'}`}>{selectedOrder.total}</div>
                           </div>
                         </div>
 
                         {/* Account Profile Card */}
-                        <div className="p-3 rounded-lg bg-[#0A0C10] border border-[#1A1D24] mb-4 space-y-2 text-xs">
+                        <div className={`p-3 rounded-lg border mb-4 space-y-2 text-xs transition-colors ${
+                          isLight ? 'bg-slate-50 border-slate-200' : 'bg-[#0A0C10] border-[#1A1D24]'
+                        }`}>
                           <div className="flex items-center justify-between">
-                            <span className="text-[#717684]">Client Account:</span>
-                            <span className="font-semibold text-white truncate max-w-[200px]">{selectedOrder.client}</span>
+                            <span className={isLight ? 'text-slate-500' : 'text-[#717684]'}>Client Account:</span>
+                            <span className={`font-semibold truncate max-w-[200px] ${isLight ? 'text-slate-900' : 'text-white'}`}>{selectedOrder.client}</span>
                           </div>
                           <div className="flex items-center justify-between">
-                            <span className="text-[#717684]">Account Executive:</span>
-                            <span className="text-[#EDEDED]">{selectedOrder.rep}</span>
+                            <span className={isLight ? 'text-slate-500' : 'text-[#717684]'}>Account Executive:</span>
+                            <span className={isLight ? 'text-slate-800 font-medium' : 'text-[#EDEDED]'}>{selectedOrder.rep}</span>
                           </div>
                           <div className="flex items-center justify-between">
-                            <span className="text-[#717684]">Payment Terms:</span>
-                            <span className="text-emerald-400 font-medium">Net-30 (Approved Credit)</span>
+                            <span className={isLight ? 'text-slate-500' : 'text-[#717684]'}>Payment Terms:</span>
+                            <span className={`font-medium ${isLight ? 'text-emerald-700 font-semibold' : 'text-emerald-400'}`}>Net-30 (Approved Credit)</span>
                           </div>
                           <div className="flex items-center justify-between">
-                            <span className="text-[#717684]">Delivery SLA:</span>
-                            <span className="text-[#EDEDED]">{selectedOrder.sla}</span>
+                            <span className={isLight ? 'text-slate-500' : 'text-[#717684]'}>Delivery SLA:</span>
+                            <span className={isLight ? 'text-slate-800 font-medium' : 'text-[#EDEDED]'}>{selectedOrder.sla}</span>
                           </div>
                         </div>
 
                         {/* SKU Breakdown Visual List */}
                         <div className="space-y-2 mb-4">
-                          <div className="text-[11px] font-semibold uppercase tracking-wider text-[#717684]">Verified Line Items</div>
-                          <div className="p-3 rounded-lg bg-[#0A0C10] border border-[#1A1D24]">
-                            <div className="flex items-center justify-between text-xs font-semibold text-white mb-1">
+                          <div className={`text-[11px] font-semibold uppercase tracking-wider ${isLight ? 'text-slate-500' : 'text-[#717684]'}`}>
+                            Verified Line Items
+                          </div>
+                          <div className={`p-3 rounded-lg border transition-colors ${
+                            isLight ? 'bg-slate-50 border-slate-200' : 'bg-[#0A0C10] border-[#1A1D24]'
+                          }`}>
+                            <div className={`flex items-center justify-between text-xs font-semibold mb-1 ${isLight ? 'text-slate-900' : 'text-white'}`}>
                               <span>{selectedOrder.items}</span>
                               <span className="tabular-nums">{selectedOrder.total}</span>
                             </div>
-                            <div className="text-[10px] text-[#717684] flex items-center justify-between">
+                            <div className={`text-[10px] flex items-center justify-between ${isLight ? 'text-slate-500' : 'text-[#717684]'}`}>
                               <span>Quantity: {selectedOrder.units} units</span>
-                              <span className="text-emerald-400 font-medium">Barcode Verified (0ms)</span>
+                              <span className={`font-medium ${isLight ? 'text-emerald-700 font-semibold' : 'text-emerald-400'}`}>Barcode Verified (0ms)</span>
                             </div>
                           </div>
                         </div>
                       </div>
 
                       {/* One-Click Tactical Actions */}
-                      <div className="space-y-2 pt-3 border-t border-[#1A1D24]">
+                      <div className={`space-y-2 pt-3 border-t ${isLight ? 'border-slate-100' : 'border-[#1A1D24]'}`}>
                         {selectedOrder.status === 'Pending Approval' ? (
                           <button
                             onClick={() => handleApproveB2BOrder(selectedOrder.id)}
@@ -1499,14 +1723,18 @@ export default function App() {
                         ) : (
                           <button
                             onClick={() => handleGenerateB2BInvoice(selectedOrder.id)}
-                            className="w-full py-2.5 rounded-lg bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-700/60 active:scale-[0.98] text-emerald-300 font-semibold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm"
+                            className={`w-full py-2.5 rounded-lg active:scale-[0.98] font-semibold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm ${
+                              isLight
+                                ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-600/20'
+                                : 'bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-700/60 text-emerald-300'
+                            }`}
                           >
                             <FileText className="w-4 h-4" />
                             <span>{selectedOrder.invoiced ? 'Re-Issue Encrypted Invoice' : 'Generate & Send PDF Invoice'}</span>
                           </button>
                         )}
 
-                        <div className="text-[10px] text-[#585B64] text-center pt-1">
+                        <div className={`text-[10px] text-center pt-1 ${isLight ? 'text-slate-400' : 'text-[#585B64]'}`}>
                           Cryptographic local WAL hash: 0x8f2a...99c4 • Synchronized
                         </div>
                       </div>
@@ -1521,11 +1749,15 @@ export default function App() {
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
                       
                       {/* Status Filters */}
-                      <div className="inline-flex p-0.5 rounded-lg bg-[#14161D] border border-[#20232B] text-xs font-medium whitespace-nowrap shrink-0 overflow-x-auto">
+                      <div className={`inline-flex p-0.5 rounded-lg border text-xs font-medium whitespace-nowrap shrink-0 overflow-x-auto ${
+                        isLight ? 'bg-slate-200/80 border-slate-300' : 'bg-[#14161D] border-[#20232B]'
+                      }`}>
                         <button
                           onClick={() => setB2BFilter('all')}
                           className={`px-2.5 py-1 rounded transition-colors whitespace-nowrap cursor-pointer ${
-                            b2bFilter === 'all' ? 'bg-[#1E2129] text-white shadow-sm font-semibold' : 'text-[#717684] hover:text-white'
+                            b2bFilter === 'all'
+                              ? isLight ? 'bg-white text-slate-900 shadow-sm font-semibold' : 'bg-[#1E2129] text-white shadow-sm font-semibold'
+                              : isLight ? 'text-slate-600 hover:text-slate-900' : 'text-[#717684] hover:text-white'
                           }`}
                         >
                           All ({b2bOrders.length})
@@ -1533,7 +1765,9 @@ export default function App() {
                         <button
                           onClick={() => setB2BFilter('pending')}
                           className={`px-2.5 py-1 rounded transition-colors whitespace-nowrap cursor-pointer ${
-                            b2bFilter === 'pending' ? 'bg-[#1E2129] text-amber-300 shadow-sm font-semibold' : 'text-[#717684] hover:text-white'
+                            b2bFilter === 'pending'
+                              ? isLight ? 'bg-white text-amber-800 shadow-sm font-semibold' : 'bg-[#1E2129] text-amber-300 shadow-sm font-semibold'
+                              : isLight ? 'text-slate-600 hover:text-slate-900' : 'text-[#717684] hover:text-white'
                           }`}
                         >
                           Pending ({b2bOrders.filter(o => o.status === 'Pending Approval').length})
@@ -1541,7 +1775,9 @@ export default function App() {
                         <button
                           onClick={() => setB2BFilter('transit')}
                           className={`px-2.5 py-1 rounded transition-colors whitespace-nowrap cursor-pointer ${
-                            b2bFilter === 'transit' ? 'bg-[#1E2129] text-blue-300 shadow-sm font-semibold' : 'text-[#717684] hover:text-white'
+                            b2bFilter === 'transit'
+                              ? isLight ? 'bg-white text-blue-800 shadow-sm font-semibold' : 'bg-[#1E2129] text-blue-300 shadow-sm font-semibold'
+                              : isLight ? 'text-slate-600 hover:text-slate-900' : 'text-[#717684] hover:text-white'
                           }`}
                         >
                           In Transit ({b2bOrders.filter(o => o.status === 'In Transit').length})
@@ -1549,7 +1785,9 @@ export default function App() {
                         <button
                           onClick={() => setB2BFilter('completed')}
                           className={`px-2.5 py-1 rounded transition-colors whitespace-nowrap cursor-pointer ${
-                            b2bFilter === 'completed' ? 'bg-[#1E2129] text-emerald-300 shadow-sm font-semibold' : 'text-[#717684] hover:text-white'
+                            b2bFilter === 'completed'
+                              ? isLight ? 'bg-white text-emerald-800 shadow-sm font-semibold' : 'bg-[#1E2129] text-emerald-300 shadow-sm font-semibold'
+                              : isLight ? 'text-slate-600 hover:text-slate-900' : 'text-[#717684] hover:text-white'
                           }`}
                         >
                           Invoiced ({b2bOrders.filter(o => o.status === 'Invoiced & Completed' || o.status === 'Approved & Queued').length})
@@ -1559,18 +1797,28 @@ export default function App() {
                       {/* Search Bar & Quick Order Button */}
                       <div className="flex items-center gap-2 shrink-0">
                         <div className="relative">
-                          <Search className="w-3.5 h-3.5 text-[#585B64] absolute left-2.5 top-1/2 -translate-y-1/2" />
+                          <Search className={`w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 ${
+                            isLight ? 'text-slate-400' : 'text-[#585B64]'
+                          }`} />
                           <input 
                             type="text"
                             placeholder="Search client, SKU, or order ID..."
                             value={b2bSearch}
                             onChange={(e) => setB2BSearch(e.target.value)}
-                            className="bg-[#14161D] border border-[#232731] rounded-md pl-8 pr-3 py-1.5 text-xs text-white placeholder:text-[#585B64] focus:outline-none focus:border-[#F84B11] transition-colors w-52 sm:w-64"
+                            className={`border rounded-md pl-8 pr-3 py-1.5 text-xs transition-colors w-52 sm:w-64 focus:outline-none focus:border-[#F84B11] ${
+                              isLight
+                                ? 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 shadow-xs'
+                                : 'bg-[#14161D] border-[#232731] text-white placeholder:text-[#585B64]'
+                            }`}
                           />
                         </div>
                         <button 
                           onClick={handleQuickAddB2BOrder}
-                          className="px-3 py-1.5 rounded-md bg-[#161922] hover:bg-[#1E222D] active:scale-[0.97] border border-[#232731] hover:border-[#F84B11]/50 text-xs font-medium text-white flex items-center gap-1.5 transition-all duration-150 cursor-pointer whitespace-nowrap shrink-0"
+                          className={`px-3 py-1.5 rounded-md border active:scale-[0.97] text-xs font-medium flex items-center gap-1.5 transition-all duration-150 cursor-pointer whitespace-nowrap shrink-0 ${
+                            isLight
+                              ? 'bg-white hover:bg-slate-50 border-slate-300 hover:border-[#F84B11]/50 text-slate-800 shadow-xs'
+                              : 'bg-[#161922] hover:bg-[#1E222D] border-[#232731] hover:border-[#F84B11]/50 text-white'
+                          }`}
                         >
                           <Plus className="w-3.5 h-3.5 text-[#F84B11] shrink-0" />
                           <span>New Order</span>
@@ -1580,9 +1828,13 @@ export default function App() {
                     </div>
 
                     {/* Vorsik Production Table */}
-                    <div className="overflow-x-auto border border-[#1F232B] rounded-lg bg-[#0A0C10]">
+                    <div className={`overflow-x-auto border rounded-lg transition-colors ${
+                      isLight ? 'border-slate-300 bg-white shadow-xs' : 'border-[#1F232B] bg-[#0A0C10]'
+                    }`}>
                       <table className="w-full text-left text-xs min-w-[960px]">
-                        <thead className="border-b border-[#1F232B] text-[#585B64] bg-[#0E1015] uppercase tracking-wider font-semibold text-[11px] whitespace-nowrap">
+                        <thead className={`border-b uppercase tracking-wider font-semibold text-[11px] whitespace-nowrap ${
+                          isLight ? 'border-slate-300 text-slate-600 bg-slate-100' : 'border-[#1F232B] text-[#585B64] bg-[#0E1015]'
+                        }`}>
                           <tr>
                             <th className="py-2.5 px-4 font-medium whitespace-nowrap">Order ID</th>
                             <th className="py-2.5 px-4 font-medium whitespace-nowrap">Account / Client</th>
@@ -1593,28 +1845,32 @@ export default function App() {
                             <th className="py-2.5 px-4 text-right font-medium whitespace-nowrap">Operational Action</th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-[#171920] whitespace-nowrap">
+                        <tbody className={`divide-y whitespace-nowrap ${
+                          isLight ? 'divide-slate-200' : 'divide-[#171920]'
+                        }`}>
                           {filteredB2BOrders.map((order) => (
-                            <tr key={order.id} className="hover:bg-[#141620] transition-colors duration-150 whitespace-nowrap">
+                            <tr key={order.id} className={`transition-colors duration-150 whitespace-nowrap ${
+                              isLight ? 'hover:bg-slate-50' : 'hover:bg-[#141620]'
+                            }`}>
                               <td className="py-3 px-4 font-mono font-semibold text-[#F84B11] whitespace-nowrap">{order.id}</td>
-                              <td className="py-3 px-4 font-semibold text-white whitespace-nowrap">
+                              <td className={`py-3 px-4 font-semibold whitespace-nowrap ${isLight ? 'text-slate-900' : 'text-white'}`}>
                                 <span>{order.client}</span>
                               </td>
-                              <td className="py-3 px-4 text-[#EDEDED] whitespace-nowrap">
+                              <td className={`py-3 px-4 whitespace-nowrap ${isLight ? 'text-slate-700' : 'text-[#EDEDED]'}`}>
                                 <span>{order.items}</span>
-                                <span className="text-[#717684] ml-1.5 font-mono text-[11px]">({order.units} units)</span>
+                                <span className={`ml-1.5 font-mono text-[11px] ${isLight ? 'text-slate-500' : 'text-[#717684]'}`}>({order.units} units)</span>
                               </td>
-                              <td className="py-3 px-4 tabular-nums font-semibold text-white whitespace-nowrap">{order.total}</td>
-                              <td className="py-3 px-4 text-[#94979E] text-[11px] whitespace-nowrap">{order.sla}</td>
+                              <td className={`py-3 px-4 tabular-nums font-semibold whitespace-nowrap ${isLight ? 'text-slate-900' : 'text-white'}`}>{order.total}</td>
+                              <td className={`py-3 px-4 text-[11px] whitespace-nowrap ${isLight ? 'text-slate-600' : 'text-[#94979E]'}`}>{order.sla}</td>
                               <td className="py-3 px-4 whitespace-nowrap">
                                 <span className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium whitespace-nowrap transition-colors ${
                                   order.status === 'Approved & Queued' 
-                                    ? 'bg-emerald-950/60 text-emerald-400 border border-emerald-800/40' 
+                                    ? isLight ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-emerald-950/60 text-emerald-400 border border-emerald-800/40' 
                                     : order.status === 'In Transit'
-                                    ? 'bg-blue-950/60 text-blue-400 border border-blue-800/40'
+                                    ? isLight ? 'bg-blue-100 text-blue-800 border border-blue-300' : 'bg-blue-950/60 text-blue-400 border border-blue-800/40'
                                     : order.status === 'Invoiced & Completed'
-                                    ? 'bg-zinc-800/60 text-zinc-300 border border-zinc-700/40'
-                                    : 'bg-[#251A15] text-[#F84B11] border border-[#F84B11]/30'
+                                    ? isLight ? 'bg-slate-100 text-slate-700 border border-slate-300' : 'bg-zinc-800/60 text-zinc-300 border border-zinc-700/40'
+                                    : isLight ? 'bg-orange-50 text-[#F84B11] border border-[#F84B11]/40' : 'bg-[#251A15] text-[#F84B11] border border-[#F84B11]/30'
                                 }`}>
                                   {order.status}
                                 </span>
@@ -1631,7 +1887,11 @@ export default function App() {
                                 ) : order.status === 'Approved & Queued' ? (
                                   <button
                                     onClick={() => handleGenerateB2BInvoice(order.id)}
-                                    className="px-2.5 py-1 rounded bg-emerald-950/70 hover:bg-emerald-900/80 active:scale-[0.95] text-emerald-300 border border-emerald-700/50 font-medium text-[11px] transition-all duration-150 cursor-pointer inline-flex items-center gap-1 whitespace-nowrap"
+                                    className={`px-2.5 py-1 rounded active:scale-[0.95] font-medium text-[11px] transition-all duration-150 cursor-pointer inline-flex items-center gap-1 whitespace-nowrap ${
+                                      isLight
+                                        ? 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-300 shadow-xs'
+                                        : 'bg-emerald-950/70 hover:bg-emerald-900/80 text-emerald-300 border border-emerald-700/50'
+                                    }`}
                                   >
                                     <FileText className="w-3 h-3 shrink-0" />
                                     <span>Issue Invoice</span>
@@ -1642,13 +1902,19 @@ export default function App() {
                                       setToastMessage(`Truck #04 en route to ${order.client}. GPS ping: 0.1ms.`);
                                       setTimeout(() => setToastMessage(null), 3000);
                                     }}
-                                    className="px-2.5 py-1 rounded bg-blue-950/70 hover:bg-blue-900/80 active:scale-[0.95] text-blue-300 border border-blue-700/50 font-medium text-[11px] transition-all duration-150 cursor-pointer inline-flex items-center gap-1 whitespace-nowrap"
+                                    className={`px-2.5 py-1 rounded active:scale-[0.95] font-medium text-[11px] transition-all duration-150 cursor-pointer inline-flex items-center gap-1 whitespace-nowrap ${
+                                      isLight
+                                        ? 'bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-300 shadow-xs'
+                                        : 'bg-blue-950/70 hover:bg-blue-900/80 text-blue-300 border border-blue-700/50'
+                                    }`}
                                   >
                                     <Truck className="w-3 h-3 shrink-0" />
                                     <span>Track Truck</span>
                                   </button>
                                 ) : (
-                                  <span className="inline-flex items-center gap-1 text-[11px] text-emerald-400 font-medium whitespace-nowrap">
+                                  <span className={`inline-flex items-center gap-1 text-[11px] font-medium whitespace-nowrap ${
+                                    isLight ? 'text-emerald-700 font-semibold' : 'text-emerald-400'
+                                  }`}>
                                     <CheckCircle2 className="w-3 h-3 shrink-0" />
                                     <span>Invoiced & Audited</span>
                                   </span>
@@ -1663,9 +1929,11 @@ export default function App() {
                 )}
 
                 {/* Vorsik System Audit & Integrity Footer */}
-                <div className="flex flex-wrap items-center justify-between text-[11px] text-[#717684] pt-1">
+                <div className={`flex flex-wrap items-center justify-between text-[11px] pt-1 ${
+                  isLight ? 'text-slate-600' : 'text-[#717684]'
+                }`}>
                   <span>Cryptographic audit log: {auditEventsCount} immutable events committed to local storage</span>
-                  <span className="text-emerald-400 flex items-center gap-1.5">
+                  <span className={`flex items-center gap-1.5 ${isLight ? 'text-emerald-700 font-semibold' : 'text-emerald-400'}`}>
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                     Local database transactions synchronized (0.1ms WAL commit)
                   </span>
