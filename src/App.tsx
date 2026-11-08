@@ -305,6 +305,29 @@ export default function App() {
   ];
 
   const [kanbanTasks, setKanbanTasks] = useState<KanbanTask[]>(initialKanbanTasks);
+  const [draggedKanbanTaskId, setDraggedKanbanTaskId] = useState<string | null>(null);
+  const [dragOverStage, setDragOverStage] = useState<'intake' | 'assembly' | 'qa' | 'dispatch' | null>(null);
+
+  const handleDropKanbanTask = (targetStage: 'intake' | 'assembly' | 'qa' | 'dispatch', taskId?: string) => {
+    const idToMove = taskId || draggedKanbanTaskId;
+    if (!idToMove) return;
+
+    const currentTask = kanbanTasks.find(t => t.id === idToMove);
+    if (currentTask && currentTask.stage !== targetStage) {
+      setKanbanTasks(prev => prev.map(t => t.id === idToMove ? { ...t, stage: targetStage } : t));
+      const stageTitles: Record<'intake' | 'assembly' | 'qa' | 'dispatch', string> = {
+        intake: '1. Intake & Specs',
+        assembly: '2. Assembly & Pack',
+        qa: '3. QA & Testing',
+        dispatch: '4. Ready for Dispatch'
+      };
+      setToastMessage(`Task ${idToMove} moved to ${stageTitles[targetStage]} (0.1ms LAN WAL commit).`);
+      setTimeout(() => setToastMessage(null), 3000);
+    }
+
+    setDraggedKanbanTaskId(null);
+    setDragOverStage(null);
+  };
 
   const handleAdvanceKanbanTask = (taskId: string) => {
     setKanbanTasks(prev => prev.map(t => {
@@ -2574,6 +2597,10 @@ export default function App() {
             }`}>
               {isKanbanLight ? 'Light UI (Contrast Example)' : 'Dark UI'}
             </span>
+            <span className="text-[10px] px-1.5 py-0.5 rounded font-mono uppercase tracking-wider font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hidden sm:inline-flex items-center gap-1">
+              <GripVertical className="w-2.5 h-2.5" />
+              <span>Drag & Drop Ready</span>
+            </span>
           </div>
 
           <div className="text-[11px] font-mono text-[#717684]">
@@ -2741,7 +2768,27 @@ export default function App() {
                 }`}>
                   <button
                     onClick={() => setMobileActiveStage('intake')}
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      e.dataTransfer.dropEffect = 'move';
+                      if (dragOverStage !== 'intake') setDragOverStage('intake');
+                    }}
+                    onDragLeave={() => {
+                      if (dragOverStage === 'intake') setDragOverStage(null);
+                    }}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      const taskId = e.dataTransfer.getData('text/plain') || draggedKanbanTaskId;
+                      if (taskId) {
+                        handleDropKanbanTask('intake', taskId);
+                        setMobileActiveStage('intake');
+                      }
+                    }}
                     className={`py-1.5 rounded text-center transition-all cursor-pointer truncate ${
+                      dragOverStage === 'intake' && draggedKanbanTaskId
+                        ? 'ring-2 ring-[#F84B11] scale-[1.03] shadow-md '
+                        : ''
+                    }${
                       mobileActiveStage === 'intake'
                         ? isKanbanLight
                           ? 'bg-white text-amber-700 font-bold shadow-xs border border-slate-200/60'
@@ -2755,7 +2802,27 @@ export default function App() {
                   </button>
                   <button
                     onClick={() => setMobileActiveStage('assembly')}
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      e.dataTransfer.dropEffect = 'move';
+                      if (dragOverStage !== 'assembly') setDragOverStage('assembly');
+                    }}
+                    onDragLeave={() => {
+                      if (dragOverStage === 'assembly') setDragOverStage(null);
+                    }}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      const taskId = e.dataTransfer.getData('text/plain') || draggedKanbanTaskId;
+                      if (taskId) {
+                        handleDropKanbanTask('assembly', taskId);
+                        setMobileActiveStage('assembly');
+                      }
+                    }}
                     className={`py-1.5 rounded text-center transition-all cursor-pointer truncate ${
+                      dragOverStage === 'assembly' && draggedKanbanTaskId
+                        ? 'ring-2 ring-[#F84B11] scale-[1.03] shadow-md '
+                        : ''
+                    }${
                       mobileActiveStage === 'assembly'
                         ? isKanbanLight
                           ? 'bg-white text-blue-700 font-bold shadow-xs border border-slate-200/60'
@@ -2769,7 +2836,27 @@ export default function App() {
                   </button>
                   <button
                     onClick={() => setMobileActiveStage('qa')}
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      e.dataTransfer.dropEffect = 'move';
+                      if (dragOverStage !== 'qa') setDragOverStage('qa');
+                    }}
+                    onDragLeave={() => {
+                      if (dragOverStage === 'qa') setDragOverStage(null);
+                    }}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      const taskId = e.dataTransfer.getData('text/plain') || draggedKanbanTaskId;
+                      if (taskId) {
+                        handleDropKanbanTask('qa', taskId);
+                        setMobileActiveStage('qa');
+                      }
+                    }}
                     className={`py-1.5 rounded text-center transition-all cursor-pointer truncate ${
+                      dragOverStage === 'qa' && draggedKanbanTaskId
+                        ? 'ring-2 ring-[#F84B11] scale-[1.03] shadow-md '
+                        : ''
+                    }${
                       mobileActiveStage === 'qa'
                         ? isKanbanLight
                           ? 'bg-white text-purple-700 font-bold shadow-xs border border-slate-200/60'
@@ -2783,7 +2870,27 @@ export default function App() {
                   </button>
                   <button
                     onClick={() => setMobileActiveStage('dispatch')}
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      e.dataTransfer.dropEffect = 'move';
+                      if (dragOverStage !== 'dispatch') setDragOverStage('dispatch');
+                    }}
+                    onDragLeave={() => {
+                      if (dragOverStage === 'dispatch') setDragOverStage(null);
+                    }}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      const taskId = e.dataTransfer.getData('text/plain') || draggedKanbanTaskId;
+                      if (taskId) {
+                        handleDropKanbanTask('dispatch', taskId);
+                        setMobileActiveStage('dispatch');
+                      }
+                    }}
                     className={`py-1.5 rounded text-center transition-all cursor-pointer truncate ${
+                      dragOverStage === 'dispatch' && draggedKanbanTaskId
+                        ? 'ring-2 ring-[#F84B11] scale-[1.03] shadow-md '
+                        : ''
+                    }${
                       mobileActiveStage === 'dispatch'
                         ? isKanbanLight
                           ? 'bg-white text-emerald-700 font-bold shadow-xs border border-slate-200/60'
@@ -2808,6 +2915,12 @@ export default function App() {
                   }`}>
                     <button
                       onClick={() => setTabletStagePair('production')}
+                      onDragOver={(e) => {
+                        e.preventDefault();
+                        if (tabletStagePair !== 'production') {
+                          setTabletStagePair('production');
+                        }
+                      }}
                       className={`px-3 py-1 rounded transition-all cursor-pointer ${
                         tabletStagePair === 'production'
                           ? isKanbanLight
@@ -2822,6 +2935,12 @@ export default function App() {
                     </button>
                     <button
                       onClick={() => setTabletStagePair('fulfillment')}
+                      onDragOver={(e) => {
+                        e.preventDefault();
+                        if (tabletStagePair !== 'fulfillment') {
+                          setTabletStagePair('fulfillment');
+                        }
+                      }}
                       className={`px-3 py-1 rounded transition-all cursor-pointer ${
                         tabletStagePair === 'fulfillment'
                           ? isKanbanLight
@@ -2861,11 +2980,44 @@ export default function App() {
                         dispatch: { title: '4. Ready for Dispatch', color: 'emerald', count: tasksInStage.length }
                       }[stageKey];
 
+                      const isColumnDragOver = dragOverStage === stageKey && draggedKanbanTaskId !== null;
+
                       return (
                         <div 
                           key={stageKey} 
-                          className={`p-3 rounded-xl border flex flex-col min-h-0 min-w-0 transition-colors duration-200 ${
-                            isKanbanLight 
+                          onDragOver={(e) => {
+                            e.preventDefault();
+                            e.dataTransfer.dropEffect = 'move';
+                            if (dragOverStage !== stageKey) {
+                              setDragOverStage(stageKey);
+                            }
+                          }}
+                          onDragEnter={(e) => {
+                            e.preventDefault();
+                            if (dragOverStage !== stageKey) {
+                              setDragOverStage(stageKey);
+                            }
+                          }}
+                          onDragLeave={(e) => {
+                            if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+                              if (dragOverStage === stageKey) {
+                                setDragOverStage(null);
+                              }
+                            }
+                          }}
+                          onDrop={(e) => {
+                            e.preventDefault();
+                            const taskId = e.dataTransfer.getData('text/plain') || draggedKanbanTaskId;
+                            if (taskId) {
+                              handleDropKanbanTask(stageKey, taskId);
+                            }
+                          }}
+                          className={`p-3 rounded-xl border flex flex-col min-h-0 min-w-0 transition-all duration-200 ${
+                            isColumnDragOver
+                              ? isKanbanLight 
+                                ? 'border-[#F84B11] bg-orange-50/70 ring-2 ring-[#F84B11]/30 shadow-md' 
+                                : 'border-[#F84B11] bg-[#F84B11]/10 ring-2 ring-[#F84B11]/30 shadow-md'
+                              : isKanbanLight 
                               ? 'border-slate-200 bg-white/90 shadow-xs' 
                               : 'border-[#1E222A] bg-[#0E1015]'
                           }`}
@@ -2899,118 +3051,167 @@ export default function App() {
                           <div className={`space-y-2 overflow-y-auto flex-1 pr-1 min-h-0 ${
                             isKanbanLight ? 'sandbox-light-scroll' : ''
                           }`}>
-                            {tasksInStage.map(task => (
-                              <div
-                                key={task.id}
-                                className={`p-2.5 rounded-lg border transition-all space-y-2 group min-w-0 ${
-                                  isKanbanLight
-                                    ? 'border-slate-200/90 bg-slate-50/70 hover:bg-white hover:border-slate-300 hover:shadow-xs'
-                                    : 'border-[#1E222A] bg-[#08090C] hover:border-[#2C303B]'
-                                }`}
-                              >
-                                <div className="flex items-start justify-between gap-1.5">
-                                  <div className="min-w-0 truncate">
-                                    <span className="font-mono text-[10px] font-bold text-[#F84B11] mr-1.5">{task.id}</span>
-                                    <span className={`text-[10px] font-mono ${isKanbanLight ? 'text-slate-500' : 'text-[#717684]'}`}>
-                                      {task.sku}
+                            {tasksInStage.map(task => {
+                              const isTaskBeingDragged = draggedKanbanTaskId === task.id;
+                              return (
+                                <div
+                                  key={task.id}
+                                  draggable
+                                  onDragStart={(e) => {
+                                    e.dataTransfer.setData('text/plain', task.id);
+                                    e.dataTransfer.effectAllowed = 'move';
+                                    setDraggedKanbanTaskId(task.id);
+                                  }}
+                                  onDragEnd={() => {
+                                    setDraggedKanbanTaskId(null);
+                                    setDragOverStage(null);
+                                  }}
+                                  className={`p-2.5 rounded-lg border transition-all space-y-2 group min-w-0 cursor-grab active:cursor-grabbing select-none ${
+                                    isTaskBeingDragged
+                                      ? 'opacity-40 border-dashed border-[#F84B11] scale-[0.98]'
+                                      : isKanbanLight
+                                      ? 'border-slate-200/90 bg-slate-50/70 hover:bg-white hover:border-slate-300 hover:shadow-xs'
+                                      : 'border-[#1E222A] bg-[#08090C] hover:border-[#2C303B]'
+                                  }`}
+                                >
+                                  <div className="flex items-start justify-between gap-1.5">
+                                    <div className="flex items-center gap-1 min-w-0 truncate">
+                                      <GripVertical className="w-3 h-3 text-[#717684] opacity-40 group-hover:opacity-100 transition-opacity shrink-0" />
+                                      <span className="font-mono text-[10px] font-bold text-[#F84B11] mr-1">{task.id}</span>
+                                      <span className={`text-[10px] font-mono truncate ${isKanbanLight ? 'text-slate-500' : 'text-[#717684]'}`}>
+                                        {task.sku}
+                                      </span>
+                                    </div>
+                                    <span className={`px-1.5 py-0.2 rounded text-[9.5px] font-semibold border shrink-0 ${
+                                      task.priority === 'Critical'
+                                        ? isKanbanLight
+                                          ? 'bg-red-50 text-red-700 border-red-200 font-bold'
+                                          : 'bg-red-950/80 text-red-400 border-red-800/40'
+                                        : task.priority === 'High'
+                                        ? isKanbanLight
+                                          ? 'bg-amber-50 text-amber-800 border-amber-200 font-semibold'
+                                          : 'bg-amber-950/80 text-amber-300 border-amber-800/40'
+                                        : isKanbanLight
+                                          ? 'bg-slate-100 text-slate-700 border-slate-200 font-medium'
+                                          : 'bg-zinc-800/60 text-zinc-300 border-zinc-700/40'
+                                    }`}>
+                                      {task.priority}
                                     </span>
                                   </div>
-                                  <span className={`px-1.5 py-0.2 rounded text-[9.5px] font-semibold border shrink-0 ${
-                                    task.priority === 'Critical'
-                                      ? isKanbanLight
-                                        ? 'bg-red-50 text-red-700 border-red-200 font-bold'
-                                        : 'bg-red-950/80 text-red-400 border-red-800/40'
-                                      : task.priority === 'High'
-                                      ? isKanbanLight
-                                        ? 'bg-amber-50 text-amber-800 border-amber-200 font-semibold'
-                                        : 'bg-amber-950/80 text-amber-300 border-amber-800/40'
-                                      : isKanbanLight
-                                        ? 'bg-slate-100 text-slate-700 border-slate-200 font-medium'
-                                        : 'bg-zinc-800/60 text-zinc-300 border-zinc-700/40'
+
+                                  <p className={`text-xs font-semibold leading-snug line-clamp-2 ${
+                                    isKanbanLight ? 'text-slate-900' : 'text-white'
                                   }`}>
-                                    {task.priority}
-                                  </span>
-                                </div>
+                                    {task.title}
+                                  </p>
 
-                                <p className={`text-xs font-semibold leading-snug line-clamp-2 ${
-                                  isKanbanLight ? 'text-slate-900' : 'text-white'
-                                }`}>
-                                  {task.title}
-                                </p>
-
-                                <div className={`flex items-center justify-between text-[10px] ${
-                                  isKanbanLight ? 'text-slate-500' : 'text-[#717684]'
-                                }`}>
-                                  <span className="flex items-center gap-1">
-                                    <Clock3 className={`w-3 h-3 ${isKanbanLight ? 'text-slate-400' : 'text-[#717684]'}`} />
-                                    <span>{task.sla}</span>
-                                  </span>
-                                  <span className={isKanbanLight ? 'text-slate-700 font-medium font-mono' : 'text-zinc-400 font-mono'}>
-                                    {task.assignee}
-                                  </span>
-                                </div>
-
-                                {task.progress && (
-                                  <div>
-                                    <div className={`flex items-center justify-between text-[9px] mb-0.5 ${
-                                      isKanbanLight ? 'text-slate-500' : 'text-[#717684]'
-                                    }`}>
-                                      <span>Milestones</span>
-                                      <span className="font-mono">{task.progress.current}/{task.progress.total}</span>
-                                    </div>
-                                    <div className={`w-full h-1 rounded-full overflow-hidden ${
-                                      isKanbanLight ? 'bg-slate-200' : 'bg-[#1A1D24]'
-                                    }`}>
-                                      <div
-                                        className="h-full bg-blue-600 rounded-full"
-                                        style={{ width: `${(task.progress.current / task.progress.total) * 100}%` }}
-                                      />
-                                    </div>
-                                  </div>
-                                )}
-
-                                <div className={`pt-1 border-t flex items-center justify-between ${
-                                  isKanbanLight ? 'border-slate-200' : 'border-[#161922]'
-                                }`}>
-                                  <span className={`text-[9.5px] truncate max-w-[120px] ${
+                                  <div className={`flex items-center justify-between text-[10px] ${
                                     isKanbanLight ? 'text-slate-500' : 'text-[#717684]'
                                   }`}>
-                                    {task.tag}
-                                  </span>
-                                  <div className="flex items-center gap-1">
-                                    {stageKey !== 'intake' && (
-                                      <button
-                                        onClick={() => handleRegressKanbanTask(task.id)}
-                                        className={`px-1.5 py-0.5 rounded text-[10px] border cursor-pointer transition-colors ${
-                                          isKanbanLight
-                                            ? 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200'
-                                            : 'bg-[#161922] hover:bg-[#1E222D] text-[#94979E] hover:text-white border-[#232731]'
-                                        }`}
-                                        title="Return to previous stage"
-                                      >
-                                        ←
-                                      </button>
-                                    )}
-                                    {stageKey !== 'dispatch' ? (
-                                      <button
-                                        onClick={() => handleAdvanceKanbanTask(task.id)}
-                                        className="px-2 py-0.5 rounded text-[10px] bg-[#F84B11] hover:bg-[#ff5d26] text-white font-medium flex items-center gap-1 cursor-pointer transition-all active:scale-[0.95] shadow-2xs"
-                                      >
-                                        <span>Advance</span>
-                                        <span>→</span>
-                                      </button>
-                                    ) : (
-                                      <span className={`text-[9.5px] font-semibold flex items-center gap-0.5 ${
-                                        isKanbanLight ? 'text-emerald-700 bg-emerald-50 px-1 py-0.2 rounded border border-emerald-200' : 'text-emerald-400'
+                                    <span className="flex items-center gap-1">
+                                      <Clock3 className={`w-3 h-3 ${isKanbanLight ? 'text-slate-400' : 'text-[#717684]'}`} />
+                                      <span>{task.sla}</span>
+                                    </span>
+                                    <span className={isKanbanLight ? 'text-slate-700 font-medium font-mono' : 'text-zinc-400 font-mono'}>
+                                      {task.assignee}
+                                    </span>
+                                  </div>
+
+                                  {task.progress && (
+                                    <div>
+                                      <div className={`flex items-center justify-between text-[9px] mb-0.5 ${
+                                        isKanbanLight ? 'text-slate-500' : 'text-[#717684]'
                                       }`}>
-                                        <CheckCircle2 className="w-3 h-3" />
-                                        <span>Dispatched</span>
-                                      </span>
-                                    )}
+                                        <span>Milestones</span>
+                                        <span className="font-mono">{task.progress.current}/{task.progress.total}</span>
+                                      </div>
+                                      <div className={`w-full h-1 rounded-full overflow-hidden ${
+                                        isKanbanLight ? 'bg-slate-200' : 'bg-[#1A1D24]'
+                                      }`}>
+                                        <div
+                                          className="h-full bg-blue-600 rounded-full"
+                                          style={{ width: `${(task.progress.current / task.progress.total) * 100}%` }}
+                                        />
+                                      </div>
+                                    </div>
+                                  )}
+
+                                  <div className={`pt-1 border-t flex items-center justify-between ${
+                                    isKanbanLight ? 'border-slate-200' : 'border-[#161922]'
+                                  }`}>
+                                    <span className={`text-[9.5px] truncate max-w-[120px] ${
+                                      isKanbanLight ? 'text-slate-500' : 'text-[#717684]'
+                                    }`}>
+                                      {task.tag}
+                                    </span>
+                                    <div className="flex items-center gap-1">
+                                      {stageKey !== 'intake' && (
+                                        <button
+                                          onMouseDown={(e) => e.stopPropagation()}
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleRegressKanbanTask(task.id);
+                                          }}
+                                          className={`px-1.5 py-0.5 rounded text-[10px] border cursor-pointer transition-colors ${
+                                            isKanbanLight
+                                              ? 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200'
+                                              : 'bg-[#161922] hover:bg-[#1E222D] text-[#94979E] hover:text-white border-[#232731]'
+                                          }`}
+                                          title="Return to previous stage"
+                                        >
+                                          ←
+                                        </button>
+                                      )}
+                                      {stageKey !== 'dispatch' ? (
+                                        <button
+                                          onMouseDown={(e) => e.stopPropagation()}
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleAdvanceKanbanTask(task.id);
+                                          }}
+                                          className="px-2 py-0.5 rounded text-[10px] bg-[#F84B11] hover:bg-[#ff5d26] text-white font-medium flex items-center gap-1 cursor-pointer transition-all active:scale-[0.95] shadow-2xs"
+                                        >
+                                          <span>Advance</span>
+                                          <span>→</span>
+                                        </button>
+                                      ) : (
+                                        <span className={`text-[9.5px] font-semibold flex items-center gap-0.5 ${
+                                          isKanbanLight ? 'text-emerald-700 bg-emerald-50 px-1 py-0.2 rounded border border-emerald-200' : 'text-emerald-400'
+                                        }`}>
+                                          <CheckCircle2 className="w-3 h-3" />
+                                          <span>Dispatched</span>
+                                        </span>
+                                      )}
+                                    </div>
                                   </div>
                                 </div>
+                              );
+                            })}
+
+                            {tasksInStage.length === 0 && (
+                              <div className={`h-24 rounded-lg border border-dashed flex flex-col items-center justify-center p-3 text-center transition-colors ${
+                                isColumnDragOver
+                                  ? 'border-[#F84B11] bg-[#F84B11]/10 text-[#F84B11]'
+                                  : isKanbanLight
+                                  ? 'border-slate-200 text-slate-400 bg-slate-50/50'
+                                  : 'border-[#1E222A] text-[#717684] bg-white/[0.01]'
+                              }`}>
+                                <span className="text-[10px] font-mono font-medium">
+                                  {isColumnDragOver ? 'Drop task to assign here' : 'No work orders in stage'}
+                                </span>
+                                <span className="text-[9px] text-[#717684] mt-0.5">Drag any card here</span>
                               </div>
-                            ))}
+                            )}
+
+                            {isColumnDragOver && tasksInStage.length > 0 && kanbanTasks.find(t => t.id === draggedKanbanTaskId)?.stage !== stageKey && (
+                              <div className={`p-2 rounded-lg border-2 border-dashed flex items-center justify-center gap-1.5 text-[11px] font-mono font-medium transition-all animate-pulse ${
+                                isKanbanLight 
+                                  ? 'border-[#F84B11] bg-orange-100/60 text-[#F84B11]' 
+                                  : 'border-[#F84B11]/60 bg-[#F84B11]/10 text-orange-400'
+                              }`}>
+                                <span>Drop to move here</span>
+                              </div>
+                            )}
                           </div>
                         </div>
                       );
@@ -3033,11 +3234,44 @@ export default function App() {
                         dispatch: { title: 'Stage 4: Ready for Dispatch', count: tasksInStage.length, color: 'emerald' }
                       }[stageKey];
 
+                      const isColumnDragOver = dragOverStage === stageKey && draggedKanbanTaskId !== null;
+
                       return (
                         <div 
                           key={stageKey} 
-                          className={`p-3.5 rounded-xl border flex flex-col min-h-0 min-w-0 transition-colors duration-200 ${
-                            isKanbanLight 
+                          onDragOver={(e) => {
+                            e.preventDefault();
+                            e.dataTransfer.dropEffect = 'move';
+                            if (dragOverStage !== stageKey) {
+                              setDragOverStage(stageKey);
+                            }
+                          }}
+                          onDragEnter={(e) => {
+                            e.preventDefault();
+                            if (dragOverStage !== stageKey) {
+                              setDragOverStage(stageKey);
+                            }
+                          }}
+                          onDragLeave={(e) => {
+                            if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+                              if (dragOverStage === stageKey) {
+                                setDragOverStage(null);
+                              }
+                            }
+                          }}
+                          onDrop={(e) => {
+                            e.preventDefault();
+                            const taskId = e.dataTransfer.getData('text/plain') || draggedKanbanTaskId;
+                            if (taskId) {
+                              handleDropKanbanTask(stageKey, taskId);
+                            }
+                          }}
+                          className={`p-3.5 rounded-xl border flex flex-col min-h-0 min-w-0 transition-all duration-200 ${
+                            isColumnDragOver
+                              ? isKanbanLight 
+                                ? 'border-[#F84B11] bg-orange-50/70 ring-2 ring-[#F84B11]/30 shadow-md' 
+                                : 'border-[#F84B11] bg-[#F84B11]/10 ring-2 ring-[#F84B11]/30 shadow-md'
+                              : isKanbanLight 
                               ? 'border-slate-200 bg-white/90 shadow-xs' 
                               : 'border-[#262C38] bg-[#0E1015]'
                           }`}
@@ -3069,98 +3303,147 @@ export default function App() {
                           <div className={`space-y-3 overflow-y-auto flex-1 pr-1 min-h-0 ${
                             isKanbanLight ? 'sandbox-light-scroll' : ''
                           }`}>
-                            {tasksInStage.map(task => (
-                              <div
-                                key={task.id}
-                                className={`p-3.5 rounded-xl border transition-all space-y-2.5 shadow-xs min-w-0 ${
-                                  isKanbanLight
-                                    ? 'border-slate-200/90 bg-slate-50/70 hover:bg-white hover:border-slate-300'
-                                    : 'border-[#232834] bg-[#090B0F] hover:border-[#384052]'
-                                }`}
-                              >
-                                <div className="flex items-center justify-between gap-2">
-                                  <div className="flex items-center gap-2 min-w-0">
-                                    <span className="font-mono text-xs font-bold text-[#F84B11]">{task.id}</span>
-                                    <span className={`px-1.5 py-0.5 rounded text-[10px] font-mono border ${
-                                      isKanbanLight 
-                                        ? 'bg-slate-100 text-slate-600 border-slate-200' 
-                                        : 'bg-[#161922] text-[#94979E] border-[#232731]'
+                            {tasksInStage.map(task => {
+                              const isTaskBeingDragged = draggedKanbanTaskId === task.id;
+                              return (
+                                <div
+                                  key={task.id}
+                                  draggable
+                                  onDragStart={(e) => {
+                                    e.dataTransfer.setData('text/plain', task.id);
+                                    e.dataTransfer.effectAllowed = 'move';
+                                    setDraggedKanbanTaskId(task.id);
+                                  }}
+                                  onDragEnd={() => {
+                                    setDraggedKanbanTaskId(null);
+                                    setDragOverStage(null);
+                                  }}
+                                  className={`p-3.5 rounded-xl border transition-all space-y-2.5 shadow-xs min-w-0 cursor-grab active:cursor-grabbing select-none ${
+                                    isTaskBeingDragged
+                                      ? 'opacity-40 border-dashed border-[#F84B11] scale-[0.98]'
+                                      : isKanbanLight
+                                      ? 'border-slate-200/90 bg-slate-50/70 hover:bg-white hover:border-slate-300'
+                                      : 'border-[#232834] bg-[#090B0F] hover:border-[#384052]'
+                                  }`}
+                                >
+                                  <div className="flex items-center justify-between gap-2">
+                                    <div className="flex items-center gap-2 min-w-0">
+                                      <GripVertical className="w-3.5 h-3.5 text-[#717684] opacity-40 group-hover:opacity-100 transition-opacity shrink-0" />
+                                      <span className="font-mono text-xs font-bold text-[#F84B11]">{task.id}</span>
+                                      <span className={`px-1.5 py-0.5 rounded text-[10px] font-mono border ${
+                                        isKanbanLight 
+                                          ? 'bg-slate-100 text-slate-600 border-slate-200' 
+                                          : 'bg-[#161922] text-[#94979E] border-[#232731]'
+                                      }`}>
+                                        {task.sku}
+                                      </span>
+                                    </div>
+                                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold border shrink-0 ${
+                                      task.priority === 'Critical'
+                                        ? isKanbanLight
+                                          ? 'bg-red-50 text-red-700 border-red-200'
+                                          : 'bg-red-950 text-red-400 border-red-800/40'
+                                        : task.priority === 'High'
+                                        ? isKanbanLight
+                                          ? 'bg-amber-50 text-amber-800 border-amber-200'
+                                          : 'bg-amber-950 text-amber-300 border-amber-800/40'
+                                        : isKanbanLight
+                                          ? 'bg-slate-100 text-slate-700 border-slate-200'
+                                          : 'bg-zinc-800 text-zinc-300 border-zinc-700/40'
                                     }`}>
-                                      {task.sku}
+                                      {task.priority}
                                     </span>
                                   </div>
-                                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold border shrink-0 ${
-                                    task.priority === 'Critical'
-                                      ? isKanbanLight
-                                        ? 'bg-red-50 text-red-700 border-red-200'
-                                        : 'bg-red-950 text-red-400 border-red-800/40'
-                                      : task.priority === 'High'
-                                      ? isKanbanLight
-                                        ? 'bg-amber-50 text-amber-800 border-amber-200'
-                                        : 'bg-amber-950 text-amber-300 border-amber-800/40'
-                                      : isKanbanLight
-                                        ? 'bg-slate-100 text-slate-700 border-slate-200'
-                                        : 'bg-zinc-800 text-zinc-300 border-zinc-700/40'
+
+                                  <h4 className={`text-sm font-semibold leading-snug ${
+                                    isKanbanLight ? 'text-slate-900' : 'text-white'
                                   }`}>
-                                    {task.priority}
-                                  </span>
-                                </div>
+                                    {task.title}
+                                  </h4>
 
-                                <h4 className={`text-sm font-semibold leading-snug ${
-                                  isKanbanLight ? 'text-slate-900' : 'text-white'
-                                }`}>
-                                  {task.title}
-                                </h4>
+                                  <div className={`flex items-center justify-between text-xs ${
+                                    isKanbanLight ? 'text-slate-500' : 'text-[#94979E]'
+                                  }`}>
+                                    <span className="flex items-center gap-1.5">
+                                      <Clock3 className="w-3.5 h-3.5 text-amber-500" />
+                                      <span>{task.sla}</span>
+                                    </span>
+                                    <span className={`font-medium ${isKanbanLight ? 'text-slate-800' : 'text-white'}`}>
+                                      {task.assignee}
+                                    </span>
+                                  </div>
 
-                                <div className={`flex items-center justify-between text-xs ${
-                                  isKanbanLight ? 'text-slate-500' : 'text-[#94979E]'
-                                }`}>
-                                  <span className="flex items-center gap-1.5">
-                                    <Clock3 className="w-3.5 h-3.5 text-amber-500" />
-                                    <span>{task.sla}</span>
-                                  </span>
-                                  <span className={`font-medium ${isKanbanLight ? 'text-slate-800' : 'text-white'}`}>
-                                    {task.assignee}
-                                  </span>
+                                  {/* Tactile Glove-Friendly Action Buttons */}
+                                  <div className={`pt-2 border-t flex items-center gap-2 ${
+                                    isKanbanLight ? 'border-slate-200' : 'border-[#1A1D24]'
+                                  }`}>
+                                    {stageKey !== 'intake' && (
+                                      <button
+                                        onMouseDown={(e) => e.stopPropagation()}
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleRegressKanbanTask(task.id);
+                                        }}
+                                        className={`py-2 px-3 rounded-lg text-xs font-semibold cursor-pointer border transition-colors ${
+                                          isKanbanLight
+                                            ? 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200'
+                                            : 'bg-[#161922] hover:bg-[#202533] text-zinc-300 border-[#262B37]'
+                                        }`}
+                                      >
+                                        ← Back
+                                      </button>
+                                    )}
+                                    {stageKey !== 'dispatch' ? (
+                                      <button
+                                        onMouseDown={(e) => e.stopPropagation()}
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleAdvanceKanbanTask(task.id);
+                                        }}
+                                        className="flex-1 py-2 px-3 rounded-lg text-xs font-bold bg-[#F84B11] hover:bg-[#ff5d26] text-white flex items-center justify-center gap-1.5 cursor-pointer shadow-xs transition-all active:scale-[0.97]"
+                                      >
+                                        <span>Advance Stage</span>
+                                        <span>→</span>
+                                      </button>
+                                    ) : (
+                                      <div className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 border ${
+                                        isKanbanLight 
+                                          ? 'bg-emerald-50 border-emerald-200 text-emerald-800' 
+                                          : 'bg-emerald-950/60 border-emerald-800/40 text-emerald-400'
+                                      }`}>
+                                        <CheckCircle2 className="w-4 h-4" />
+                                        <span>Fulfillment Reconciled</span>
+                                      </div>
+                                    )}
+                                  </div>
                                 </div>
+                              );
+                            })}
 
-                                {/* Tactile Glove-Friendly Action Buttons */}
-                                <div className={`pt-2 border-t flex items-center gap-2 ${
-                                  isKanbanLight ? 'border-slate-200' : 'border-[#1A1D24]'
-                                }`}>
-                                  {stageKey !== 'intake' && (
-                                    <button
-                                      onClick={() => handleRegressKanbanTask(task.id)}
-                                      className={`py-2 px-3 rounded-lg text-xs font-semibold cursor-pointer border transition-colors ${
-                                        isKanbanLight
-                                          ? 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200'
-                                          : 'bg-[#161922] hover:bg-[#202533] text-zinc-300 border-[#262B37]'
-                                      }`}
-                                    >
-                                      ← Back
-                                    </button>
-                                  )}
-                                  {stageKey !== 'dispatch' ? (
-                                    <button
-                                      onClick={() => handleAdvanceKanbanTask(task.id)}
-                                      className="flex-1 py-2 px-3 rounded-lg text-xs font-bold bg-[#F84B11] hover:bg-[#ff5d26] text-white flex items-center justify-center gap-1.5 cursor-pointer shadow-xs transition-all active:scale-[0.97]"
-                                    >
-                                      <span>Advance Stage</span>
-                                      <span>→</span>
-                                    </button>
-                                  ) : (
-                                    <div className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 border ${
-                                      isKanbanLight 
-                                        ? 'bg-emerald-50 border-emerald-200 text-emerald-800' 
-                                        : 'bg-emerald-950/60 border-emerald-800/40 text-emerald-400'
-                                    }`}>
-                                      <CheckCircle2 className="w-4 h-4" />
-                                      <span>Fulfillment Reconciled</span>
-                                    </div>
-                                  )}
-                                </div>
+                            {tasksInStage.length === 0 && (
+                              <div className={`h-24 rounded-lg border border-dashed flex flex-col items-center justify-center p-3 text-center transition-colors ${
+                                isColumnDragOver
+                                  ? 'border-[#F84B11] bg-[#F84B11]/10 text-[#F84B11]'
+                                  : isKanbanLight
+                                  ? 'border-slate-200 text-slate-400 bg-slate-50/50'
+                                  : 'border-[#262C38] text-[#717684] bg-white/[0.01]'
+                              }`}>
+                                <span className="text-[10px] font-mono font-medium">
+                                  {isColumnDragOver ? 'Drop task to assign here' : 'No work orders in stage'}
+                                </span>
+                                <span className="text-[9px] text-[#717684] mt-0.5">Drag any card here</span>
                               </div>
-                            ))}
+                            )}
+
+                            {isColumnDragOver && tasksInStage.length > 0 && kanbanTasks.find(t => t.id === draggedKanbanTaskId)?.stage !== stageKey && (
+                              <div className={`p-2 rounded-lg border-2 border-dashed flex items-center justify-center gap-1.5 text-[11px] font-mono font-medium transition-all animate-pulse ${
+                                isKanbanLight 
+                                  ? 'border-[#F84B11] bg-orange-100/60 text-[#F84B11]' 
+                                  : 'border-[#F84B11]/60 bg-[#F84B11]/10 text-orange-400'
+                              }`}>
+                                <span>Drop to move here</span>
+                              </div>
+                            )}
                           </div>
                         </div>
                       );
@@ -3170,96 +3453,162 @@ export default function App() {
 
                 {/* 3. MOBILE: SINGLE COLUMN THUMB FEED */}
                 {activeLayoutDevice === 'mobile' && (
-                  <div className={`space-y-2.5 overflow-y-auto flex-1 min-h-0 pr-1 ${
-                    isKanbanLight ? 'sandbox-light-scroll' : ''
-                  }`}>
-                    {filteredKanbanTasks.filter(t => t.stage === mobileActiveStage).map(task => (
-                      <div
-                        key={task.id}
-                        className={`p-3 rounded-xl border space-y-2 shadow-xs transition-all min-w-0 ${
-                          isKanbanLight
-                            ? 'border-slate-200/90 bg-white'
-                            : 'border-[#20242E] bg-[#0E1015]'
-                        }`}
-                      >
-                        <div className="flex items-center justify-between gap-1.5">
-                          <div className="flex items-center gap-1.5 min-w-0">
-                            <span className="font-mono text-xs font-bold text-[#F84B11]">{task.id}</span>
-                            <span className={`text-[10px] font-mono ${isKanbanLight ? 'text-slate-500' : 'text-[#717684]'}`}>
-                              {task.sku}
+                  <div 
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      e.dataTransfer.dropEffect = 'move';
+                      if (dragOverStage !== mobileActiveStage) {
+                        setDragOverStage(mobileActiveStage);
+                      }
+                    }}
+                    onDragLeave={(e) => {
+                      if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+                        if (dragOverStage === mobileActiveStage) {
+                          setDragOverStage(null);
+                        }
+                      }
+                    }}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      const taskId = e.dataTransfer.getData('text/plain') || draggedKanbanTaskId;
+                      if (taskId) {
+                        handleDropKanbanTask(mobileActiveStage, taskId);
+                      }
+                    }}
+                    className={`space-y-2.5 overflow-y-auto flex-1 min-h-0 pr-1 p-1 rounded-xl transition-all ${
+                      dragOverStage === mobileActiveStage && draggedKanbanTaskId
+                        ? 'ring-2 ring-[#F84B11]/50 bg-[#F84B11]/5'
+                        : ''
+                    } ${
+                      isKanbanLight ? 'sandbox-light-scroll' : ''
+                    }`}
+                  >
+                    {filteredKanbanTasks.filter(t => t.stage === mobileActiveStage).map(task => {
+                      const isTaskBeingDragged = draggedKanbanTaskId === task.id;
+                      return (
+                        <div
+                          key={task.id}
+                          draggable
+                          onDragStart={(e) => {
+                            e.dataTransfer.setData('text/plain', task.id);
+                            e.dataTransfer.effectAllowed = 'move';
+                            setDraggedKanbanTaskId(task.id);
+                          }}
+                          onDragEnd={() => {
+                            setDraggedKanbanTaskId(null);
+                            setDragOverStage(null);
+                          }}
+                          className={`p-3 rounded-xl border space-y-2 shadow-xs transition-all min-w-0 cursor-grab active:cursor-grabbing select-none ${
+                            isTaskBeingDragged
+                              ? 'opacity-40 border-dashed border-[#F84B11] scale-[0.98]'
+                              : isKanbanLight
+                              ? 'border-slate-200/90 bg-white hover:border-slate-300'
+                              : 'border-[#20242E] bg-[#0E1015] hover:border-[#2C303B]'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between gap-1.5">
+                            <div className="flex items-center gap-1.5 min-w-0">
+                              <GripVertical className="w-3.5 h-3.5 text-[#717684] opacity-40 group-hover:opacity-100 transition-opacity shrink-0" />
+                              <span className="font-mono text-xs font-bold text-[#F84B11]">{task.id}</span>
+                              <span className={`text-[10px] font-mono ${isKanbanLight ? 'text-slate-500' : 'text-[#717684]'}`}>
+                                {task.sku}
+                              </span>
+                            </div>
+                            <span className={`px-2 py-0.5 rounded text-[10px] font-semibold border shrink-0 ${
+                              task.priority === 'Critical'
+                                ? isKanbanLight
+                                  ? 'bg-red-50 text-red-700 border-red-200'
+                                  : 'bg-red-950 text-red-400 border-red-800/40'
+                                : task.priority === 'High'
+                                ? isKanbanLight
+                                  ? 'bg-amber-50 text-amber-800 border-amber-200'
+                                  : 'bg-amber-950 text-amber-300 border-amber-800/40'
+                                : isKanbanLight
+                                  ? 'bg-slate-100 text-slate-700 border-slate-200'
+                                  : 'bg-zinc-800 text-zinc-300 border-zinc-700/40'
+                            }`}>
+                              {task.priority}
                             </span>
                           </div>
-                          <span className={`px-2 py-0.5 rounded text-[10px] font-semibold border shrink-0 ${
-                            task.priority === 'Critical'
-                              ? isKanbanLight
-                                ? 'bg-red-50 text-red-700 border-red-200'
-                                : 'bg-red-950 text-red-400 border-red-800/40'
-                              : task.priority === 'High'
-                              ? isKanbanLight
-                                ? 'bg-amber-50 text-amber-800 border-amber-200'
-                                : 'bg-amber-950 text-amber-300 border-amber-800/40'
-                              : isKanbanLight
-                                ? 'bg-slate-100 text-slate-700 border-slate-200'
-                                : 'bg-zinc-800 text-zinc-300 border-zinc-700/40'
+
+                          <h4 className={`text-xs font-semibold leading-snug ${
+                            isKanbanLight ? 'text-slate-900' : 'text-white'
                           }`}>
-                            {task.priority}
-                          </span>
-                        </div>
+                            {task.title}
+                          </h4>
 
-                        <h4 className={`text-xs font-semibold leading-snug ${
-                          isKanbanLight ? 'text-slate-900' : 'text-white'
-                        }`}>
-                          {task.title}
-                        </h4>
+                          <div className={`flex items-center justify-between text-[10.5px] ${
+                            isKanbanLight ? 'text-slate-500' : 'text-[#717684]'
+                          }`}>
+                            <span className="flex items-center gap-1">
+                              <Clock3 className="w-3 h-3 text-amber-500" />
+                              <span>{task.sla}</span>
+                            </span>
+                            <span className={isKanbanLight ? 'text-slate-700 font-medium' : 'text-zinc-300'}>
+                              {task.assignee}
+                            </span>
+                          </div>
 
-                        <div className={`flex items-center justify-between text-[10.5px] ${
-                          isKanbanLight ? 'text-slate-500' : 'text-[#717684]'
-                        }`}>
-                          <span className="flex items-center gap-1">
-                            <Clock3 className="w-3 h-3 text-amber-500" />
-                            <span>{task.sla}</span>
-                          </span>
-                          <span className={isKanbanLight ? 'text-slate-700 font-medium' : 'text-zinc-300'}>
-                            {task.assignee}
-                          </span>
-                        </div>
-
-                        <div className={`pt-1.5 border-t flex items-center gap-2 ${
-                          isKanbanLight ? 'border-slate-200' : 'border-[#1A1D24]'
-                        }`}>
-                          {task.stage !== 'intake' && (
-                            <button
-                              onClick={() => handleRegressKanbanTask(task.id)}
-                              className={`py-1.5 px-3 rounded-lg text-xs font-medium cursor-pointer border transition-colors ${
+                          <div className={`pt-1.5 border-t flex items-center gap-2 ${
+                            isKanbanLight ? 'border-slate-200' : 'border-[#1A1D24]'
+                          }`}>
+                            {task.stage !== 'intake' && (
+                              <button
+                                onMouseDown={(e) => e.stopPropagation()}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleRegressKanbanTask(task.id);
+                                }}
+                                className={`py-1.5 px-3 rounded-lg text-xs font-medium cursor-pointer border transition-colors ${
+                                  isKanbanLight
+                                    ? 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200'
+                                    : 'bg-[#161922] text-zinc-300 border-[#262B37]'
+                                }`}
+                              >
+                                ←
+                              </button>
+                            )}
+                            {task.stage !== 'dispatch' ? (
+                              <button
+                                onMouseDown={(e) => e.stopPropagation()}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleAdvanceKanbanTask(task.id);
+                                }}
+                                className="flex-1 py-2 rounded-lg text-xs font-bold bg-[#F84B11] hover:bg-[#ff5d26] text-white flex items-center justify-center gap-1.5 cursor-pointer shadow-xs active:scale-[0.97]"
+                              >
+                                <span>Advance to Next Stage</span>
+                                <span>→</span>
+                              </button>
+                            ) : (
+                              <div className={`flex-1 py-1.5 rounded-lg text-xs font-bold flex items-center justify-center gap-1 border ${
                                 isKanbanLight
-                                  ? 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200'
-                                  : 'bg-[#161922] text-zinc-300 border-[#262B37]'
-                              }`}
-                            >
-                              ←
-                            </button>
-                          )}
-                          {task.stage !== 'dispatch' ? (
-                            <button
-                              onClick={() => handleAdvanceKanbanTask(task.id)}
-                              className="flex-1 py-2 rounded-lg text-xs font-bold bg-[#F84B11] hover:bg-[#ff5d26] text-white flex items-center justify-center gap-1.5 cursor-pointer shadow-xs active:scale-[0.97]"
-                            >
-                              <span>Advance to Next Stage</span>
-                              <span>→</span>
-                            </button>
-                          ) : (
-                            <div className={`flex-1 py-1.5 rounded-lg text-xs font-bold flex items-center justify-center gap-1 border ${
-                              isKanbanLight
-                                ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
-                                : 'bg-emerald-950/60 border-emerald-800/40 text-emerald-400'
-                            }`}>
-                              <CheckCircle2 className="w-3.5 h-3.5" />
-                              <span>Dispatched & Verified</span>
-                            </div>
-                          )}
+                                  ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
+                                  : 'bg-emerald-950/60 border-emerald-800/40 text-emerald-400'
+                              }`}>
+                                <CheckCircle2 className="w-3.5 h-3.5" />
+                                <span>Dispatched & Verified</span>
+                              </div>
+                            )}
+                          </div>
                         </div>
+                      );
+                    })}
+
+                    {filteredKanbanTasks.filter(t => t.stage === mobileActiveStage).length === 0 && (
+                      <div className={`h-28 rounded-xl border border-dashed flex flex-col items-center justify-center p-3 text-center transition-colors ${
+                        dragOverStage === mobileActiveStage && draggedKanbanTaskId
+                          ? 'border-[#F84B11] bg-[#F84B11]/10 text-[#F84B11]'
+                          : isKanbanLight
+                          ? 'border-slate-200 text-slate-400 bg-slate-50/50'
+                          : 'border-[#20242E] text-[#717684] bg-white/[0.01]'
+                      }`}>
+                        <span className="text-xs font-mono font-medium">
+                          {dragOverStage === mobileActiveStage && draggedKanbanTaskId ? 'Drop task to assign here' : 'No work orders in this stage'}
+                        </span>
+                        <span className="text-[10px] text-[#717684] mt-0.5">Drag any task or switch stages above</span>
                       </div>
-                    ))}
+                    )}
                   </div>
                 )}
 
