@@ -28,7 +28,9 @@ import {
   Search,
   Plus,
   Sun,
-  Moon
+  Moon,
+  MapPin,
+  Radio
 } from 'lucide-react';
 
 export default function App() {
@@ -145,6 +147,7 @@ export default function App() {
   // Vorsik Subview: 'cards' (default) vs 'table' (alternative)
   const [vorsikSubView, setVorsikSubView] = useState<'cards' | 'table'>('cards');
   const [selectedOrderId, setSelectedOrderId] = useState<string>('ORD-8942');
+  const [trackingDriverOrderId, setTrackingDriverOrderId] = useState<string | null>(null);
 
   // ROI Calculator state
   const [employees, setEmployees] = useState(25);
@@ -1478,7 +1481,10 @@ export default function App() {
                           {b2bOrders.filter(o => o.status === 'Pending Approval').map(order => (
                             <div
                               key={order.id}
-                              onClick={() => setSelectedOrderId(order.id)}
+                              onClick={() => {
+                                setSelectedOrderId(order.id);
+                                setTrackingDriverOrderId(null);
+                              }}
                               className={`p-2.5 rounded-lg border transition-all cursor-pointer ${
                                 selectedOrderId === order.id
                                   ? isLight
@@ -1591,7 +1597,9 @@ export default function App() {
                                 <button
                                   onClick={(e) => {
                                     e.stopPropagation();
-                                    setToastMessage(`Truck #04 GPS ping: 1.4 miles to delivery dock. Telemetry synced (0.1ms).`);
+                                    setSelectedOrderId(order.id);
+                                    setTrackingDriverOrderId(order.id);
+                                    setToastMessage(`Tracking Truck #04 • Regional Corridor GPS telemetry online (0.1ms).`);
                                     setTimeout(() => setToastMessage(null), 3000);
                                   }}
                                   className={`px-2 py-0.5 rounded border font-medium text-[11px] transition-all flex items-center gap-1 cursor-pointer ${
@@ -1611,105 +1619,339 @@ export default function App() {
 
                     </div>
 
-                    {/* Right: Live Order Inspector & One-Click Billing Console (5 cols) */}
+                    {/* Right: Live Order Inspector & One-Click Billing Console OR Live Driver Telemetry GPS Map (5 cols) */}
                     <div data-build-showroom className={`lg:col-span-5 p-3 sm:p-3.5 lg:p-4 rounded-xl border flex flex-col justify-between transition-colors overflow-hidden ${
                       isLight ? 'border-slate-200 bg-white shadow-xs' : 'border-[#232731] bg-[#0E1015]'
                     }`}>
-                      <div className="overflow-hidden">
-                        <div className={`flex items-center justify-between pb-2 border-b mb-2.5 ${
-                          isLight ? 'border-slate-100' : 'border-[#1A1D24]'
-                        }`}>
-                          <div>
-                            <span className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider text-[#F84B11]">Live Order Inspector</span>
-                            <h4 className={`text-sm sm:text-base font-bold flex items-center gap-1.5 mt-0.5 ${isLight ? 'text-slate-900' : 'text-white'}`}>
-                              <span>{selectedOrder.id}</span>
-                              <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium border ${
-                                selectedOrder.status === 'Pending Approval'
-                                  ? isLight ? 'bg-amber-100 text-amber-800 border-amber-300' : 'bg-amber-950/70 text-amber-300 border-amber-800/40'
-                                  : selectedOrder.status === 'In Transit'
-                                  ? isLight ? 'bg-blue-100 text-blue-800 border-blue-300' : 'bg-blue-950/70 text-blue-300 border-blue-800/40'
-                                  : isLight ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : 'bg-emerald-950/70 text-emerald-300 border-emerald-800/40'
-                              }`}>
-                                {selectedOrder.status}
-                              </span>
-                            </h4>
-                          </div>
-                          <div className="text-right">
-                            <div className={`text-[10px] ${isLight ? 'text-slate-500' : 'text-[#717684]'}`}>Total Order Net</div>
-                            <div className={`text-sm sm:text-base font-bold tabular-nums ${isLight ? 'text-slate-900' : 'text-white'}`}>{selectedOrder.total}</div>
-                          </div>
-                        </div>
-
-                        {/* Account Profile Card */}
-                        <div className={`p-2.5 rounded-lg border mb-2.5 space-y-1.5 text-xs transition-colors ${
-                          isLight ? 'bg-slate-50 border-slate-200' : 'bg-[#0A0C10] border-[#1A1D24]'
-                        }`}>
-                          <div className="flex items-center justify-between">
-                            <span className={isLight ? 'text-slate-500' : 'text-[#717684]'}>Client Account:</span>
-                            <span className={`font-semibold truncate max-w-[190px] ${isLight ? 'text-slate-900' : 'text-white'}`}>{selectedOrder.client}</span>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <span className={isLight ? 'text-slate-500' : 'text-[#717684]'}>Account Executive:</span>
-                            <span className={isLight ? 'text-slate-800 font-medium' : 'text-[#EDEDED]'}>{selectedOrder.rep}</span>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <span className={isLight ? 'text-slate-500' : 'text-[#717684]'}>Payment Terms:</span>
-                            <span className={`font-medium ${isLight ? 'text-emerald-700 font-semibold' : 'text-emerald-400'}`}>Net-30 (Approved Credit)</span>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <span className={isLight ? 'text-slate-500' : 'text-[#717684]'}>Delivery SLA:</span>
-                            <span className={isLight ? 'text-slate-800 font-medium' : 'text-[#EDEDED]'}>{selectedOrder.sla}</span>
-                          </div>
-                        </div>
-
-                        {/* SKU Breakdown Visual List */}
-                        <div className="space-y-1.5 mb-2.5">
-                          <div className={`text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider ${isLight ? 'text-slate-500' : 'text-[#717684]'}`}>
-                            Verified Line Items
-                          </div>
-                          <div className={`p-2.5 rounded-lg border transition-colors ${
-                            isLight ? 'bg-slate-50 border-slate-200' : 'bg-[#0A0C10] border-[#1A1D24]'
+                      {trackingDriverOrderId === selectedOrder.id ? (
+                        /* LIVE GPS DRIVER TRACKING MAP VIEW */
+                        <div className="h-full flex flex-col justify-between overflow-hidden animate-fade-in">
+                          {/* Map Top Header */}
+                          <div className={`flex items-center justify-between pb-2 border-b shrink-0 ${
+                            isLight ? 'border-slate-100' : 'border-[#1A1D24]'
                           }`}>
-                            <div className={`flex items-center justify-between text-xs font-semibold mb-0.5 ${isLight ? 'text-slate-900' : 'text-white'}`}>
-                              <span className="truncate pr-2">{selectedOrder.items}</span>
-                              <span className="tabular-nums shrink-0">{selectedOrder.total}</span>
+                            <div className="flex items-center gap-2">
+                              <div className="relative flex h-2 w-2">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                              </div>
+                              <div>
+                                <div className="flex items-center gap-1.5">
+                                  <span className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider text-blue-500">
+                                    Live Fleet Telemetry
+                                  </span>
+                                  <span className={`text-[9px] font-mono px-1 py-0.2 rounded border ${
+                                    isLight ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-blue-950/60 text-blue-300 border-blue-800/40'
+                                  }`}>
+                                    0.1ms Link
+                                  </span>
+                                </div>
+                                <h4 className={`text-xs sm:text-sm font-bold flex items-center gap-1.5 ${isLight ? 'text-slate-900' : 'text-white'}`}>
+                                  <span>Truck #04 • Regional Dispatch</span>
+                                </h4>
+                              </div>
                             </div>
-                            <div className={`text-[10px] flex items-center justify-between ${isLight ? 'text-slate-500' : 'text-[#717684]'}`}>
-                              <span>Quantity: {selectedOrder.units} units</span>
-                              <span className={`font-medium ${isLight ? 'text-emerald-700 font-semibold' : 'text-emerald-400'}`}>Barcode Verified (0ms)</span>
+
+                            {/* Close Button to return to Full Order Details */}
+                            <button
+                              onClick={() => setTrackingDriverOrderId(null)}
+                              className={`px-2 py-1 rounded-md text-xs font-medium flex items-center gap-1 transition-all cursor-pointer ${
+                                isLight
+                                  ? 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200'
+                                  : 'bg-[#181B23] hover:bg-[#222631] text-zinc-300 border border-[#262B37]'
+                              }`}
+                              title="Close map and view full order details"
+                            >
+                              <X className="w-3.5 h-3.5" />
+                              <span className="hidden sm:inline text-[11px]">Close Map</span>
+                            </button>
+                          </div>
+
+                          {/* Interactive Map Visual Area with Minimalist Order Overlay */}
+                          <div className={`relative flex-1 min-h-[200px] rounded-lg border my-2 overflow-hidden flex items-center justify-center ${
+                            isLight ? 'bg-[#EEF2F6] border-slate-200' : 'bg-[#080A0E] border-[#1C2028]'
+                          }`}>
+                            {/* SVG Tactical Vector Map */}
+                            <svg className="w-full h-full absolute inset-0 select-none" viewBox="0 0 400 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <defs>
+                                <pattern id="telemetryGrid" width="24" height="24" patternUnits="userSpaceOnUse">
+                                  <path d="M 24 0 L 0 0 0 24" fill="none" stroke={isLight ? '#CBD5E1' : '#161922'} strokeWidth="0.75" />
+                                </pattern>
+                              </defs>
+
+                              {/* Grid Background */}
+                              <rect width="100%" height="100%" fill="url(#telemetryGrid)" />
+
+                              {/* Secondary Arterial Roads (Background Network) */}
+                              <path d="M 0 70 Q 150 90 280 40 T 400 30" stroke={isLight ? '#E2E8F0' : '#12151D'} strokeWidth="2.5" fill="none" />
+                              <path d="M 30 0 Q 80 120 70 240" stroke={isLight ? '#E2E8F0' : '#12151D'} strokeWidth="2" fill="none" />
+                              <path d="M 190 0 L 210 240" stroke={isLight ? '#E2E8F0' : '#12151D'} strokeWidth="1.5" fill="none" />
+                              <path d="M 0 160 Q 160 140 320 200 T 400 210" stroke={isLight ? '#E2E8F0' : '#12151D'} strokeWidth="2" fill="none" />
+                              <path d="M 310 0 C 330 80 340 160 380 240" stroke={isLight ? '#E2E8F0' : '#12151D'} strokeWidth="1.5" fill="none" />
+
+                              {/* Main Regional Highway Corridor (Thick road bed) */}
+                              <path 
+                                d="M 40 185 C 100 180, 130 140, 200 130 C 260 120, 280 80, 345 65" 
+                                stroke={isLight ? '#CBD5E1' : '#1A202C'} 
+                                strokeWidth="7" 
+                                strokeLinecap="round" 
+                                fill="none" 
+                              />
+
+                              {/* Planned / Future Route (Dashed) */}
+                              <path 
+                                d="M 235 125 C 270 120, 285 80, 345 65" 
+                                stroke={isLight ? '#94A3B8' : '#3B82F6'} 
+                                strokeWidth="3" 
+                                strokeDasharray="4 4" 
+                                strokeLinecap="round" 
+                                strokeOpacity={isLight ? '0.6' : '0.4'}
+                                fill="none" 
+                              />
+
+                              {/* Traveled Route Line (Solid glowing blue) */}
+                              <path 
+                                d="M 40 185 C 100 180, 130 140, 235 125" 
+                                stroke="#2563EB" 
+                                strokeWidth="3" 
+                                strokeLinecap="round" 
+                                fill="none" 
+                              />
+
+                              {/* Origin Point: Central Warehouse */}
+                              <circle cx="40" cy="185" r="5" fill="#3B82F6" stroke={isLight ? '#FFFFFF' : '#0E1015'} strokeWidth="2" />
+                              <circle cx="40" cy="185" r="9" stroke="#3B82F6" strokeWidth="1" strokeOpacity="0.4" fill="none" />
+                              <text x="40" y="204" textAnchor="middle" fontSize="8" fontWeight="600" fill={isLight ? '#475569' : '#94A3B8'} fontFamily="ui-sans-serif, system-ui">
+                                Origin Depot
+                              </text>
+
+                              {/* Intermediate Waypoint: Highway Interlink 4 */}
+                              <circle cx="160" cy="145" r="3.5" fill="#10B981" stroke={isLight ? '#FFFFFF' : '#0E1015'} strokeWidth="1.5" />
+                              <text x="160" y="163" textAnchor="middle" fontSize="8" fontWeight="500" fill={isLight ? '#64748B' : '#717684'} fontFamily="ui-sans-serif, system-ui">
+                                Interlink 4 ✓
+                              </text>
+
+                              {/* Destination Point: Client Delivery Dock */}
+                              <circle cx="345" cy="65" r="5" fill="#F84B11" stroke={isLight ? '#FFFFFF' : '#0E1015'} strokeWidth="2" />
+                              <circle cx="345" cy="65" r="10" stroke="#F84B11" strokeWidth="1" strokeOpacity="0.5" strokeDasharray="2 2" fill="none" />
+                              <text x="345" y="52" textAnchor="middle" fontSize="8.5" fontWeight="700" fill={isLight ? '#0F172A' : '#FFFFFF'} fontFamily="ui-sans-serif, system-ui">
+                                Delivery Dock
+                              </text>
+
+                              {/* Current Vehicle Position Marker (Truck #04 at ~68% of the route) */}
+                              <g transform="translate(235, 125)">
+                                {/* Animated Pulsing Radar Rings */}
+                                <circle cx="0" cy="0" r="14" fill="#3B82F6" fillOpacity="0.2">
+                                  <animate attributeName="r" values="7;18;7" dur="2.4s" repeatCount="indefinite" />
+                                  <animate attributeName="fill-opacity" values="0.35;0.05;0.35" dur="2.4s" repeatCount="indefinite" />
+                                </circle>
+                                <circle cx="0" cy="0" r="6" fill="#2563EB" stroke="#FFFFFF" strokeWidth="2" />
+                                
+                                {/* Speed & Heading Callout */}
+                                <rect x="10" y="-18" width="66" height="15" rx="3.5" fill={isLight ? 'rgba(255,255,255,0.92)' : 'rgba(15,23,42,0.92)'} stroke={isLight ? '#CBD5E1' : '#334155'} strokeWidth="0.75" />
+                                <text x="43" y="-7.5" textAnchor="middle" fontSize="7.5" fontWeight="700" fill={isLight ? '#1E293B' : '#38BDF8'} fontFamily="ui-monospace, monospace">
+                                  54 MPH • 68%
+                                </text>
+                              </g>
+                            </svg>
+
+                            {/* Minimalist Order Overlay Badge (Top-Left of map, semi-transparent frosted card) */}
+                            <div className={`absolute top-2 left-2 max-w-[210px] p-2 rounded-lg backdrop-blur-md border text-xs shadow-md transition-all ${
+                              isLight 
+                                ? 'bg-white/90 border-slate-200/90 text-slate-800 shadow-slate-900/5' 
+                                : 'bg-[#0E1015]/90 border-[#232731]/90 text-white shadow-black/40'
+                            }`}>
+                              <div className="flex items-center justify-between gap-1.5 mb-0.5">
+                                <span className="font-mono text-[10px] font-bold text-[#F84B11]">{selectedOrder.id}</span>
+                                <span className={`text-[10px] font-semibold tabular-nums ${isLight ? 'text-slate-900' : 'text-emerald-400'}`}>
+                                  {selectedOrder.total}
+                                </span>
+                              </div>
+                              <p className="text-[10.5px] font-semibold truncate leading-tight">{selectedOrder.client}</p>
+                              <div className={`flex items-center justify-between text-[9.5px] mt-1 pt-1 border-t ${
+                                isLight ? 'border-slate-200/80 text-slate-500' : 'border-[#1E222A] text-slate-400'
+                              }`}>
+                                <span className="truncate pr-1">{selectedOrder.items}</span>
+                                <span className="font-medium text-blue-500 shrink-0 font-mono">ETA 35m</span>
+                              </div>
+                            </div>
+
+                            {/* Floating Compass / Status HUD (Top-Right of map) */}
+                            <div className={`absolute top-2 right-2 px-1.5 py-0.5 rounded-md backdrop-blur-md border text-[9.5px] font-mono shadow-xs flex items-center gap-1 ${
+                              isLight ? 'bg-white/85 border-slate-200 text-slate-700' : 'bg-[#0E1015]/85 border-[#232731] text-zinc-300'
+                            }`}>
+                              <Radio className="w-2.5 h-2.5 text-emerald-500 animate-pulse" />
+                              <span>GPS RTK (99.8%)</span>
+                            </div>
+
+                            {/* Route Progress Floating Pill (Bottom of map) */}
+                            <div className={`absolute bottom-2 left-2 right-2 px-2 py-1 rounded-md backdrop-blur-md border flex items-center justify-between text-[9.5px] shadow-xs ${
+                              isLight ? 'bg-white/90 border-slate-200 text-slate-700' : 'bg-[#0E1015]/90 border-[#232731] text-zinc-300'
+                            }`}>
+                              <div className="flex items-center gap-1.5 truncate">
+                                <MapPin className="w-3 h-3 text-[#F84B11] shrink-0" />
+                                <span className="truncate">Corridor I-80 East • Interlink 4</span>
+                              </div>
+                              <span className={`font-semibold shrink-0 ml-1.5 ${isLight ? 'text-emerald-700' : 'text-emerald-400'}`}>
+                                On Schedule
+                              </span>
                             </div>
                           </div>
-                        </div>
-                      </div>
 
-                      {/* One-Click Tactical Actions */}
-                      <div className={`space-y-1.5 pt-2 border-t shrink-0 ${isLight ? 'border-slate-100' : 'border-[#1A1D24]'}`}>
-                        {selectedOrder.status === 'Pending Approval' ? (
-                          <button
-                            onClick={() => handleApproveB2BOrder(selectedOrder.id)}
-                            className="w-full py-2 rounded-lg bg-[#F84B11] hover:bg-[#ff5d26] active:scale-[0.98] text-white font-semibold text-xs transition-all flex items-center justify-center gap-1.5 shadow-md shadow-[#F84B11]/20 cursor-pointer"
-                          >
-                            <Zap className="w-3.5 h-3.5 fill-current" />
-                            <span>Authorize Order & Queue Dispatch</span>
-                          </button>
-                        ) : (
-                          <button
-                            onClick={() => handleGenerateB2BInvoice(selectedOrder.id)}
-                            className={`w-full py-2 rounded-lg active:scale-[0.98] font-semibold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm ${
-                              isLight
-                                ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-600/20'
-                                : 'bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-700/60 text-emerald-300'
-                            }`}
-                          >
-                            <FileText className="w-3.5 h-3.5" />
-                            <span>{selectedOrder.invoiced ? 'Re-Issue Encrypted Invoice' : 'Generate & Send PDF Invoice'}</span>
-                          </button>
-                        )}
+                          {/* Driver Telemetry Details & Instant Tactical Action */}
+                          <div className={`space-y-1.5 pt-1.5 border-t shrink-0 ${isLight ? 'border-slate-100' : 'border-[#1A1D24]'}`}>
+                            <div className="grid grid-cols-3 gap-1.5 text-center">
+                              <div className={`p-1.5 rounded border text-[10px] ${
+                                isLight ? 'bg-slate-50 border-slate-200 text-slate-700' : 'bg-[#0A0C10] border-[#1A1D24] text-zinc-300'
+                              }`}>
+                                <div className={`text-[8.5px] uppercase tracking-wider ${isLight ? 'text-slate-400' : 'text-[#717684]'}`}>Driver</div>
+                                <div className="font-semibold truncate">Carlos R.</div>
+                              </div>
+                              <div className={`p-1.5 rounded border text-[10px] ${
+                                isLight ? 'bg-slate-50 border-slate-200 text-slate-700' : 'bg-[#0A0C10] border-[#1A1D24] text-zinc-300'
+                              }`}>
+                                <div className={`text-[8.5px] uppercase tracking-wider ${isLight ? 'text-slate-400' : 'text-[#717684]'}`}>Telemetry</div>
+                                <div className="font-semibold truncate text-blue-500">54 mph / NVMe</div>
+                              </div>
+                              <div className={`p-1.5 rounded border text-[10px] ${
+                                isLight ? 'bg-slate-50 border-slate-200 text-slate-700' : 'bg-[#0A0C10] border-[#1A1D24] text-zinc-300'
+                              }`}>
+                                <div className={`text-[8.5px] uppercase tracking-wider ${isLight ? 'text-slate-400' : 'text-[#717684]'}`}>Cargo Security</div>
+                                <div className="font-semibold truncate text-emerald-500">Tamper-Proof ✓</div>
+                              </div>
+                            </div>
 
-                        <div className={`text-[10px] text-center pt-0.5 ${isLight ? 'text-slate-400' : 'text-[#585B64]'}`}>
-                          Cryptographic local WAL hash: 0x8f2a...99c4 • Synchronized
+                            <div className="flex items-center gap-1.5 pt-0.5">
+                              <button
+                                onClick={() => {
+                                  setToastMessage(`Driver Carlos R. pinged. Response: "Approaching delivery bay, 1.2 miles away."`);
+                                  setTimeout(() => setToastMessage(null), 3000);
+                                }}
+                                className={`flex-1 py-1.5 rounded-lg border text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                                  isLight
+                                    ? 'bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200 shadow-xs active:scale-[0.98]'
+                                    : 'bg-blue-950/70 hover:bg-blue-900/80 text-blue-300 border-blue-700/50 active:scale-[0.98]'
+                                }`}
+                              >
+                                <Radio className="w-3.5 h-3.5 text-blue-500" />
+                                <span>Ping Telemetry (0.1ms)</span>
+                              </button>
+                              
+                              <button
+                                onClick={() => setTrackingDriverOrderId(null)}
+                                className={`py-1.5 px-3 rounded-lg border text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                                  isLight
+                                    ? 'bg-white hover:bg-slate-50 text-slate-800 border-slate-300 shadow-xs'
+                                    : 'bg-[#161922] hover:bg-[#1E222D] text-white border-[#232731]'
+                                }`}
+                              >
+                                <FileText className="w-3.5 h-3.5" />
+                                <span>Show Full Order</span>
+                              </button>
+                            </div>
+                          </div>
+
                         </div>
-                      </div>
+                      ) : (
+                        /* LIVE ORDER INSPECTOR (DEFAULT VIEW) */
+                        <>
+                          <div className="overflow-hidden">
+                            <div className={`flex items-center justify-between pb-2 border-b mb-2.5 ${
+                              isLight ? 'border-slate-100' : 'border-[#1A1D24]'
+                            }`}>
+                              <div>
+                                <span className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider text-[#F84B11]">Live Order Inspector</span>
+                                <h4 className={`text-sm sm:text-base font-bold flex items-center gap-1.5 mt-0.5 ${isLight ? 'text-slate-900' : 'text-white'}`}>
+                                  <span>{selectedOrder.id}</span>
+                                  <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium border ${
+                                    selectedOrder.status === 'Pending Approval'
+                                      ? isLight ? 'bg-amber-100 text-amber-800 border-amber-300' : 'bg-amber-950/70 text-amber-300 border-amber-800/40'
+                                      : selectedOrder.status === 'In Transit'
+                                      ? isLight ? 'bg-blue-100 text-blue-800 border-blue-300' : 'bg-blue-950/70 text-blue-300 border-blue-800/40'
+                                      : isLight ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : 'bg-emerald-950/70 text-emerald-300 border-emerald-800/40'
+                                  }`}>
+                                    {selectedOrder.status}
+                                  </span>
+                                </h4>
+                              </div>
+                              <div className="text-right">
+                                <div className={`text-[10px] ${isLight ? 'text-slate-500' : 'text-[#717684]'}`}>Total Order Net</div>
+                                <div className={`text-sm sm:text-base font-bold tabular-nums ${isLight ? 'text-slate-900' : 'text-white'}`}>{selectedOrder.total}</div>
+                              </div>
+                            </div>
+
+                            {/* Account Profile Card */}
+                            <div className={`p-2.5 rounded-lg border mb-2.5 space-y-1.5 text-xs transition-colors ${
+                              isLight ? 'bg-slate-50 border-slate-200' : 'bg-[#0A0C10] border-[#1A1D24]'
+                            }`}>
+                              <div className="flex items-center justify-between">
+                                <span className={isLight ? 'text-slate-500' : 'text-[#717684]'}>Client Account:</span>
+                                <span className={`font-semibold truncate max-w-[190px] ${isLight ? 'text-slate-900' : 'text-white'}`}>{selectedOrder.client}</span>
+                              </div>
+                              <div className="flex items-center justify-between">
+                                <span className={isLight ? 'text-slate-500' : 'text-[#717684]'}>Account Executive:</span>
+                                <span className={isLight ? 'text-slate-800 font-medium' : 'text-[#EDEDED]'}>{selectedOrder.rep}</span>
+                              </div>
+                              <div className="flex items-center justify-between">
+                                <span className={isLight ? 'text-slate-500' : 'text-[#717684]'}>Payment Terms:</span>
+                                <span className={`font-medium ${isLight ? 'text-emerald-700 font-semibold' : 'text-emerald-400'}`}>Net-30 (Approved Credit)</span>
+                              </div>
+                              <div className="flex items-center justify-between">
+                                <span className={isLight ? 'text-slate-500' : 'text-[#717684]'}>Delivery SLA:</span>
+                                <span className={isLight ? 'text-slate-800 font-medium' : 'text-[#EDEDED]'}>{selectedOrder.sla}</span>
+                              </div>
+                            </div>
+
+                            {/* SKU Breakdown Visual List */}
+                            <div className="space-y-1.5 mb-2.5">
+                              <div className={`text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider ${isLight ? 'text-slate-500' : 'text-[#717684]'}`}>
+                                Verified Line Items
+                              </div>
+                              <div className={`p-2.5 rounded-lg border transition-colors ${
+                                isLight ? 'bg-slate-50 border-slate-200' : 'bg-[#0A0C10] border-[#1A1D24]'
+                              }`}>
+                                <div className={`flex items-center justify-between text-xs font-semibold mb-0.5 ${isLight ? 'text-slate-900' : 'text-white'}`}>
+                                  <span className="truncate pr-2">{selectedOrder.items}</span>
+                                  <span className="tabular-nums shrink-0">{selectedOrder.total}</span>
+                                </div>
+                                <div className={`text-[10px] flex items-center justify-between ${isLight ? 'text-slate-500' : 'text-[#717684]'}`}>
+                                  <span>Quantity: {selectedOrder.units} units</span>
+                                  <span className={`font-medium ${isLight ? 'text-emerald-700 font-semibold' : 'text-emerald-400'}`}>Barcode Verified (0ms)</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* One-Click Tactical Actions */}
+                          <div className={`space-y-1.5 pt-2 border-t shrink-0 ${isLight ? 'border-slate-100' : 'border-[#1A1D24]'}`}>
+                            {selectedOrder.status === 'Pending Approval' ? (
+                              <button
+                                onClick={() => handleApproveB2BOrder(selectedOrder.id)}
+                                className="w-full py-2 rounded-lg bg-[#F84B11] hover:bg-[#ff5d26] active:scale-[0.98] text-white font-semibold text-xs transition-all flex items-center justify-center gap-1.5 shadow-md shadow-[#F84B11]/20 cursor-pointer"
+                              >
+                                <Zap className="w-3.5 h-3.5 fill-current" />
+                                <span>Authorize Order & Queue Dispatch</span>
+                              </button>
+                            ) : (
+                              <button
+                                onClick={() => handleGenerateB2BInvoice(selectedOrder.id)}
+                                className={`w-full py-2 rounded-lg active:scale-[0.98] font-semibold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm ${
+                                  isLight
+                                    ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-600/20'
+                                    : 'bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-700/60 text-emerald-300'
+                                }`}
+                              >
+                                <FileText className="w-3.5 h-3.5" />
+                                <span>{selectedOrder.invoiced ? 'Re-Issue Encrypted Invoice' : 'Generate & Send PDF Invoice'}</span>
+                              </button>
+                            )}
+
+                            <div className={`text-[10px] text-center pt-0.5 ${isLight ? 'text-slate-400' : 'text-[#585B64]'}`}>
+                              Cryptographic local WAL hash: 0x8f2a...99c4 • Synchronized
+                            </div>
+                          </div>
+                        </>
+                      )}
                     </div>
 
                   </div>
@@ -1871,7 +2113,10 @@ export default function App() {
                                 ) : order.status === 'In Transit' ? (
                                   <button
                                     onClick={() => {
-                                      setToastMessage(`Truck #04 en route to ${order.client}. GPS ping: 0.1ms.`);
+                                      setSelectedOrderId(order.id);
+                                      setTrackingDriverOrderId(order.id);
+                                      setVorsikSubView('cards');
+                                      setToastMessage(`Tracking Truck #04 • Regional Corridor GPS telemetry online (0.1ms).`);
                                       setTimeout(() => setToastMessage(null), 3000);
                                     }}
                                     className={`px-2.5 py-1 rounded active:scale-[0.95] font-medium text-[11px] transition-all duration-150 cursor-pointer inline-flex items-center gap-1 whitespace-nowrap ${
