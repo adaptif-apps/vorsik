@@ -970,7 +970,7 @@ export default function App() {
 
         {/* Showroom Interactive Shell */}
         <div className={`rounded-xl border shadow-2xl overflow-hidden transition-all duration-300 flex flex-col ${
-          transformationMode === 'vorsik' ? 'lg:max-h-[700px]' : ''
+          transformationMode === 'vorsik' ? 'lg:h-[700px] lg:max-h-[700px]' : ''
         } ${
           isLight 
             ? 'border-slate-300/90 bg-white shadow-2xl shadow-black/30 ring-1 ring-slate-900/5' 
@@ -1081,10 +1081,10 @@ export default function App() {
           {/* Interactive Screen Content Canvas */}
           <div className={`relative flex-1 min-h-0 transition-colors duration-200 ${
             transformationMode === 'vorsik' 
-              ? 'overflow-y-auto p-4 sm:p-5 lg:p-4.5' 
+              ? 'overflow-y-auto lg:overflow-hidden flex flex-col p-3 sm:p-3.5 lg:p-3.5' 
               : 'min-h-[520px] p-4 sm:p-6'
           } ${
-            isLight ? 'bg-[#F8FAFC] sandbox-light-scroll' : 'bg-[#0B0D12]'
+            isLight ? 'bg-[#F8FAFC]' : 'bg-[#0B0D12]'
           }`}>
 
             {/* VIEW 1: THE MESSY SPREADSHEET (BEFORE) */}
@@ -1348,10 +1348,10 @@ export default function App() {
 
             {/* VIEW 2: VORSIK CUSTOM OPERATING SYSTEM (AFTER) */}
             {transformationMode === 'vorsik' && (
-              <div className="space-y-4 animate-fade-in">
+              <div className="flex-1 min-h-0 flex flex-col space-y-2 sm:space-y-2.5 animate-fade-in">
                 
                 {/* Mode Sub-Navigation: Cards (Default) vs Table */}
-                <div className={`flex items-center justify-between gap-3 pb-2 border-b flex-nowrap overflow-x-auto ${
+                <div className={`shrink-0 flex items-center justify-between gap-3 pb-2 border-b flex-nowrap overflow-x-auto ${
                   isLight ? 'border-slate-200' : 'border-[#1A1D24]'
                 }`}>
                   <div className={`inline-flex p-0.5 rounded-lg border text-xs font-medium whitespace-nowrap shrink-0 ${
@@ -1401,63 +1401,63 @@ export default function App() {
                 </div>
 
                 {/* Real-Time KPIs Top Bar (Targeted by BuildCrew) */}
-                <div data-build-showroom className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-3">
-                  <div className={`p-3 rounded-lg border transition-colors ${
+                <div data-build-showroom className="shrink-0 grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-2.5">
+                  <div className={`p-2 sm:p-2.5 rounded-lg border transition-colors ${
                     isLight ? 'border-slate-200 bg-white shadow-xs' : 'border-[#1F232B] bg-[#0E1015]'
                   }`}>
                     <div className={`text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider mb-0.5 ${
                       isLight ? 'text-slate-500 font-medium' : 'text-[#717684]'
                     }`}>Pending Approval</div>
-                    <div className={`text-sm sm:text-base font-bold tabular-nums ${isLight ? 'text-slate-900' : 'text-white'}`}>2 Orders</div>
+                    <div className={`text-xs sm:text-sm font-bold tabular-nums ${isLight ? 'text-slate-900' : 'text-white'}`}>2 Orders</div>
                     <p className={`text-[10px] sm:text-[11px] mt-0.5 ${isLight ? 'text-amber-700 font-medium' : 'text-amber-400'}`}>$23,200 USD in queue</p>
                   </div>
 
-                  <div className={`p-3 rounded-lg border transition-colors ${
+                  <div className={`p-2 sm:p-2.5 rounded-lg border transition-colors ${
                     isLight ? 'border-slate-200 bg-white shadow-xs' : 'border-[#1F232B] bg-[#0E1015]'
                   }`}>
                     <div className={`text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider mb-0.5 ${
                       isLight ? 'text-slate-500 font-medium' : 'text-[#717684]'
                     }`}>Active In Transit</div>
-                    <div className={`text-sm sm:text-base font-bold tabular-nums ${isLight ? 'text-slate-900' : 'text-white'}`}>1 Shipment</div>
+                    <div className={`text-xs sm:text-sm font-bold tabular-nums ${isLight ? 'text-slate-900' : 'text-white'}`}>1 Shipment</div>
                     <p className={`text-[10px] sm:text-[11px] mt-0.5 ${isLight ? 'text-blue-700 font-medium' : 'text-blue-400'}`}>Truck #04 ETA 35 mins</p>
                   </div>
 
-                  <div className={`p-3 rounded-lg border transition-colors ${
+                  <div className={`p-2 sm:p-2.5 rounded-lg border transition-colors ${
                     isLight ? 'border-slate-200 bg-white shadow-xs' : 'border-[#1F232B] bg-[#0E1015]'
                   }`}>
                     <div className={`text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider mb-0.5 ${
                       isLight ? 'text-slate-500 font-medium' : 'text-[#717684]'
                     }`}>Collected Volume</div>
-                    <div className={`text-sm sm:text-base font-bold tabular-nums ${isLight ? 'text-slate-900' : 'text-white'}`}>$65,060 USD</div>
+                    <div className={`text-xs sm:text-sm font-bold tabular-nums ${isLight ? 'text-slate-900' : 'text-white'}`}>$65,060 USD</div>
                     <p className={`text-[10px] sm:text-[11px] mt-0.5 ${isLight ? 'text-emerald-700 font-medium' : 'text-emerald-400'}`}>100% Reconciled</p>
                   </div>
 
-                  <div className={`p-3 rounded-lg border transition-colors ${
+                  <div className={`p-2 sm:p-2.5 rounded-lg border transition-colors ${
                     isLight ? 'border-slate-200 bg-white shadow-xs' : 'border-[#1F232B] bg-[#0E1015]'
                   }`}>
                     <div className={`text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider mb-0.5 ${
                       isLight ? 'text-slate-500 font-medium' : 'text-[#717684]'
                     }`}>System Latency</div>
-                    <div className={`text-sm sm:text-base font-bold tabular-nums ${isLight ? 'text-slate-900' : 'text-white'}`}>0.2ms Perceived</div>
+                    <div className={`text-xs sm:text-sm font-bold tabular-nums ${isLight ? 'text-slate-900' : 'text-white'}`}>0.2ms Perceived</div>
                     <p className={`text-[10px] sm:text-[11px] mt-0.5 ${isLight ? 'text-emerald-700 font-medium' : 'text-emerald-400'}`}>Local NVMe on LAN</p>
                   </div>
                 </div>
 
                 {/* SUBVIEW A: VISUAL CARDS & PIPELINE (DEFAULT) */}
                 {vorsikSubView === 'cards' ? (
-                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 lg:gap-4">
+                  <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-12 gap-2.5 lg:gap-3">
                     
                     {/* Pipeline Columns Container (7 cols) */}
-                    <div className="lg:col-span-7 space-y-4">
+                    <div className="lg:col-span-7 flex flex-col min-h-0 gap-2.5">
                       
                       {/* Stage 1: Needs Approval */}
-                      <div data-build-showroom className={`p-4 rounded-xl border space-y-3 transition-colors ${
+                      <div data-build-showroom className={`flex-1 min-h-0 flex flex-col p-2.5 sm:p-3 rounded-xl border transition-colors ${
                         isLight ? 'border-slate-200 bg-white shadow-xs' : 'border-[#232731] bg-[#0E1015]'
                       }`}>
-                        <div className={`flex items-center justify-between pb-2 border-b ${
+                        <div className={`flex items-center justify-between pb-1.5 border-b shrink-0 ${
                           isLight ? 'border-slate-100' : 'border-[#1A1D24]'
                         }`}>
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-1.5 sm:gap-2">
                             <div className={`w-2 h-2 rounded-full ${isLight ? 'bg-amber-500' : 'bg-amber-400'}`} />
                             <span className={`text-xs font-bold uppercase tracking-wider ${isLight ? 'text-slate-900' : 'text-white'}`}>
                               Stage 1: Needs Approval
@@ -1473,30 +1473,31 @@ export default function App() {
                           <span className={`text-[11px] font-semibold ${isLight ? 'text-amber-700' : 'text-amber-400'}`}>$23,200 USD</span>
                         </div>
 
-                        <div className="space-y-2.5">
+                        {/* Cards container: scrolls locally ONLY if new orders exceed the container */}
+                        <div className={`flex-1 min-h-0 overflow-y-auto pr-1 space-y-2 mt-2 ${isLight ? 'sandbox-light-scroll' : ''}`}>
                           {b2bOrders.filter(o => o.status === 'Pending Approval').map(order => (
                             <div
                               key={order.id}
                               onClick={() => setSelectedOrderId(order.id)}
-                              className={`p-3.5 rounded-lg border transition-all cursor-pointer ${
+                              className={`p-2.5 rounded-lg border transition-all cursor-pointer ${
                                 selectedOrderId === order.id
                                   ? isLight
-                                    ? 'border-[#F84B11] bg-orange-50/60 shadow-md shadow-[#F84B11]/15 ring-1 ring-[#F84B11]/30'
-                                    : 'border-[#F84B11] bg-[#141620] shadow-md shadow-[#F84B11]/10'
+                                    ? 'border-[#F84B11] bg-orange-50/60 shadow-sm ring-1 ring-[#F84B11]/30'
+                                    : 'border-[#F84B11] bg-[#141620] shadow-sm shadow-[#F84B11]/10'
                                   : isLight
                                     ? 'border-slate-200 bg-slate-50/70 hover:border-slate-300 hover:bg-slate-100/70'
                                     : 'border-[#1E222A] bg-[#0A0C10] hover:border-[#2C303B]'
                               }`}
                             >
-                              <div className="flex items-start justify-between gap-2 mb-1.5">
+                              <div className="flex items-start justify-between gap-2 mb-1">
                                 <div>
-                                  <span className="font-mono text-xs font-semibold text-[#F84B11] mr-2">{order.id}</span>
+                                  <span className="font-mono text-xs font-semibold text-[#F84B11] mr-1.5">{order.id}</span>
                                   <span className={`font-semibold text-xs ${isLight ? 'text-slate-900' : 'text-white'}`}>{order.client}</span>
                                 </div>
                                 <span className={`tabular-nums font-bold text-xs ${isLight ? 'text-slate-900' : 'text-white'}`}>{order.total}</span>
                               </div>
 
-                              <p className={`text-[11px] mb-3 ${isLight ? 'text-slate-600' : 'text-[#94979E]'}`}>{order.items}</p>
+                              <p className={`text-[11px] mb-2 truncate ${isLight ? 'text-slate-600' : 'text-[#94979E]'}`}>{order.items}</p>
 
                               <div className="flex items-center justify-between text-[11px]">
                                 <span className={`flex items-center gap-1 ${isLight ? 'text-slate-500' : 'text-[#717684]'}`}>
@@ -1508,7 +1509,7 @@ export default function App() {
                                     e.stopPropagation();
                                     handleApproveB2BOrder(order.id);
                                   }}
-                                  className="px-2.5 py-1 rounded bg-[#F84B11] hover:bg-[#ff5d26] active:scale-[0.95] text-white font-medium text-[11px] transition-all flex items-center gap-1 shadow-sm cursor-pointer"
+                                  className="px-2 py-0.5 rounded bg-[#F84B11] hover:bg-[#ff5d26] active:scale-[0.95] text-white font-medium text-[11px] transition-all flex items-center gap-1 shadow-xs cursor-pointer"
                                 >
                                   <Zap className="w-3 h-3 fill-current" />
                                   <span>Authorize & Queue</span>
@@ -1520,13 +1521,13 @@ export default function App() {
                       </div>
 
                       {/* Stage 2: Active Dispatch & In Transit */}
-                      <div data-build-showroom className={`p-4 rounded-xl border space-y-3 transition-colors ${
+                      <div data-build-showroom className={`flex-1 min-h-0 flex flex-col p-2.5 sm:p-3 rounded-xl border transition-colors ${
                         isLight ? 'border-slate-200 bg-white shadow-xs' : 'border-[#232731] bg-[#0E1015]'
                       }`}>
-                        <div className={`flex items-center justify-between pb-2 border-b ${
+                        <div className={`flex items-center justify-between pb-1.5 border-b shrink-0 ${
                           isLight ? 'border-slate-100' : 'border-[#1A1D24]'
                         }`}>
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-1.5 sm:gap-2">
                             <div className={`w-2 h-2 rounded-full ${isLight ? 'bg-blue-500' : 'bg-blue-400'}`} />
                             <span className={`text-xs font-bold uppercase tracking-wider ${isLight ? 'text-slate-900' : 'text-white'}`}>
                               Stage 2: In Transit / Fulfillment
@@ -1542,33 +1543,34 @@ export default function App() {
                           <span className={`text-[11px] font-semibold ${isLight ? 'text-blue-700' : 'text-blue-400'}`}>$28,400 USD</span>
                         </div>
 
-                        <div className="space-y-2.5">
+                        {/* Cards container: scrolls locally ONLY if new orders exceed the container */}
+                        <div className={`flex-1 min-h-0 overflow-y-auto pr-1 space-y-2 mt-2 ${isLight ? 'sandbox-light-scroll' : ''}`}>
                           {b2bOrders.filter(o => o.status === 'In Transit').map(order => (
                             <div
                               key={order.id}
                               onClick={() => setSelectedOrderId(order.id)}
-                              className={`p-3.5 rounded-lg border transition-all cursor-pointer ${
+                              className={`p-2.5 rounded-lg border transition-all cursor-pointer ${
                                 selectedOrderId === order.id
                                   ? isLight
-                                    ? 'border-[#F84B11] bg-orange-50/60 shadow-md shadow-[#F84B11]/15 ring-1 ring-[#F84B11]/30'
-                                    : 'border-[#F84B11] bg-[#141620] shadow-md shadow-[#F84B11]/10'
+                                    ? 'border-[#F84B11] bg-orange-50/60 shadow-sm ring-1 ring-[#F84B11]/30'
+                                    : 'border-[#F84B11] bg-[#141620] shadow-sm shadow-[#F84B11]/10'
                                   : isLight
                                     ? 'border-slate-200 bg-slate-50/70 hover:border-slate-300 hover:bg-slate-100/70'
                                     : 'border-[#1E222A] bg-[#0A0C10] hover:border-[#2C303B]'
                               }`}
                             >
-                              <div className="flex items-start justify-between gap-2 mb-1.5">
+                              <div className="flex items-start justify-between gap-2 mb-1">
                                 <div>
-                                  <span className="font-mono text-xs font-semibold text-[#F84B11] mr-2">{order.id}</span>
+                                  <span className="font-mono text-xs font-semibold text-[#F84B11] mr-1.5">{order.id}</span>
                                   <span className={`font-semibold text-xs ${isLight ? 'text-slate-900' : 'text-white'}`}>{order.client}</span>
                                 </div>
                                 <span className={`tabular-nums font-bold text-xs ${isLight ? 'text-slate-900' : 'text-white'}`}>{order.total}</span>
                               </div>
 
-                              <p className={`text-[11px] mb-2 ${isLight ? 'text-slate-600' : 'text-[#94979E]'}`}>{order.items}</p>
+                              <p className={`text-[11px] mb-1.5 truncate ${isLight ? 'text-slate-600' : 'text-[#94979E]'}`}>{order.items}</p>
 
                               {/* Visual Route Progress */}
-                              <div className={`p-2.5 rounded border mb-2.5 transition-colors ${
+                              <div className={`p-2 rounded border mb-2 transition-colors ${
                                 isLight ? 'bg-white border-slate-200 shadow-xs' : 'bg-[#12141C] border-[#1C2028]'
                               }`}>
                                 <div className="flex items-center justify-between text-[10px] mb-1">
@@ -1578,21 +1580,21 @@ export default function App() {
                                 <div className={`w-full h-1.5 rounded-full overflow-hidden ${isLight ? 'bg-slate-200' : 'bg-[#1C2028]'}`}>
                                   <div className="bg-blue-500 h-full w-[68%] rounded-full" />
                                 </div>
-                                <div className={`flex items-center justify-between text-[10px] mt-1.5 ${isLight ? 'text-slate-500' : 'text-[#717684]'}`}>
+                                <div className={`flex items-center justify-between text-[10px] mt-1 ${isLight ? 'text-slate-500' : 'text-[#717684]'}`}>
                                   <span>Waypoint: Highway Interlink 4</span>
                                   <span className={`font-medium ${isLight ? 'text-emerald-700' : 'text-emerald-400'}`}>ETA 35 mins</span>
                                 </div>
                               </div>
 
                               <div className="flex items-center justify-between text-[11px]">
-                                <span className={`text-[10px] ${isLight ? 'text-slate-500' : 'text-[#717684]'}`}>{order.notes}</span>
+                                <span className={`text-[10px] truncate max-w-[170px] ${isLight ? 'text-slate-500' : 'text-[#717684]'}`}>{order.notes}</span>
                                 <button
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     setToastMessage(`Truck #04 GPS ping: 1.4 miles to delivery dock. Telemetry synced (0.1ms).`);
                                     setTimeout(() => setToastMessage(null), 3000);
                                   }}
-                                  className={`px-2.5 py-1 rounded border font-medium text-[11px] transition-all flex items-center gap-1 cursor-pointer ${
+                                  className={`px-2 py-0.5 rounded border font-medium text-[11px] transition-all flex items-center gap-1 cursor-pointer ${
                                     isLight
                                       ? 'bg-blue-50 hover:bg-blue-100 active:scale-[0.95] text-blue-700 border-blue-200 shadow-xs'
                                       : 'bg-blue-950/70 hover:bg-blue-900/80 active:scale-[0.95] text-blue-300 border-blue-700/50'
@@ -1610,18 +1612,18 @@ export default function App() {
                     </div>
 
                     {/* Right: Live Order Inspector & One-Click Billing Console (5 cols) */}
-                    <div data-build-showroom className={`lg:col-span-5 p-4 sm:p-5 rounded-xl border flex flex-col justify-between transition-colors ${
+                    <div data-build-showroom className={`lg:col-span-5 p-3 sm:p-3.5 lg:p-4 rounded-xl border flex flex-col justify-between transition-colors overflow-hidden ${
                       isLight ? 'border-slate-200 bg-white shadow-xs' : 'border-[#232731] bg-[#0E1015]'
                     }`}>
-                      <div>
-                        <div className={`flex items-center justify-between pb-3 border-b mb-4 ${
+                      <div className="overflow-hidden">
+                        <div className={`flex items-center justify-between pb-2 border-b mb-2.5 ${
                           isLight ? 'border-slate-100' : 'border-[#1A1D24]'
                         }`}>
                           <div>
-                            <span className="text-[11px] font-semibold uppercase tracking-wider text-[#F84B11]">Live Order Inspector</span>
-                            <h4 className={`text-base font-bold flex items-center gap-2 mt-0.5 ${isLight ? 'text-slate-900' : 'text-white'}`}>
+                            <span className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider text-[#F84B11]">Live Order Inspector</span>
+                            <h4 className={`text-sm sm:text-base font-bold flex items-center gap-1.5 mt-0.5 ${isLight ? 'text-slate-900' : 'text-white'}`}>
                               <span>{selectedOrder.id}</span>
-                              <span className={`px-2 py-0.5 rounded text-[10px] font-medium border ${
+                              <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium border ${
                                 selectedOrder.status === 'Pending Approval'
                                   ? isLight ? 'bg-amber-100 text-amber-800 border-amber-300' : 'bg-amber-950/70 text-amber-300 border-amber-800/40'
                                   : selectedOrder.status === 'In Transit'
@@ -1634,17 +1636,17 @@ export default function App() {
                           </div>
                           <div className="text-right">
                             <div className={`text-[10px] ${isLight ? 'text-slate-500' : 'text-[#717684]'}`}>Total Order Net</div>
-                            <div className={`text-base font-bold tabular-nums ${isLight ? 'text-slate-900' : 'text-white'}`}>{selectedOrder.total}</div>
+                            <div className={`text-sm sm:text-base font-bold tabular-nums ${isLight ? 'text-slate-900' : 'text-white'}`}>{selectedOrder.total}</div>
                           </div>
                         </div>
 
                         {/* Account Profile Card */}
-                        <div className={`p-3 rounded-lg border mb-4 space-y-2 text-xs transition-colors ${
+                        <div className={`p-2.5 rounded-lg border mb-2.5 space-y-1.5 text-xs transition-colors ${
                           isLight ? 'bg-slate-50 border-slate-200' : 'bg-[#0A0C10] border-[#1A1D24]'
                         }`}>
                           <div className="flex items-center justify-between">
                             <span className={isLight ? 'text-slate-500' : 'text-[#717684]'}>Client Account:</span>
-                            <span className={`font-semibold truncate max-w-[200px] ${isLight ? 'text-slate-900' : 'text-white'}`}>{selectedOrder.client}</span>
+                            <span className={`font-semibold truncate max-w-[190px] ${isLight ? 'text-slate-900' : 'text-white'}`}>{selectedOrder.client}</span>
                           </div>
                           <div className="flex items-center justify-between">
                             <span className={isLight ? 'text-slate-500' : 'text-[#717684]'}>Account Executive:</span>
@@ -1661,16 +1663,16 @@ export default function App() {
                         </div>
 
                         {/* SKU Breakdown Visual List */}
-                        <div className="space-y-2 mb-4">
-                          <div className={`text-[11px] font-semibold uppercase tracking-wider ${isLight ? 'text-slate-500' : 'text-[#717684]'}`}>
+                        <div className="space-y-1.5 mb-2.5">
+                          <div className={`text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider ${isLight ? 'text-slate-500' : 'text-[#717684]'}`}>
                             Verified Line Items
                           </div>
-                          <div className={`p-3 rounded-lg border transition-colors ${
+                          <div className={`p-2.5 rounded-lg border transition-colors ${
                             isLight ? 'bg-slate-50 border-slate-200' : 'bg-[#0A0C10] border-[#1A1D24]'
                           }`}>
-                            <div className={`flex items-center justify-between text-xs font-semibold mb-1 ${isLight ? 'text-slate-900' : 'text-white'}`}>
-                              <span>{selectedOrder.items}</span>
-                              <span className="tabular-nums">{selectedOrder.total}</span>
+                            <div className={`flex items-center justify-between text-xs font-semibold mb-0.5 ${isLight ? 'text-slate-900' : 'text-white'}`}>
+                              <span className="truncate pr-2">{selectedOrder.items}</span>
+                              <span className="tabular-nums shrink-0">{selectedOrder.total}</span>
                             </div>
                             <div className={`text-[10px] flex items-center justify-between ${isLight ? 'text-slate-500' : 'text-[#717684]'}`}>
                               <span>Quantity: {selectedOrder.units} units</span>
@@ -1681,30 +1683,30 @@ export default function App() {
                       </div>
 
                       {/* One-Click Tactical Actions */}
-                      <div className={`space-y-2 pt-3 border-t ${isLight ? 'border-slate-100' : 'border-[#1A1D24]'}`}>
+                      <div className={`space-y-1.5 pt-2 border-t shrink-0 ${isLight ? 'border-slate-100' : 'border-[#1A1D24]'}`}>
                         {selectedOrder.status === 'Pending Approval' ? (
                           <button
                             onClick={() => handleApproveB2BOrder(selectedOrder.id)}
-                            className="w-full py-2.5 rounded-lg bg-[#F84B11] hover:bg-[#ff5d26] active:scale-[0.98] text-white font-semibold text-xs transition-all flex items-center justify-center gap-2 shadow-lg shadow-[#F84B11]/20 cursor-pointer"
+                            className="w-full py-2 rounded-lg bg-[#F84B11] hover:bg-[#ff5d26] active:scale-[0.98] text-white font-semibold text-xs transition-all flex items-center justify-center gap-1.5 shadow-md shadow-[#F84B11]/20 cursor-pointer"
                           >
-                            <Zap className="w-4 h-4 fill-current" />
+                            <Zap className="w-3.5 h-3.5 fill-current" />
                             <span>Authorize Order & Queue Dispatch</span>
                           </button>
                         ) : (
                           <button
                             onClick={() => handleGenerateB2BInvoice(selectedOrder.id)}
-                            className={`w-full py-2.5 rounded-lg active:scale-[0.98] font-semibold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm ${
+                            className={`w-full py-2 rounded-lg active:scale-[0.98] font-semibold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm ${
                               isLight
                                 ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-600/20'
                                 : 'bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-700/60 text-emerald-300'
                             }`}
                           >
-                            <FileText className="w-4 h-4" />
+                            <FileText className="w-3.5 h-3.5" />
                             <span>{selectedOrder.invoiced ? 'Re-Issue Encrypted Invoice' : 'Generate & Send PDF Invoice'}</span>
                           </button>
                         )}
 
-                        <div className={`text-[10px] text-center pt-1 ${isLight ? 'text-slate-400' : 'text-[#585B64]'}`}>
+                        <div className={`text-[10px] text-center pt-0.5 ${isLight ? 'text-slate-400' : 'text-[#585B64]'}`}>
                           Cryptographic local WAL hash: 0x8f2a...99c4 • Synchronized
                         </div>
                       </div>
@@ -1713,10 +1715,10 @@ export default function App() {
                   </div>
                 ) : (
                   /* SUBVIEW B: HIGH-DENSITY TABLE VIEW (ALTERNATIVE) */
-                  <div className="space-y-4 animate-fade-in">
+                  <div className="flex-1 min-h-0 flex flex-col space-y-2.5 animate-fade-in">
                     
                     {/* Operational Toolbar */}
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                    <div className="shrink-0 flex flex-col md:flex-row md:items-center justify-between gap-2.5">
                       
                       {/* Status Filters */}
                       <div className={`inline-flex p-0.5 rounded-lg border text-xs font-medium whitespace-nowrap shrink-0 overflow-x-auto ${
@@ -1798,7 +1800,7 @@ export default function App() {
                     </div>
 
                     {/* Vorsik Production Table */}
-                    <div className={`overflow-x-auto border rounded-lg transition-colors ${
+                    <div className={`flex-1 min-h-0 overflow-auto border rounded-lg transition-colors ${
                       isLight ? 'border-slate-300 bg-white shadow-xs sandbox-light-scroll' : 'border-[#1F232B] bg-[#0A0C10]'
                     }`}>
                       <table className="w-full text-left text-xs min-w-[960px]">
@@ -1899,7 +1901,7 @@ export default function App() {
                 )}
 
                 {/* Vorsik System Audit & Integrity Footer */}
-                <div className={`flex flex-wrap items-center justify-between text-[11px] pt-1 ${
+                <div className={`shrink-0 flex flex-wrap items-center justify-between text-[11px] pt-1 ${
                   isLight ? 'text-slate-600' : 'text-[#717684]'
                 }`}>
                   <span>Cryptographic audit log: {auditEventsCount} immutable events committed to local storage</span>
