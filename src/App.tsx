@@ -22,7 +22,6 @@ import {
   GripVertical,
   Layers,
   Zap,
-  RotateCcw,
   AlertTriangle,
   FileText,
   Database,
@@ -308,11 +307,6 @@ export default function App() {
     setVorsikSubView('cards');
     setToastMessage("✨ Building custom operating app with live engineering cursors...");
     setTimeout(() => setToastMessage(null), 3000);
-    triggerBuildCrewOnShowroom();
-  };
-
-  const handleReplayTransformation = () => {
-    setTransformationMode('vorsik');
     triggerBuildCrewOnShowroom();
   };
 
@@ -975,14 +969,16 @@ export default function App() {
         </div>
 
         {/* Showroom Interactive Shell */}
-        <div className={`rounded-xl border shadow-2xl overflow-hidden transition-all duration-300 ${
+        <div className={`rounded-xl border shadow-2xl overflow-hidden transition-all duration-300 flex flex-col ${
+          transformationMode === 'vorsik' ? 'lg:max-h-[700px]' : ''
+        } ${
           isLight 
             ? 'border-slate-300/90 bg-white shadow-2xl shadow-black/30 ring-1 ring-slate-900/5' 
             : 'border-[#20232B] bg-[#0E1015] shadow-2xl'
         }`}>
           
           {/* Workstation Frame Header */}
-          <div className={`border-b px-3 sm:px-4 min-h-[56px] py-2 sm:py-0 flex flex-wrap sm:flex-nowrap items-center justify-between gap-2.5 sm:gap-3 transition-colors ${
+          <div className={`border-b px-3 sm:px-4 min-h-[56px] py-2 sm:py-0 flex flex-wrap sm:flex-nowrap items-center justify-between gap-2.5 sm:gap-3 transition-colors shrink-0 ${
             isLight 
               ? 'border-slate-200 bg-slate-100/95' 
               : 'border-[#1F232B] bg-[#0A0C10]'
@@ -1004,7 +1000,7 @@ export default function App() {
               </span>
             </div>
 
-            {/* View Switcher, Replay & Sandbox Theme Toggle */}
+            {/* View Switcher & Sandbox Theme Toggle */}
             <div className="flex items-center gap-2 shrink-0 flex-wrap sm:flex-nowrap">
               <div className={`inline-flex p-0.5 rounded-lg border text-xs font-medium whitespace-nowrap transition-colors ${
                 isLight 
@@ -1029,18 +1025,15 @@ export default function App() {
                 </button>
 
                 <button
-                  onClick={() => {
-                    setTransformationMode('vorsik');
-                    triggerBuildCrewOnShowroom();
-                  }}
+                  onClick={handleStartTransformation}
                   className={`px-3 py-1.5 rounded-md transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
                     transformationMode === 'vorsik'
                       ? isLight
                         ? 'bg-white text-slate-900 shadow-sm font-semibold'
-                        : 'bg-[#1E2129] text-white shadow-sm'
+                        : 'bg-[#1E2129] text-white shadow-sm font-semibold'
                       : isLight
-                        ? 'text-slate-600 hover:text-slate-900'
-                        : 'text-[#94979E] hover:text-white'
+                        ? 'text-[#F84B11] hover:bg-orange-50 font-semibold'
+                        : 'text-[#F84B11] hover:bg-[#1E2129] font-semibold'
                   }`}
                 >
                   <Zap className="w-3.5 h-3.5 text-[#F84B11] fill-current shrink-0" />
@@ -1048,21 +1041,6 @@ export default function App() {
                   <span className="sm:hidden inline">2. Vorsik OS</span>
                 </button>
               </div>
-
-              {transformationMode === 'vorsik' && (
-                <button
-                  onClick={handleReplayTransformation}
-                  className={`px-2.5 py-1.5 rounded-lg border text-xs flex items-center gap-1.5 transition-all cursor-pointer active:scale-95 whitespace-nowrap shrink-0 ${
-                    isLight
-                      ? 'border-slate-300 bg-white hover:bg-slate-50 hover:border-[#F84B11]/50 text-slate-700 shadow-xs'
-                      : 'border-[#262B36] bg-[#14161D] hover:bg-[#1E222D] hover:border-[#F84B11]/50 text-[#EDEDED]'
-                  }`}
-                  title="Replay multiplayer build animation"
-                >
-                  <RotateCcw className="w-3.5 h-3.5 text-[#F84B11] shrink-0" />
-                  <span className="hidden md:inline">Replay Build</span>
-                </button>
-              )}
 
               {/* Theme Toggle: Light Mode by default / Dark Mode option */}
               <div className={`inline-flex p-0.5 rounded-lg border text-xs font-medium whitespace-nowrap shrink-0 transition-colors ${
@@ -1101,56 +1079,48 @@ export default function App() {
           </div>
 
           {/* Interactive Screen Content Canvas */}
-          <div className={`relative min-h-[520px] p-4 sm:p-6 transition-colors duration-200 ${
-            isLight ? 'bg-[#F8FAFC]' : 'bg-[#0B0D12]'
+          <div className={`relative flex-1 min-h-0 transition-colors duration-200 ${
+            transformationMode === 'vorsik' 
+              ? 'overflow-y-auto p-4 sm:p-5 lg:p-4.5' 
+              : 'min-h-[520px] p-4 sm:p-6'
+          } ${
+            isLight ? 'bg-[#F8FAFC] sandbox-light-scroll' : 'bg-[#0B0D12]'
           }`}>
 
             {/* VIEW 1: THE MESSY SPREADSHEET (BEFORE) */}
             {transformationMode === 'spreadsheet' && (
               <div className="space-y-4 animate-fade-in">
                 
-                {/* Spreadsheet Alert Ribbon & Action Banner */}
-                <div className={`p-3.5 sm:p-4 rounded-lg border flex flex-col md:flex-row md:items-center justify-between gap-4 transition-colors ${
+                {/* Spreadsheet Alert Ribbon */}
+                <div className={`p-3.5 sm:p-4 rounded-lg border flex items-start gap-3 transition-colors ${
                   isLight
                     ? 'bg-amber-50/90 border-amber-300/80 shadow-xs'
                     : 'bg-[#18130B] border-amber-500/30'
                 }`}>
-                  <div className="flex items-start gap-3">
-                    <div className={`p-2 rounded border shrink-0 ${
-                      isLight
-                        ? 'bg-amber-100 border-amber-300 text-amber-700'
-                        : 'bg-amber-500/10 border-amber-500/20 text-amber-400'
-                    }`}>
-                      <AlertTriangle className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className={`text-xs font-bold ${isLight ? 'text-amber-900' : 'text-amber-300'}`}>
-                          Sync Conflicts & Formula Breakage Detected
-                        </span>
-                        <span className={`px-1.5 py-0.2 rounded font-mono text-[10px] border ${
-                          isLight
-                            ? 'bg-red-100 text-red-700 border-red-300 font-semibold'
-                            : 'bg-red-950 text-red-400 border-red-800/40'
-                        }`}>
-                          2 Cells Corrupted
-                        </span>
-                      </div>
-                      <p className={`text-xs mt-0.5 ${isLight ? 'text-amber-800' : 'text-amber-200/80'}`}>
-                        Formula dependencies broke when Column D was deleted. Multiple users editing via shared folder without role permissions.
-                      </p>
-                    </div>
+                  <div className={`p-2 rounded border shrink-0 ${
+                    isLight
+                      ? 'bg-amber-100 border-amber-300 text-amber-700'
+                      : 'bg-amber-500/10 border-amber-500/20 text-amber-400'
+                  }`}>
+                    <AlertTriangle className="w-4 h-4" />
                   </div>
-
-                  {/* Primary Trigger Button */}
-                  <button
-                    onClick={handleStartTransformation}
-                    className="px-4 py-2.5 rounded-lg bg-[#F84B11] hover:bg-[#ff5d26] active:scale-[0.98] text-white font-semibold text-xs flex items-center justify-center gap-2 transition-all duration-150 cursor-pointer shrink-0 animate-button-glow"
-                  >
-                    <Zap className="w-3.5 h-3.5 fill-current" />
-                    <span>Transform to Vorsik Custom App</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className={`text-xs font-bold ${isLight ? 'text-amber-900' : 'text-amber-300'}`}>
+                        Sync Conflicts & Formula Breakage Detected
+                      </span>
+                      <span className={`px-1.5 py-0.2 rounded font-mono text-[10px] border ${
+                        isLight
+                          ? 'bg-red-100 text-red-700 border-red-300 font-semibold'
+                          : 'bg-red-950 text-red-400 border-red-800/40'
+                      }`}>
+                        2 Cells Corrupted
+                      </span>
+                    </div>
+                    <p className={`text-xs mt-0.5 ${isLight ? 'text-amber-800' : 'text-amber-200/80'}`}>
+                      Formula dependencies broke when Column D was deleted. Multiple users editing via shared folder without role permissions.
+                    </p>
+                  </div>
                 </div>
 
                 {/* Formula Bar Simulation */}
@@ -1169,7 +1139,7 @@ export default function App() {
                 {/* Spreadsheet Raw Grid Table */}
                 <div className={`overflow-x-auto border rounded-lg transition-colors ${
                   isLight
-                    ? 'border-slate-300 bg-white shadow-xs'
+                    ? 'border-slate-300 bg-white shadow-xs sandbox-light-scroll'
                     : 'border-[#1F232B] bg-[#08090C]'
                 }`}>
                   <table className="w-full text-left text-xs border-collapse min-w-[880px]">
@@ -1378,7 +1348,7 @@ export default function App() {
 
             {/* VIEW 2: VORSIK CUSTOM OPERATING SYSTEM (AFTER) */}
             {transformationMode === 'vorsik' && (
-              <div className="space-y-5 animate-fade-in">
+              <div className="space-y-4 animate-fade-in">
                 
                 {/* Mode Sub-Navigation: Cards (Default) vs Table */}
                 <div className={`flex items-center justify-between gap-3 pb-2 border-b flex-nowrap overflow-x-auto ${
@@ -1431,51 +1401,51 @@ export default function App() {
                 </div>
 
                 {/* Real-Time KPIs Top Bar (Targeted by BuildCrew) */}
-                <div data-build-showroom className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  <div className={`p-3.5 rounded-lg border transition-colors ${
+                <div data-build-showroom className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-3">
+                  <div className={`p-3 rounded-lg border transition-colors ${
                     isLight ? 'border-slate-200 bg-white shadow-xs' : 'border-[#1F232B] bg-[#0E1015]'
                   }`}>
-                    <div className={`text-[11px] font-semibold uppercase tracking-wider mb-0.5 ${
+                    <div className={`text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider mb-0.5 ${
                       isLight ? 'text-slate-500 font-medium' : 'text-[#717684]'
                     }`}>Pending Approval</div>
-                    <div className={`text-base font-bold tabular-nums ${isLight ? 'text-slate-900' : 'text-white'}`}>2 Orders</div>
-                    <p className={`text-[11px] mt-0.5 ${isLight ? 'text-amber-700 font-medium' : 'text-amber-400'}`}>$23,200 USD in queue</p>
+                    <div className={`text-sm sm:text-base font-bold tabular-nums ${isLight ? 'text-slate-900' : 'text-white'}`}>2 Orders</div>
+                    <p className={`text-[10px] sm:text-[11px] mt-0.5 ${isLight ? 'text-amber-700 font-medium' : 'text-amber-400'}`}>$23,200 USD in queue</p>
                   </div>
 
-                  <div className={`p-3.5 rounded-lg border transition-colors ${
+                  <div className={`p-3 rounded-lg border transition-colors ${
                     isLight ? 'border-slate-200 bg-white shadow-xs' : 'border-[#1F232B] bg-[#0E1015]'
                   }`}>
-                    <div className={`text-[11px] font-semibold uppercase tracking-wider mb-0.5 ${
+                    <div className={`text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider mb-0.5 ${
                       isLight ? 'text-slate-500 font-medium' : 'text-[#717684]'
                     }`}>Active In Transit</div>
-                    <div className={`text-base font-bold tabular-nums ${isLight ? 'text-slate-900' : 'text-white'}`}>1 Shipment</div>
-                    <p className={`text-[11px] mt-0.5 ${isLight ? 'text-blue-700 font-medium' : 'text-blue-400'}`}>Truck #04 ETA 35 mins</p>
+                    <div className={`text-sm sm:text-base font-bold tabular-nums ${isLight ? 'text-slate-900' : 'text-white'}`}>1 Shipment</div>
+                    <p className={`text-[10px] sm:text-[11px] mt-0.5 ${isLight ? 'text-blue-700 font-medium' : 'text-blue-400'}`}>Truck #04 ETA 35 mins</p>
                   </div>
 
-                  <div className={`p-3.5 rounded-lg border transition-colors ${
+                  <div className={`p-3 rounded-lg border transition-colors ${
                     isLight ? 'border-slate-200 bg-white shadow-xs' : 'border-[#1F232B] bg-[#0E1015]'
                   }`}>
-                    <div className={`text-[11px] font-semibold uppercase tracking-wider mb-0.5 ${
+                    <div className={`text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider mb-0.5 ${
                       isLight ? 'text-slate-500 font-medium' : 'text-[#717684]'
                     }`}>Collected Volume</div>
-                    <div className={`text-base font-bold tabular-nums ${isLight ? 'text-slate-900' : 'text-white'}`}>$65,060 USD</div>
-                    <p className={`text-[11px] mt-0.5 ${isLight ? 'text-emerald-700 font-medium' : 'text-emerald-400'}`}>100% Reconciled</p>
+                    <div className={`text-sm sm:text-base font-bold tabular-nums ${isLight ? 'text-slate-900' : 'text-white'}`}>$65,060 USD</div>
+                    <p className={`text-[10px] sm:text-[11px] mt-0.5 ${isLight ? 'text-emerald-700 font-medium' : 'text-emerald-400'}`}>100% Reconciled</p>
                   </div>
 
-                  <div className={`p-3.5 rounded-lg border transition-colors ${
+                  <div className={`p-3 rounded-lg border transition-colors ${
                     isLight ? 'border-slate-200 bg-white shadow-xs' : 'border-[#1F232B] bg-[#0E1015]'
                   }`}>
-                    <div className={`text-[11px] font-semibold uppercase tracking-wider mb-0.5 ${
+                    <div className={`text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider mb-0.5 ${
                       isLight ? 'text-slate-500 font-medium' : 'text-[#717684]'
                     }`}>System Latency</div>
-                    <div className={`text-base font-bold tabular-nums ${isLight ? 'text-slate-900' : 'text-white'}`}>0.2ms Perceived</div>
-                    <p className={`text-[11px] mt-0.5 ${isLight ? 'text-emerald-700 font-medium' : 'text-emerald-400'}`}>Local NVMe on LAN</p>
+                    <div className={`text-sm sm:text-base font-bold tabular-nums ${isLight ? 'text-slate-900' : 'text-white'}`}>0.2ms Perceived</div>
+                    <p className={`text-[10px] sm:text-[11px] mt-0.5 ${isLight ? 'text-emerald-700 font-medium' : 'text-emerald-400'}`}>Local NVMe on LAN</p>
                   </div>
                 </div>
 
                 {/* SUBVIEW A: VISUAL CARDS & PIPELINE (DEFAULT) */}
                 {vorsikSubView === 'cards' ? (
-                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 lg:gap-4">
                     
                     {/* Pipeline Columns Container (7 cols) */}
                     <div className="lg:col-span-7 space-y-4">
@@ -1829,7 +1799,7 @@ export default function App() {
 
                     {/* Vorsik Production Table */}
                     <div className={`overflow-x-auto border rounded-lg transition-colors ${
-                      isLight ? 'border-slate-300 bg-white shadow-xs' : 'border-[#1F232B] bg-[#0A0C10]'
+                      isLight ? 'border-slate-300 bg-white shadow-xs sandbox-light-scroll' : 'border-[#1F232B] bg-[#0A0C10]'
                     }`}>
                       <table className="w-full text-left text-xs min-w-[960px]">
                         <thead className={`border-b uppercase tracking-wider font-semibold text-[11px] whitespace-nowrap ${
