@@ -972,32 +972,34 @@ export default function App() {
         <div className="rounded-xl border border-[#20232B] bg-[#0E1015] shadow-2xl overflow-hidden transition-all duration-300">
           
           {/* Workstation Frame Header */}
-          <div className="border-b border-[#1F232B] bg-[#0A0C10] px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+          <div className="border-b border-[#1F232B] bg-[#0A0C10] px-4 h-14 flex items-center justify-between gap-3">
             
             {/* Window Controls & State Protocol */}
-            <div className="flex items-center gap-2">
-              <div className="w-2.5 h-2.5 rounded-full bg-[#2A2E39]" />
-              <div className="w-2.5 h-2.5 rounded-full bg-[#2A2E39]" />
-              <div className="w-2.5 h-2.5 rounded-full bg-[#2A2E39]" />
-              <span className="ml-2 font-mono text-xs text-[#717684]">
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="flex items-center gap-1.5 shrink-0">
+                <div className="w-2.5 h-2.5 rounded-full bg-[#2A2E39]" />
+                <div className="w-2.5 h-2.5 rounded-full bg-[#2A2E39]" />
+                <div className="w-2.5 h-2.5 rounded-full bg-[#2A2E39]" />
+              </div>
+              <span className="ml-2 font-mono text-xs text-[#717684] truncate">
                 {transformationMode === 'spreadsheet' 
-                  ? 'xlsx://local/B2B_Orders_Master_2025_FINAL_v4_copy.xlsx (Sync conflict in Row 2)' 
-                  : 'vorsik-core://orders.lan (On-Premise NVMe • 0.2ms latency)'}
+                  ? 'orders_master.xlsx (Manual)' 
+                  : 'vorsik-os://orders (Automated)'}
               </span>
             </div>
 
             {/* View Switcher / Interactive Trigger Pill */}
-            <div className="flex items-center gap-2">
-              <div className="inline-flex p-0.5 rounded-lg bg-[#14161D] border border-[#20232B] text-xs font-medium">
+            <div className="flex items-center gap-2 shrink-0">
+              <div className="inline-flex p-0.5 rounded-lg bg-[#14161D] border border-[#20232B] text-xs font-medium whitespace-nowrap">
                 <button
                   onClick={() => setTransformationMode('spreadsheet')}
-                  className={`px-3 py-1.5 rounded-md transition-all flex items-center gap-1.5 cursor-pointer ${
+                  className={`px-3 py-1.5 rounded-md transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
                     transformationMode === 'spreadsheet'
                       ? 'bg-[#1E2129] text-white shadow-sm'
                       : 'text-[#94979E] hover:text-white'
                   }`}
                 >
-                  <FileSpreadsheet className="w-3.5 h-3.5 text-amber-400" />
+                  <FileSpreadsheet className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                   <span className="hidden sm:inline">1. Messy Spreadsheet (Before)</span>
                   <span className="sm:hidden inline">1. Spreadsheet</span>
                 </button>
@@ -1007,13 +1009,13 @@ export default function App() {
                     setTransformationMode('vorsik');
                     triggerBuildCrewOnShowroom();
                   }}
-                  className={`px-3 py-1.5 rounded-md transition-all flex items-center gap-1.5 cursor-pointer ${
+                  className={`px-3 py-1.5 rounded-md transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
                     transformationMode === 'vorsik'
                       ? 'bg-[#1E2129] text-white shadow-sm'
                       : 'text-[#94979E] hover:text-white'
                   }`}
                 >
-                  <Zap className="w-3.5 h-3.5 text-[#F84B11] fill-current" />
+                  <Zap className="w-3.5 h-3.5 text-[#F84B11] fill-current shrink-0" />
                   <span className="hidden sm:inline">2. Vorsik Custom OS (After)</span>
                   <span className="sm:hidden inline">2. Vorsik OS</span>
                 </button>
@@ -1022,10 +1024,10 @@ export default function App() {
               {transformationMode === 'vorsik' && (
                 <button
                   onClick={handleReplayTransformation}
-                  className="px-2.5 py-1.5 rounded-lg border border-[#262B36] bg-[#14161D] hover:bg-[#1E222D] hover:border-[#F84B11]/50 text-xs text-[#EDEDED] flex items-center gap-1.5 transition-all cursor-pointer active:scale-95"
+                  className="px-2.5 py-1.5 rounded-lg border border-[#262B36] bg-[#14161D] hover:bg-[#1E222D] hover:border-[#F84B11]/50 text-xs text-[#EDEDED] flex items-center gap-1.5 transition-all cursor-pointer active:scale-95 whitespace-nowrap shrink-0"
                   title="Replay multiplayer build animation"
                 >
-                  <RotateCcw className="w-3.5 h-3.5 text-[#F84B11]" />
+                  <RotateCcw className="w-3.5 h-3.5 text-[#F84B11] shrink-0" />
                   <span className="hidden md:inline">Replay Build</span>
                 </button>
               )}
@@ -1059,7 +1061,7 @@ export default function App() {
                   {/* Primary Trigger Button */}
                   <button
                     onClick={handleStartTransformation}
-                    className="px-4 py-2.5 rounded-lg bg-[#F84B11] hover:bg-[#ff5d26] active:scale-[0.98] text-white font-semibold text-xs flex items-center justify-center gap-2 transition-all duration-150 cursor-pointer shadow-lg shadow-[#F84B11]/20 hover:shadow-[#F84B11]/40 shrink-0 animate-pulse-glow"
+                    className="px-4 py-2.5 rounded-lg bg-[#F84B11] hover:bg-[#ff5d26] active:scale-[0.98] text-white font-semibold text-xs flex items-center justify-center gap-2 transition-all duration-150 cursor-pointer shrink-0 animate-button-glow"
                   >
                     <Zap className="w-3.5 h-3.5 fill-current" />
                     <span>Transform to Vorsik Custom App</span>
@@ -1078,20 +1080,20 @@ export default function App() {
 
                 {/* Spreadsheet Raw Grid Table */}
                 <div className="overflow-x-auto border border-[#1F232B] rounded-lg bg-[#08090C]">
-                  <table className="w-full text-left text-xs border-collapse">
-                    <thead className="border-b border-[#1F232B] bg-[#0E1015] text-[#585B64] font-mono text-[11px]">
+                  <table className="w-full text-left text-xs border-collapse min-w-[880px]">
+                    <thead className="border-b border-[#1F232B] bg-[#0E1015] text-[#585B64] font-mono text-[11px] whitespace-nowrap">
                       <tr>
-                        <th className="py-2 px-3 border-r border-[#1F232B] w-8 text-center bg-[#0A0C10]">#</th>
-                        <th className="py-2 px-3 border-r border-[#1F232B] font-semibold">A: Order ID</th>
-                        <th className="py-2 px-3 border-r border-[#1F232B] font-semibold">B: Account / Client</th>
-                        <th className="py-2 px-3 border-r border-[#1F232B] font-semibold">C: SKU Breakdown</th>
-                        <th className="py-2 px-3 border-r border-[#1F232B] font-semibold">D: Net Total</th>
-                        <th className="py-2 px-3 border-r border-[#1F232B] font-semibold">E: Payment Status</th>
-                        <th className="py-2 px-3 border-r border-[#1F232B] font-semibold">F: Delivery SLA</th>
-                        <th className="py-2 px-3 font-semibold text-amber-400/90">G: Internal Notes (WhatsApp / Post-its)</th>
+                        <th className="py-2 px-3 border-r border-[#1F232B] w-8 text-center bg-[#0A0C10] whitespace-nowrap">#</th>
+                        <th className="py-2 px-3 border-r border-[#1F232B] font-semibold whitespace-nowrap">A: Order ID</th>
+                        <th className="py-2 px-3 border-r border-[#1F232B] font-semibold whitespace-nowrap">B: Account / Client</th>
+                        <th className="py-2 px-3 border-r border-[#1F232B] font-semibold whitespace-nowrap">C: SKU Breakdown</th>
+                        <th className="py-2 px-3 border-r border-[#1F232B] font-semibold whitespace-nowrap">D: Net Total</th>
+                        <th className="py-2 px-3 border-r border-[#1F232B] font-semibold whitespace-nowrap">E: Payment Status</th>
+                        <th className="py-2 px-3 border-r border-[#1F232B] font-semibold whitespace-nowrap">F: Delivery SLA</th>
+                        <th className="py-2 px-3 font-semibold text-amber-400/90 whitespace-nowrap">G: Internal Notes (WhatsApp / Post-its)</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[#171920] font-sans">
+                    <tbody className="divide-y divide-[#171920] font-sans whitespace-nowrap">
                       <tr className="hover:bg-[#101218] transition-colors">
                         <td className="py-2.5 px-3 border-r border-[#1F232B] font-mono text-[11px] text-[#585B64] text-center bg-[#0A0C10]">2</td>
                         <td className="py-2.5 px-3 border-r border-[#1F232B] font-mono font-medium text-white">ORD-8942</td>
@@ -1229,35 +1231,38 @@ export default function App() {
               <div className="space-y-5 animate-fade-in">
                 
                 {/* Mode Sub-Navigation: Cards (Default) vs Table */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-[#1A1D24]">
-                  <div className="inline-flex p-0.5 rounded-lg bg-[#14161D] border border-[#20232B] text-xs font-medium">
+                <div className="flex items-center justify-between gap-3 pb-2 border-b border-[#1A1D24] flex-nowrap overflow-x-auto">
+                  <div className="inline-flex p-0.5 rounded-lg bg-[#14161D] border border-[#20232B] text-xs font-medium whitespace-nowrap shrink-0">
                     <button
                       onClick={() => setVorsikSubView('cards')}
-                      className={`px-3 py-1.5 rounded-md transition-all flex items-center gap-1.5 cursor-pointer ${
+                      className={`px-3 py-1.5 rounded-md transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
                         vorsikSubView === 'cards'
                           ? 'bg-[#1E2129] text-white shadow-sm font-semibold'
                           : 'text-[#717684] hover:text-white'
                       }`}
                     >
-                      <Layers className="w-3.5 h-3.5 text-[#F84B11]" />
-                      <span>1. Visual Cards & Pipeline (Default)</span>
+                      <Layers className="w-3.5 h-3.5 text-[#F84B11] shrink-0" />
+                      <span className="hidden sm:inline">1. Visual Cards & Pipeline (Default)</span>
+                      <span className="sm:hidden inline">1. Cards (Default)</span>
                     </button>
                     <button
                       onClick={() => setVorsikSubView('table')}
-                      className={`px-3 py-1.5 rounded-md transition-all flex items-center gap-1.5 cursor-pointer ${
+                      className={`px-3 py-1.5 rounded-md transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
                         vorsikSubView === 'table'
                           ? 'bg-[#1E2129] text-white shadow-sm font-semibold'
                           : 'text-[#717684] hover:text-white'
                       }`}
                     >
-                      <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-400" />
-                      <span>2. High-Density Table View</span>
+                      <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                      <span className="hidden sm:inline">2. High-Density Table View</span>
+                      <span className="sm:hidden inline">2. Table View</span>
                     </button>
                   </div>
 
-                  <div className="text-xs text-[#717684] flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                    <span>0.2ms Perceived • ACID Local SQLite / PostgreSQL</span>
+                  <div className="text-xs text-[#717684] flex items-center gap-2 whitespace-nowrap shrink-0">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+                    <span className="hidden md:inline">0.2ms Perceived • ACID Local SQLite / PostgreSQL</span>
+                    <span className="md:hidden inline">0.2ms Perceived</span>
                   </div>
                 </div>
 
@@ -1513,38 +1518,38 @@ export default function App() {
                   <div className="space-y-4 animate-fade-in">
                     
                     {/* Operational Toolbar */}
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
                       
                       {/* Status Filters */}
-                      <div className="inline-flex p-0.5 rounded-lg bg-[#14161D] border border-[#20232B] text-xs font-medium">
+                      <div className="inline-flex p-0.5 rounded-lg bg-[#14161D] border border-[#20232B] text-xs font-medium whitespace-nowrap shrink-0 overflow-x-auto">
                         <button
                           onClick={() => setB2BFilter('all')}
-                          className={`px-2.5 py-1 rounded transition-colors ${
-                            b2bFilter === 'all' ? 'bg-[#1E2129] text-white shadow-sm' : 'text-[#717684] hover:text-white'
+                          className={`px-2.5 py-1 rounded transition-colors whitespace-nowrap cursor-pointer ${
+                            b2bFilter === 'all' ? 'bg-[#1E2129] text-white shadow-sm font-semibold' : 'text-[#717684] hover:text-white'
                           }`}
                         >
                           All ({b2bOrders.length})
                         </button>
                         <button
                           onClick={() => setB2BFilter('pending')}
-                          className={`px-2.5 py-1 rounded transition-colors ${
-                            b2bFilter === 'pending' ? 'bg-[#1E2129] text-amber-300 shadow-sm' : 'text-[#717684] hover:text-white'
+                          className={`px-2.5 py-1 rounded transition-colors whitespace-nowrap cursor-pointer ${
+                            b2bFilter === 'pending' ? 'bg-[#1E2129] text-amber-300 shadow-sm font-semibold' : 'text-[#717684] hover:text-white'
                           }`}
                         >
                           Pending ({b2bOrders.filter(o => o.status === 'Pending Approval').length})
                         </button>
                         <button
                           onClick={() => setB2BFilter('transit')}
-                          className={`px-2.5 py-1 rounded transition-colors ${
-                            b2bFilter === 'transit' ? 'bg-[#1E2129] text-blue-300 shadow-sm' : 'text-[#717684] hover:text-white'
+                          className={`px-2.5 py-1 rounded transition-colors whitespace-nowrap cursor-pointer ${
+                            b2bFilter === 'transit' ? 'bg-[#1E2129] text-blue-300 shadow-sm font-semibold' : 'text-[#717684] hover:text-white'
                           }`}
                         >
                           In Transit ({b2bOrders.filter(o => o.status === 'In Transit').length})
                         </button>
                         <button
                           onClick={() => setB2BFilter('completed')}
-                          className={`px-2.5 py-1 rounded transition-colors ${
-                            b2bFilter === 'completed' ? 'bg-[#1E2129] text-emerald-300 shadow-sm' : 'text-[#717684] hover:text-white'
+                          className={`px-2.5 py-1 rounded transition-colors whitespace-nowrap cursor-pointer ${
+                            b2bFilter === 'completed' ? 'bg-[#1E2129] text-emerald-300 shadow-sm font-semibold' : 'text-[#717684] hover:text-white'
                           }`}
                         >
                           Invoiced ({b2bOrders.filter(o => o.status === 'Invoiced & Completed' || o.status === 'Approved & Queued').length})
@@ -1552,7 +1557,7 @@ export default function App() {
                       </div>
 
                       {/* Search Bar & Quick Order Button */}
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 shrink-0">
                         <div className="relative">
                           <Search className="w-3.5 h-3.5 text-[#585B64] absolute left-2.5 top-1/2 -translate-y-1/2" />
                           <input 
@@ -1560,14 +1565,14 @@ export default function App() {
                             placeholder="Search client, SKU, or order ID..."
                             value={b2bSearch}
                             onChange={(e) => setB2BSearch(e.target.value)}
-                            className="bg-[#14161D] border border-[#232731] rounded-md pl-8 pr-3 py-1.5 text-xs text-white placeholder:text-[#585B64] focus:outline-none focus:border-[#F84B11] transition-colors w-52 sm:w-60"
+                            className="bg-[#14161D] border border-[#232731] rounded-md pl-8 pr-3 py-1.5 text-xs text-white placeholder:text-[#585B64] focus:outline-none focus:border-[#F84B11] transition-colors w-52 sm:w-64"
                           />
                         </div>
                         <button 
                           onClick={handleQuickAddB2BOrder}
-                          className="px-3 py-1.5 rounded-md bg-[#161922] hover:bg-[#1E222D] active:scale-[0.97] border border-[#232731] hover:border-[#F84B11]/50 text-xs font-medium text-white flex items-center gap-1.5 transition-all duration-150 cursor-pointer"
+                          className="px-3 py-1.5 rounded-md bg-[#161922] hover:bg-[#1E222D] active:scale-[0.97] border border-[#232731] hover:border-[#F84B11]/50 text-xs font-medium text-white flex items-center gap-1.5 transition-all duration-150 cursor-pointer whitespace-nowrap shrink-0"
                         >
-                          <Plus className="w-3.5 h-3.5 text-[#F84B11]" />
+                          <Plus className="w-3.5 h-3.5 text-[#F84B11] shrink-0" />
                           <span>New Order</span>
                         </button>
                       </div>
@@ -1576,34 +1581,33 @@ export default function App() {
 
                     {/* Vorsik Production Table */}
                     <div className="overflow-x-auto border border-[#1F232B] rounded-lg bg-[#0A0C10]">
-                      <table className="w-full text-left text-xs">
-                        <thead className="border-b border-[#1F232B] text-[#585B64] bg-[#0E1015] uppercase tracking-wider font-semibold text-[11px]">
+                      <table className="w-full text-left text-xs min-w-[960px]">
+                        <thead className="border-b border-[#1F232B] text-[#585B64] bg-[#0E1015] uppercase tracking-wider font-semibold text-[11px] whitespace-nowrap">
                           <tr>
-                            <th className="py-2.5 px-4 font-medium">Order ID</th>
-                            <th className="py-2.5 px-4 font-medium">Account / Client</th>
-                            <th className="py-2.5 px-4 font-medium">SKU Breakdown</th>
-                            <th className="py-2.5 px-4 font-medium">Total Amount</th>
-                            <th className="py-2.5 px-4 font-medium">Fulfillment SLA</th>
-                            <th className="py-2.5 px-4 font-medium">Status</th>
-                            <th className="py-2.5 px-4 text-right font-medium">Operational Action</th>
+                            <th className="py-2.5 px-4 font-medium whitespace-nowrap">Order ID</th>
+                            <th className="py-2.5 px-4 font-medium whitespace-nowrap">Account / Client</th>
+                            <th className="py-2.5 px-4 font-medium whitespace-nowrap">SKU Breakdown</th>
+                            <th className="py-2.5 px-4 font-medium whitespace-nowrap">Total Amount</th>
+                            <th className="py-2.5 px-4 font-medium whitespace-nowrap">Fulfillment SLA</th>
+                            <th className="py-2.5 px-4 font-medium whitespace-nowrap">Status</th>
+                            <th className="py-2.5 px-4 text-right font-medium whitespace-nowrap">Operational Action</th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-[#171920]">
+                        <tbody className="divide-y divide-[#171920] whitespace-nowrap">
                           {filteredB2BOrders.map((order) => (
-                            <tr key={order.id} className="hover:bg-[#141620] transition-colors duration-150">
-                              <td className="py-3 px-4 font-mono font-semibold text-[#F84B11]">{order.id}</td>
-                              <td className="py-3 px-4 font-semibold text-white">
-                                <div>{order.client}</div>
-                                <div className="text-[10px] text-[#717684] font-normal">{order.notes}</div>
+                            <tr key={order.id} className="hover:bg-[#141620] transition-colors duration-150 whitespace-nowrap">
+                              <td className="py-3 px-4 font-mono font-semibold text-[#F84B11] whitespace-nowrap">{order.id}</td>
+                              <td className="py-3 px-4 font-semibold text-white whitespace-nowrap">
+                                <span>{order.client}</span>
                               </td>
-                              <td className="py-3 px-4 text-[#EDEDED]">
+                              <td className="py-3 px-4 text-[#EDEDED] whitespace-nowrap">
                                 <span>{order.items}</span>
-                                <span className="text-[#717684] ml-1.5">({order.units} units)</span>
+                                <span className="text-[#717684] ml-1.5 font-mono text-[11px]">({order.units} units)</span>
                               </td>
-                              <td className="py-3 px-4 tabular-nums font-semibold text-white">{order.total}</td>
-                              <td className="py-3 px-4 text-[#94979E] text-[11px]">{order.sla}</td>
-                              <td className="py-3 px-4">
-                                <span className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium transition-colors ${
+                              <td className="py-3 px-4 tabular-nums font-semibold text-white whitespace-nowrap">{order.total}</td>
+                              <td className="py-3 px-4 text-[#94979E] text-[11px] whitespace-nowrap">{order.sla}</td>
+                              <td className="py-3 px-4 whitespace-nowrap">
+                                <span className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium whitespace-nowrap transition-colors ${
                                   order.status === 'Approved & Queued' 
                                     ? 'bg-emerald-950/60 text-emerald-400 border border-emerald-800/40' 
                                     : order.status === 'In Transit'
@@ -1615,21 +1619,21 @@ export default function App() {
                                   {order.status}
                                 </span>
                               </td>
-                              <td className="py-3 px-4 text-right">
+                              <td className="py-3 px-4 text-right whitespace-nowrap">
                                 {order.status === 'Pending Approval' ? (
                                   <button
                                     onClick={() => handleApproveB2BOrder(order.id)}
-                                    className="px-2.5 py-1 rounded bg-[#F84B11] hover:bg-[#ff5d26] active:scale-[0.95] text-white font-medium text-[11px] transition-all duration-150 cursor-pointer shadow-sm hover:shadow-[#F84B11]/30 hover:-translate-y-0.5 inline-flex items-center gap-1"
+                                    className="px-2.5 py-1 rounded bg-[#F84B11] hover:bg-[#ff5d26] active:scale-[0.95] text-white font-medium text-[11px] transition-all duration-150 cursor-pointer shadow-sm hover:shadow-[#F84B11]/30 inline-flex items-center gap-1 whitespace-nowrap"
                                   >
-                                    <Zap className="w-3 h-3 fill-current" />
+                                    <Zap className="w-3 h-3 fill-current shrink-0" />
                                     <span>Approve & Dispatch</span>
                                   </button>
                                 ) : order.status === 'Approved & Queued' ? (
                                   <button
                                     onClick={() => handleGenerateB2BInvoice(order.id)}
-                                    className="px-2.5 py-1 rounded bg-emerald-950/70 hover:bg-emerald-900/80 active:scale-[0.95] text-emerald-300 border border-emerald-700/50 font-medium text-[11px] transition-all duration-150 cursor-pointer inline-flex items-center gap-1"
+                                    className="px-2.5 py-1 rounded bg-emerald-950/70 hover:bg-emerald-900/80 active:scale-[0.95] text-emerald-300 border border-emerald-700/50 font-medium text-[11px] transition-all duration-150 cursor-pointer inline-flex items-center gap-1 whitespace-nowrap"
                                   >
-                                    <FileText className="w-3 h-3" />
+                                    <FileText className="w-3 h-3 shrink-0" />
                                     <span>Issue Invoice</span>
                                   </button>
                                 ) : order.status === 'In Transit' ? (
@@ -1638,14 +1642,14 @@ export default function App() {
                                       setToastMessage(`Truck #04 en route to ${order.client}. GPS ping: 0.1ms.`);
                                       setTimeout(() => setToastMessage(null), 3000);
                                     }}
-                                    className="px-2.5 py-1 rounded bg-blue-950/70 hover:bg-blue-900/80 active:scale-[0.95] text-blue-300 border border-blue-700/50 font-medium text-[11px] transition-all duration-150 cursor-pointer inline-flex items-center gap-1"
+                                    className="px-2.5 py-1 rounded bg-blue-950/70 hover:bg-blue-900/80 active:scale-[0.95] text-blue-300 border border-blue-700/50 font-medium text-[11px] transition-all duration-150 cursor-pointer inline-flex items-center gap-1 whitespace-nowrap"
                                   >
-                                    <Truck className="w-3 h-3" />
+                                    <Truck className="w-3 h-3 shrink-0" />
                                     <span>Track Truck</span>
                                   </button>
                                 ) : (
-                                  <span className="inline-flex items-center gap-1 text-[11px] text-emerald-400 font-medium">
-                                    <CheckCircle2 className="w-3 h-3" />
+                                  <span className="inline-flex items-center gap-1 text-[11px] text-emerald-400 font-medium whitespace-nowrap">
+                                    <CheckCircle2 className="w-3 h-3 shrink-0" />
                                     <span>Invoiced & Audited</span>
                                   </span>
                                 )}
