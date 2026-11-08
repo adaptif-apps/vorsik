@@ -30,7 +30,12 @@ import {
   Sun,
   Moon,
   MapPin,
-  Radio
+  Radio,
+  Monitor,
+  Laptop,
+  Tablet,
+  Smartphone,
+  Barcode
 } from 'lucide-react';
 
 export default function App() {
@@ -148,6 +153,153 @@ export default function App() {
   const [vorsikSubView, setVorsikSubView] = useState<'cards' | 'table'>('cards');
   const [selectedOrderId, setSelectedOrderId] = useState<string>('ORD-8942');
   const [trackingDriverOrderId, setTrackingDriverOrderId] = useState<string | null>(null);
+
+  // Multi-Device Responsive Kanban Simulator State
+  type KanbanDevice = 'desktop' | 'laptop' | 'tablet' | 'mobile';
+  const [kanbanDevice, setKanbanDevice] = useState<KanbanDevice>('desktop');
+  const [kanbanFilter, setKanbanFilter] = useState<'all' | 'critical' | 'standard'>('all');
+  const [mobileActiveStage, setMobileActiveStage] = useState<'intake' | 'assembly' | 'qa' | 'dispatch'>('intake');
+  const [tabletStagePair, setTabletStagePair] = useState<'production' | 'fulfillment'>('production');
+
+  interface KanbanTask {
+    id: string;
+    title: string;
+    stage: 'intake' | 'assembly' | 'qa' | 'dispatch';
+    priority: 'Critical' | 'High' | 'Standard';
+    assignee: string;
+    sla: string;
+    sku: string;
+    progress?: { current: number; total: number };
+    tag: string;
+  }
+
+  const initialKanbanTasks: KanbanTask[] = [
+    {
+      id: 'WO-410',
+      title: 'CNC Precision Milling: 120x Hydraulic Valve Seals',
+      stage: 'intake',
+      priority: 'High',
+      assignee: 'M. Chen',
+      sla: 'Today 04:00 PM',
+      sku: 'SKU-VALVE-88',
+      progress: { current: 4, total: 4 },
+      tag: 'Tolerances: 0.02mm'
+    },
+    {
+      id: 'WO-414',
+      title: 'Clinical Sterilization: 45x HEPA Filtration Kits',
+      stage: 'intake',
+      priority: 'Critical',
+      assignee: 'J. Taylor',
+      sla: 'Tomorrow 10:00 AM',
+      sku: 'SKU-MED-HEPA',
+      progress: { current: 1, total: 3 },
+      tag: 'Batch Lot #994A'
+    },
+    {
+      id: 'WO-408',
+      title: 'Flange Hydro-Press: 310x Heavy Industrial Bearings',
+      stage: 'assembly',
+      priority: 'Standard',
+      assignee: 'E. Morales',
+      sla: 'Today 06:30 PM',
+      sku: 'SKU-BEAR-310',
+      progress: { current: 2, total: 3 },
+      tag: 'Pressing Stage 2/3'
+    },
+    {
+      id: 'WO-409',
+      title: 'Digital Manifold Regulators: O-Ring Sub-Assembly',
+      stage: 'assembly',
+      priority: 'High',
+      assignee: 'D. Ross',
+      sla: 'Tomorrow 02:00 PM',
+      sku: 'SKU-REG-18',
+      progress: { current: 3, total: 3 },
+      tag: 'Torque: 42 Nm'
+    },
+    {
+      id: 'WO-405',
+      title: 'Pressure Chamber Test: 650 PSI Rupture Hold',
+      stage: 'qa',
+      priority: 'Critical',
+      assignee: 'R. Patel',
+      sla: 'Passed (0.1ms Log)',
+      sku: 'SKU-TEST-650',
+      progress: { current: 5, total: 5 },
+      tag: '100% Hermetic Seal'
+    },
+    {
+      id: 'WO-406',
+      title: 'Barcode Tamper Seal QA & Digital Manifest Match',
+      stage: 'qa',
+      priority: 'Standard',
+      assignee: 'A. Vance',
+      sla: 'Audit Queue',
+      sku: 'SKU-TAMPER-04',
+      progress: { current: 2, total: 2 },
+      tag: 'Crypto-Signed'
+    },
+    {
+      id: 'WO-402',
+      title: 'Pallet Staging Dock #02: Truck #04 Regional Corridor',
+      stage: 'dispatch',
+      priority: 'High',
+      assignee: 'Carlos R.',
+      sla: 'ETA 35 mins',
+      sku: 'SKU-PALLET-04',
+      progress: { current: 3, total: 3 },
+      tag: 'Driver Dispatched'
+    },
+    {
+      id: 'WO-401',
+      title: 'Medical Express Pack: St. Mary Surgical Clinic',
+      stage: 'dispatch',
+      priority: 'Critical',
+      assignee: 'Courier Ex-1',
+      sla: 'Delivered (Signature #8891)',
+      sku: 'SKU-MED-BOX',
+      progress: { current: 4, total: 4 },
+      tag: 'Remito Signed'
+    }
+  ];
+
+  const [kanbanTasks, setKanbanTasks] = useState<KanbanTask[]>(initialKanbanTasks);
+
+  const handleAdvanceKanbanTask = (taskId: string) => {
+    setKanbanTasks(prev => prev.map(t => {
+      if (t.id !== taskId) return t;
+      if (t.stage === 'intake') return { ...t, stage: 'assembly' };
+      if (t.stage === 'assembly') return { ...t, stage: 'qa' };
+      if (t.stage === 'qa') return { ...t, stage: 'dispatch' };
+      return t;
+    }));
+    setToastMessage(`Task ${taskId} advanced to next stage (0.1ms WAL commit).`);
+    setTimeout(() => setToastMessage(null), 3000);
+  };
+
+  const handleRegressKanbanTask = (taskId: string) => {
+    setKanbanTasks(prev => prev.map(t => {
+      if (t.id !== taskId) return t;
+      if (t.stage === 'dispatch') return { ...t, stage: 'qa' };
+      if (t.stage === 'qa') return { ...t, stage: 'assembly' };
+      if (t.stage === 'assembly') return { ...t, stage: 'intake' };
+      return t;
+    }));
+    setToastMessage(`Task ${taskId} returned to previous stage.`);
+    setTimeout(() => setToastMessage(null), 3000);
+  };
+
+  const handleScanBarcodeSim = () => {
+    setToastMessage(`Barcode Scanner Laser: Scanned SKU-BEAR-310 (Dock 2 pallet). Synced (0.1ms).`);
+    setTimeout(() => setToastMessage(null), 3500);
+  };
+
+  const filteredKanbanTasks = kanbanTasks.filter((t: KanbanTask) => {
+    if (kanbanFilter === 'critical') return t.priority === 'Critical' || t.priority === 'High';
+    if (kanbanFilter === 'standard') return t.priority === 'Standard';
+    return true;
+  });
 
   // ROI Calculator state
   const [employees, setEmployees] = useState(25);
@@ -431,6 +583,7 @@ export default function App() {
               <span>Showroom</span>
               <span className="px-1.5 py-0.2 rounded bg-[#F84B11]/20 text-[#F84B11] text-[10px] font-semibold border border-[#F84B11]/30">Live</span>
             </a>
+            <a href="#responsive-kanban" className="hover:text-white transition-colors">Multi-Device</a>
             <a href="#engineering" className="hover:text-white transition-colors">Engineering</a>
             <a href="#calculator" className="hover:text-white transition-colors">ROI Calculator</a>
             <a href="#faq" className="hover:text-white transition-colors">FAQ</a>
@@ -476,6 +629,14 @@ export default function App() {
                   <Zap className="w-3.5 h-3.5 text-[#F84B11] fill-current" />
                   <span>Showroom (Transformation)</span>
                 </span>
+                <ArrowRight className="w-3.5 h-3.5 opacity-40" />
+              </a>
+              <a 
+                href="#responsive-kanban" 
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="px-3 py-2 rounded-md hover:bg-[#161922] hover:text-white transition-colors flex items-center justify-between"
+              >
+                <span>Multi-Device Kanban</span>
                 <ArrowRight className="w-3.5 h-3.5 opacity-40" />
               </a>
               <a 
@@ -2195,6 +2356,654 @@ export default function App() {
             <h3 className="text-sm font-bold text-white mb-1">Zero Per-User Seat Rent</h3>
             <p className="text-xs text-[#94979E] leading-relaxed">
               Commercial ERPs bill $120+ USD per user each month. Vorsik is delivered as a capitalized corporate software asset—you own the source code, hardware deployment, and client data forever.
+            </p>
+          </div>
+        </div>
+
+      </section>
+
+      {/* Responsive Multi-Device Kanban Section */}
+      <section id="responsive-kanban" className="py-20 px-4 sm:px-6 max-w-6xl mx-auto border-t border-[#1F232B]">
+        
+        {/* Section Header */}
+        <div className="max-w-3xl mb-10">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#F84B11]/10 text-[#F84B11] border border-[#F84B11]/20 font-mono text-xs mb-3 font-semibold">
+            <Layers className="w-3.5 h-3.5 fill-current" />
+            <span>100% Adaptive Multi-Device Architecture</span>
+          </div>
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white tracking-tight">
+            Industrial Workflows Engineered for Every Screen Resolution
+          </h2>
+          <p className="text-[#94979E] text-sm mt-3 leading-relaxed">
+            Off-the-shelf software breaks on warehouse tablets or forces endless sideways scrolling on mobile. Vorsik custom applications are architected to adapt ergonomically to every physical station—from 4K dispatch command desks to rugged warehouse barcode tablets and field mobile devices.
+          </p>
+        </div>
+
+        {/* Viewport Simulator Control Bar */}
+        <div className="p-3 sm:p-4 rounded-xl border border-[#1F232B] bg-[#0E1015] mb-6 flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-xl">
+          {/* Device Switcher Segmented Control */}
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <span className="text-xs font-semibold uppercase tracking-wider text-[#717684] mr-1 hidden sm:inline">
+              Simulate Viewport:
+            </span>
+            <div className="inline-flex p-1 rounded-lg border border-[#20232B] bg-[#14161D] text-xs font-medium">
+              <button
+                onClick={() => setKanbanDevice('desktop')}
+                className={`px-3 py-1.5 rounded-md transition-all flex items-center gap-1.5 cursor-pointer ${
+                  kanbanDevice === 'desktop'
+                    ? 'bg-[#1E2129] text-white shadow-sm font-semibold'
+                    : 'text-[#94979E] hover:text-white'
+                }`}
+              >
+                <Monitor className="w-3.5 h-3.5 text-[#F84B11]" />
+                <span>Desktop (1440px)</span>
+              </button>
+
+              <button
+                onClick={() => setKanbanDevice('laptop')}
+                className={`px-3 py-1.5 rounded-md transition-all flex items-center gap-1.5 cursor-pointer ${
+                  kanbanDevice === 'laptop'
+                    ? 'bg-[#1E2129] text-white shadow-sm font-semibold'
+                    : 'text-[#94979E] hover:text-white'
+                }`}
+              >
+                <Laptop className="w-3.5 h-3.5 text-blue-400" />
+                <span>Laptop (1024px)</span>
+              </button>
+
+              <button
+                onClick={() => setKanbanDevice('tablet')}
+                className={`px-3 py-1.5 rounded-md transition-all flex items-center gap-1.5 cursor-pointer ${
+                  kanbanDevice === 'tablet'
+                    ? 'bg-[#1E2129] text-white shadow-sm font-semibold'
+                    : 'text-[#94979E] hover:text-white'
+                }`}
+              >
+                <Tablet className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Rugged Tablet (768px)</span>
+              </button>
+
+              <button
+                onClick={() => setKanbanDevice('mobile')}
+                className={`px-3 py-1.5 rounded-md transition-all flex items-center gap-1.5 cursor-pointer ${
+                  kanbanDevice === 'mobile'
+                    ? 'bg-[#1E2129] text-white shadow-sm font-semibold'
+                    : 'text-[#94979E] hover:text-white'
+                }`}
+              >
+                <Smartphone className="w-3.5 h-3.5 text-amber-400" />
+                <span>Mobile (390px)</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Quick Filter & Reset */}
+          <div className="flex items-center gap-2">
+            <div className="inline-flex p-0.5 rounded-lg border border-[#20232B] bg-[#14161D] text-xs">
+              <button
+                onClick={() => setKanbanFilter('all')}
+                className={`px-2 py-1 rounded transition-colors cursor-pointer ${
+                  kanbanFilter === 'all' ? 'bg-[#1E2129] text-white font-semibold' : 'text-[#717684] hover:text-white'
+                }`}
+              >
+                All ({kanbanTasks.length})
+              </button>
+              <button
+                onClick={() => setKanbanFilter('critical')}
+                className={`px-2 py-1 rounded transition-colors cursor-pointer ${
+                  kanbanFilter === 'critical' ? 'bg-[#1E2129] text-red-400 font-semibold' : 'text-[#717684] hover:text-white'
+                }`}
+              >
+                Critical ({kanbanTasks.filter(t => t.priority === 'Critical' || t.priority === 'High').length})
+              </button>
+              <button
+                onClick={() => setKanbanFilter('standard')}
+                className={`px-2 py-1 rounded transition-colors cursor-pointer ${
+                  kanbanFilter === 'standard' ? 'bg-[#1E2129] text-slate-300 font-semibold' : 'text-[#717684] hover:text-white'
+                }`}
+              >
+                Standard ({kanbanTasks.filter(t => t.priority === 'Standard').length})
+              </button>
+            </div>
+
+            <button
+              onClick={() => setKanbanTasks(initialKanbanTasks)}
+              className="p-1.5 rounded-lg border border-[#20232B] bg-[#14161D] text-[#717684] hover:text-white hover:bg-[#1A1D27] cursor-pointer transition-all"
+              title="Reset Tasks"
+            >
+              <RefreshCw className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+
+        {/* Viewport Ergonomics Live Indicator Banner */}
+        <div className="flex flex-wrap items-center justify-between text-xs px-3 py-2 rounded-lg bg-[#12141A] border border-[#1E222A] text-[#94979E] mb-6">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="font-semibold text-white">
+              {kanbanDevice === 'desktop' && 'Desktop Command Mode • 1440 × 720px'}
+              {kanbanDevice === 'laptop' && 'Compact Laptop Mode • 1024 × 700px'}
+              {kanbanDevice === 'tablet' && 'Rugged Warehouse Tablet • 768 × 760px'}
+              {kanbanDevice === 'mobile' && 'Field Handheld Mobile • 390 × 760px'}
+            </span>
+          </div>
+
+          <div className="text-[11px] font-mono text-[#717684]">
+            {kanbanDevice === 'desktop' && '4-Column Simultaneous View • Mouse & Keyboard Precision'}
+            {kanbanDevice === 'laptop' && '4-Column Balanced View • Field Engineering Density'}
+            {kanbanDevice === 'tablet' && '+30% Touch Hitboxes • Direct Barcode Laser Scanner Trigger'}
+            {kanbanDevice === 'mobile' && 'Single-Thumb Ergonomics • Segmented Stage Switcher'}
+          </div>
+        </div>
+
+        {/* Scalable Interactive Device Hardware Viewport Container */}
+        <div className={`transition-all duration-500 ease-in-out mx-auto ${
+          kanbanDevice === 'desktop' 
+            ? 'w-full' 
+            : kanbanDevice === 'laptop' 
+            ? 'max-w-[1024px] w-full' 
+            : kanbanDevice === 'tablet' 
+            ? 'max-w-[768px] w-full' 
+            : 'max-w-[390px] w-full'
+        }`}>
+          
+          {/* Hardware Frame Shell */}
+          <div className={`border bg-[#0E1015] shadow-2xl transition-all duration-300 flex flex-col ${
+            kanbanDevice === 'mobile'
+              ? 'rounded-[36px] border-4 border-[#2A2E39] p-3'
+              : kanbanDevice === 'tablet'
+              ? 'rounded-2xl border-2 border-[#333846] p-2.5'
+              : 'rounded-xl border border-[#20232B] overflow-hidden'
+          }`}>
+
+            {/* Mobile Top Notch Simulation */}
+            {kanbanDevice === 'mobile' && (
+              <div className="flex items-center justify-between px-4 pt-1 pb-2">
+                <span className="text-[10px] font-semibold text-white font-mono">09:41</span>
+                <div className="w-20 h-4 rounded-full bg-black border border-[#2A2E39] flex items-center justify-center">
+                  <div className="w-2 h-2 rounded-full bg-[#1F232B] mr-2" />
+                  <div className="w-1.5 h-1.5 rounded-full bg-blue-900" />
+                </div>
+                <div className="flex items-center gap-1 text-[10px] text-white">
+                  <span>5G</span>
+                  <span>100%</span>
+                </div>
+              </div>
+            )}
+
+            {/* Workstation / Tablet Window Titlebar */}
+            {kanbanDevice !== 'mobile' && (
+              <div className="border-b border-[#1F232B] bg-[#0A0C10] px-3 sm:px-4 py-2.5 flex items-center justify-between gap-3 shrink-0 rounded-t-xl">
+                <div className="flex items-center gap-2 min-w-0">
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#FF5F56]" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#FFBD2E]" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#27C93F]" />
+                  </div>
+                  <span className="ml-1.5 font-mono text-xs text-[#717684] truncate">
+                    vorsik-os://warehouse-alpha/kanban • LAN 10Gbps
+                  </span>
+                </div>
+
+                {/* Tablet-Specific Barcode Action */}
+                {kanbanDevice === 'tablet' && (
+                  <button
+                    onClick={handleScanBarcodeSim}
+                    className="px-2.5 py-1 rounded bg-emerald-600 hover:bg-emerald-500 active:scale-[0.96] text-white font-semibold text-xs flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
+                  >
+                    <Barcode className="w-3.5 h-3.5" />
+                    <span>Scan Barcode</span>
+                  </button>
+                )}
+
+                <div className="text-xs flex items-center gap-1.5 text-emerald-400 font-mono">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="hidden sm:inline">0.1ms Engine</span>
+                </div>
+              </div>
+            )}
+
+            {/* Kanban Inner Workstation Content */}
+            <div className={`p-3 sm:p-4 bg-[#08090C] ${
+              kanbanDevice === 'mobile' ? 'rounded-[26px] min-h-[580px]' : 'rounded-b-xl min-h-[500px]'
+            } flex flex-col`}>
+
+              {/* Sub-Header / Operational Controls */}
+              <div className="flex items-center justify-between pb-3 border-b border-[#1A1D24] mb-3 shrink-0">
+                <div>
+                  <h3 className="text-xs sm:text-sm font-bold text-white flex items-center gap-1.5">
+                    <span>Manufacturing & Fulfillment Pipeline</span>
+                    <span className="px-1.5 py-0.2 rounded font-mono text-[10px] border bg-[#1E222A] text-zinc-300 border-[#2A2F3D]">
+                      {filteredKanbanTasks.length} Work Orders
+                    </span>
+                  </h3>
+                  <p className="text-[10px] text-[#717684] mt-0.5">
+                    Local PostgreSQL event log • Zero-loss offline buffer
+                  </p>
+                </div>
+
+                {/* Mobile Quick Scan button */}
+                {kanbanDevice === 'mobile' && (
+                  <button
+                    onClick={handleScanBarcodeSim}
+                    className="p-1.5 rounded bg-emerald-600 hover:bg-emerald-500 active:scale-[0.96] text-white text-xs flex items-center gap-1 cursor-pointer"
+                    title="Scan SKU Barcode"
+                  >
+                    <Barcode className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+
+              {/* Mobile Mode: Segmented 4-Stage Pill Switcher */}
+              {kanbanDevice === 'mobile' && (
+                <div className="grid grid-cols-4 gap-1 p-1 rounded-lg border border-[#20232B] bg-[#12141C] text-[10px] font-medium mb-3 shrink-0">
+                  <button
+                    onClick={() => setMobileActiveStage('intake')}
+                    className={`py-1.5 rounded text-center transition-all cursor-pointer truncate ${
+                      mobileActiveStage === 'intake'
+                        ? 'bg-[#1E2129] text-amber-300 font-bold shadow-xs'
+                        : 'text-[#717684] hover:text-white'
+                    }`}
+                  >
+                    Intake ({filteredKanbanTasks.filter(t => t.stage === 'intake').length})
+                  </button>
+                  <button
+                    onClick={() => setMobileActiveStage('assembly')}
+                    className={`py-1.5 rounded text-center transition-all cursor-pointer truncate ${
+                      mobileActiveStage === 'assembly'
+                        ? 'bg-[#1E2129] text-blue-300 font-bold shadow-xs'
+                        : 'text-[#717684] hover:text-white'
+                    }`}
+                  >
+                    Assembly ({filteredKanbanTasks.filter(t => t.stage === 'assembly').length})
+                  </button>
+                  <button
+                    onClick={() => setMobileActiveStage('qa')}
+                    className={`py-1.5 rounded text-center transition-all cursor-pointer truncate ${
+                      mobileActiveStage === 'qa'
+                        ? 'bg-[#1E2129] text-purple-300 font-bold shadow-xs'
+                        : 'text-[#717684] hover:text-white'
+                    }`}
+                  >
+                    QA ({filteredKanbanTasks.filter(t => t.stage === 'qa').length})
+                  </button>
+                  <button
+                    onClick={() => setMobileActiveStage('dispatch')}
+                    className={`py-1.5 rounded text-center transition-all cursor-pointer truncate ${
+                      mobileActiveStage === 'dispatch'
+                        ? 'bg-[#1E2129] text-emerald-300 font-bold shadow-xs'
+                        : 'text-[#717684] hover:text-white'
+                    }`}
+                  >
+                    Dispatch ({filteredKanbanTasks.filter(t => t.stage === 'dispatch').length})
+                  </button>
+                </div>
+              )}
+
+              {/* Tablet Mode: Track Pair Selector Switcher */}
+              {kanbanDevice === 'tablet' && (
+                <div className="flex items-center justify-between gap-2 pb-2 mb-3 border-b border-[#1A1D24] shrink-0">
+                  <div className="inline-flex p-0.5 rounded-lg border border-[#20232B] bg-[#12141C] text-xs">
+                    <button
+                      onClick={() => setTabletStagePair('production')}
+                      className={`px-3 py-1 rounded transition-all cursor-pointer ${
+                        tabletStagePair === 'production'
+                          ? 'bg-[#1E2129] text-white font-semibold'
+                          : 'text-[#717684] hover:text-white'
+                      }`}
+                    >
+                      Track A: Production (Intake & Assembly)
+                    </button>
+                    <button
+                      onClick={() => setTabletStagePair('fulfillment')}
+                      className={`px-3 py-1 rounded transition-all cursor-pointer ${
+                        tabletStagePair === 'fulfillment'
+                          ? 'bg-[#1E2129] text-white font-semibold'
+                          : 'text-[#717684] hover:text-white'
+                      }`}
+                    >
+                      Track B: Quality & Logistics (QA & Dispatch)
+                    </button>
+                  </div>
+
+                  <span className="text-[11px] text-[#717684] font-mono">
+                    Glove Hitboxes: +30% Padding Active
+                  </span>
+                </div>
+              )}
+
+              {/* KANBAN CARDS CONTAINER */}
+              <div className="flex-1 min-h-0">
+                
+                {/* 1. DESKTOP & LAPTOP: 4 COLUMNS FULL SPREAD */}
+                {(kanbanDevice === 'desktop' || kanbanDevice === 'laptop') && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 h-full">
+                    {(['intake', 'assembly', 'qa', 'dispatch'] as const).map(stageKey => {
+                      const tasksInStage = filteredKanbanTasks.filter(t => t.stage === stageKey);
+                      const meta = {
+                        intake: { title: '1. Intake & Specs', color: 'amber', count: tasksInStage.length },
+                        assembly: { title: '2. Assembly & Pack', color: 'blue', count: tasksInStage.length },
+                        qa: { title: '3. QA & Testing', color: 'purple', count: tasksInStage.length },
+                        dispatch: { title: '4. Ready for Dispatch', color: 'emerald', count: tasksInStage.length }
+                      }[stageKey];
+
+                      return (
+                        <div key={stageKey} className="p-3 rounded-xl border border-[#1E222A] bg-[#0E1015] flex flex-col">
+                          {/* Column Header */}
+                          <div className="flex items-center justify-between pb-2 border-b border-[#1A1D24] mb-2.5 shrink-0">
+                            <div className="flex items-center gap-1.5">
+                              <div className={`w-2 h-2 rounded-full ${
+                                meta.color === 'amber' ? 'bg-amber-400' :
+                                meta.color === 'blue' ? 'bg-blue-400' :
+                                meta.color === 'purple' ? 'bg-purple-400' : 'bg-emerald-400'
+                              }`} />
+                              <span className="text-xs font-bold text-white uppercase tracking-wider">{meta.title}</span>
+                            </div>
+                            <span className="px-1.5 py-0.2 rounded font-mono text-[10px] border border-[#232731] bg-[#14161D] text-[#94979E]">
+                              {meta.count}
+                            </span>
+                          </div>
+
+                          {/* Column Card List */}
+                          <div className="space-y-2 overflow-y-auto flex-1 pr-0.5">
+                            {tasksInStage.map(task => (
+                              <div
+                                key={task.id}
+                                className="p-2.5 rounded-lg border border-[#1E222A] bg-[#08090C] hover:border-[#2C303B] transition-all space-y-2 group"
+                              >
+                                <div className="flex items-start justify-between gap-1.5">
+                                  <div>
+                                    <span className="font-mono text-[10px] font-bold text-[#F84B11] mr-1.5">{task.id}</span>
+                                    <span className="text-[10px] font-mono text-[#717684]">{task.sku}</span>
+                                  </div>
+                                  <span className={`px-1.5 py-0.2 rounded text-[9.5px] font-semibold border ${
+                                    task.priority === 'Critical'
+                                      ? 'bg-red-950/80 text-red-400 border-red-800/40'
+                                      : task.priority === 'High'
+                                      ? 'bg-amber-950/80 text-amber-300 border-amber-800/40'
+                                      : 'bg-zinc-800/60 text-zinc-300 border-zinc-700/40'
+                                  }`}>
+                                    {task.priority}
+                                  </span>
+                                </div>
+
+                                <p className="text-xs font-medium text-white leading-snug line-clamp-2">
+                                  {task.title}
+                                </p>
+
+                                <div className="flex items-center justify-between text-[10px] text-[#717684]">
+                                  <span className="flex items-center gap-1">
+                                    <Clock3 className="w-3 h-3 text-[#717684]" />
+                                    <span>{task.sla}</span>
+                                  </span>
+                                  <span className="text-zinc-400 font-mono">{task.assignee}</span>
+                                </div>
+
+                                {task.progress && (
+                                  <div>
+                                    <div className="flex items-center justify-between text-[9px] text-[#717684] mb-0.5">
+                                      <span>Milestones</span>
+                                      <span className="font-mono">{task.progress.current}/{task.progress.total}</span>
+                                    </div>
+                                    <div className="w-full h-1 rounded-full bg-[#1A1D24] overflow-hidden">
+                                      <div
+                                        className="h-full bg-blue-500 rounded-full"
+                                        style={{ width: `${(task.progress.current / task.progress.total) * 100}%` }}
+                                      />
+                                    </div>
+                                  </div>
+                                )}
+
+                                <div className="pt-1 border-t border-[#161922] flex items-center justify-between">
+                                  <span className="text-[9.5px] text-[#717684] truncate max-w-[120px]">{task.tag}</span>
+                                  <div className="flex items-center gap-1">
+                                    {stageKey !== 'intake' && (
+                                      <button
+                                        onClick={() => handleRegressKanbanTask(task.id)}
+                                        className="px-1.5 py-0.5 rounded text-[10px] bg-[#161922] hover:bg-[#1E222D] text-[#94979E] hover:text-white border border-[#232731] cursor-pointer"
+                                        title="Return to previous stage"
+                                      >
+                                        ←
+                                      </button>
+                                    )}
+                                    {stageKey !== 'dispatch' ? (
+                                      <button
+                                        onClick={() => handleAdvanceKanbanTask(task.id)}
+                                        className="px-2 py-0.5 rounded text-[10px] bg-[#F84B11] hover:bg-[#ff5d26] text-white font-medium flex items-center gap-1 cursor-pointer transition-all active:scale-[0.95]"
+                                      >
+                                        <span>Advance</span>
+                                        <span>→</span>
+                                      </button>
+                                    ) : (
+                                      <span className="text-[9.5px] font-semibold text-emerald-400 flex items-center gap-0.5">
+                                        <CheckCircle2 className="w-3 h-3" />
+                                        <span>Dispatched</span>
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {/* 2. TABLET: DUAL 2-COLUMN VIEW (GLOVE-FRIENDLY TACTILE MODE) */}
+                {kanbanDevice === 'tablet' && (
+                  <div className="grid grid-cols-2 gap-3.5 h-full">
+                    {(tabletStagePair === 'production' 
+                      ? (['intake', 'assembly'] as const) 
+                      : (['qa', 'dispatch'] as const)
+                    ).map(stageKey => {
+                      const tasksInStage = filteredKanbanTasks.filter(t => t.stage === stageKey);
+                      const meta = {
+                        intake: { title: 'Stage 1: Intake & Specs', count: tasksInStage.length, color: 'amber' },
+                        assembly: { title: 'Stage 2: Assembly & Pack', count: tasksInStage.length, color: 'blue' },
+                        qa: { title: 'Stage 3: QA & Testing', count: tasksInStage.length, color: 'purple' },
+                        dispatch: { title: 'Stage 4: Ready for Dispatch', count: tasksInStage.length, color: 'emerald' }
+                      }[stageKey];
+
+                      return (
+                        <div key={stageKey} className="p-3.5 rounded-xl border border-[#262C38] bg-[#0E1015] flex flex-col">
+                          <div className="flex items-center justify-between pb-2.5 border-b border-[#1A1D24] mb-3 shrink-0">
+                            <div className="flex items-center gap-2">
+                              <div className={`w-2.5 h-2.5 rounded-full ${
+                                meta.color === 'amber' ? 'bg-amber-400' :
+                                meta.color === 'blue' ? 'bg-blue-400' :
+                                meta.color === 'purple' ? 'bg-purple-400' : 'bg-emerald-400'
+                              }`} />
+                              <span className="text-xs font-bold text-white uppercase tracking-wider">{meta.title}</span>
+                            </div>
+                            <span className="px-2 py-0.5 rounded-md font-mono text-[11px] font-bold border border-[#232731] bg-[#14161D] text-[#94979E]">
+                              {meta.count} Orders
+                            </span>
+                          </div>
+
+                          <div className="space-y-3 overflow-y-auto flex-1 pr-1">
+                            {tasksInStage.map(task => (
+                              <div
+                                key={task.id}
+                                className="p-3.5 rounded-xl border border-[#232834] bg-[#090B0F] hover:border-[#384052] transition-all space-y-2.5 shadow-sm"
+                              >
+                                <div className="flex items-center justify-between gap-2">
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-mono text-xs font-bold text-[#F84B11]">{task.id}</span>
+                                    <span className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-[#161922] text-[#94979E] border border-[#232731]">
+                                      {task.sku}
+                                    </span>
+                                  </div>
+                                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${
+                                    task.priority === 'Critical'
+                                      ? 'bg-red-950 text-red-400 border-red-800/40'
+                                      : task.priority === 'High'
+                                      ? 'bg-amber-950 text-amber-300 border-amber-800/40'
+                                      : 'bg-zinc-800 text-zinc-300 border-zinc-700/40'
+                                  }`}>
+                                    {task.priority}
+                                  </span>
+                                </div>
+
+                                <h4 className="text-sm font-semibold text-white leading-snug">
+                                  {task.title}
+                                </h4>
+
+                                <div className="flex items-center justify-between text-xs text-[#94979E]">
+                                  <span className="flex items-center gap-1.5">
+                                    <Clock3 className="w-3.5 h-3.5 text-amber-400" />
+                                    <span>{task.sla}</span>
+                                  </span>
+                                  <span className="text-white font-medium">{task.assignee}</span>
+                                </div>
+
+                                {/* Tactile Glove-Friendly Action Buttons */}
+                                <div className="pt-2 border-t border-[#1A1D24] flex items-center gap-2">
+                                  {stageKey !== 'intake' && (
+                                    <button
+                                      onClick={() => handleRegressKanbanTask(task.id)}
+                                      className="py-2 px-3 rounded-lg text-xs font-semibold bg-[#161922] hover:bg-[#202533] text-zinc-300 border border-[#262B37] cursor-pointer"
+                                    >
+                                      ← Back
+                                    </button>
+                                  )}
+                                  {stageKey !== 'dispatch' ? (
+                                    <button
+                                      onClick={() => handleAdvanceKanbanTask(task.id)}
+                                      className="flex-1 py-2 px-3 rounded-lg text-xs font-bold bg-[#F84B11] hover:bg-[#ff5d26] text-white flex items-center justify-center gap-1.5 cursor-pointer shadow-md transition-all active:scale-[0.97]"
+                                    >
+                                      <span>Advance Stage</span>
+                                      <span>→</span>
+                                    </button>
+                                  ) : (
+                                    <div className="flex-1 py-2 px-3 rounded-lg text-xs font-bold bg-emerald-950/60 border border-emerald-800/40 text-emerald-400 flex items-center justify-center gap-1.5">
+                                      <CheckCircle2 className="w-4 h-4" />
+                                      <span>Fulfillment Reconciled</span>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {/* 3. MOBILE: SINGLE COLUMN THUMB FEED */}
+                {kanbanDevice === 'mobile' && (
+                  <div className="space-y-2.5 overflow-y-auto max-h-[460px] pr-0.5">
+                    {filteredKanbanTasks.filter(t => t.stage === mobileActiveStage).map(task => (
+                      <div
+                        key={task.id}
+                        className="p-3 rounded-xl border border-[#20242E] bg-[#0E1015] space-y-2 shadow-md"
+                      >
+                        <div className="flex items-center justify-between gap-1.5">
+                          <div className="flex items-center gap-1.5">
+                            <span className="font-mono text-xs font-bold text-[#F84B11]">{task.id}</span>
+                            <span className="text-[10px] font-mono text-[#717684]">{task.sku}</span>
+                          </div>
+                          <span className={`px-2 py-0.5 rounded text-[10px] font-semibold border ${
+                            task.priority === 'Critical'
+                              ? 'bg-red-950 text-red-400 border-red-800/40'
+                              : task.priority === 'High'
+                              ? 'bg-amber-950 text-amber-300 border-amber-800/40'
+                              : 'bg-zinc-800 text-zinc-300 border-zinc-700/40'
+                          }`}>
+                            {task.priority}
+                          </span>
+                        </div>
+
+                        <h4 className="text-xs font-semibold text-white leading-snug">
+                          {task.title}
+                        </h4>
+
+                        <div className="flex items-center justify-between text-[10.5px] text-[#717684]">
+                          <span className="flex items-center gap-1">
+                            <Clock3 className="w-3 h-3 text-amber-400" />
+                            <span>{task.sla}</span>
+                          </span>
+                          <span className="text-zinc-300">{task.assignee}</span>
+                        </div>
+
+                        <div className="pt-1.5 border-t border-[#1A1D24] flex items-center gap-2">
+                          {task.stage !== 'intake' && (
+                            <button
+                              onClick={() => handleRegressKanbanTask(task.id)}
+                              className="py-1.5 px-3 rounded-lg text-xs font-medium bg-[#161922] text-zinc-300 border border-[#262B37] cursor-pointer"
+                            >
+                              ←
+                            </button>
+                          )}
+                          {task.stage !== 'dispatch' ? (
+                            <button
+                              onClick={() => handleAdvanceKanbanTask(task.id)}
+                              className="flex-1 py-2 rounded-lg text-xs font-bold bg-[#F84B11] hover:bg-[#ff5d26] text-white flex items-center justify-center gap-1.5 cursor-pointer shadow-sm active:scale-[0.97]"
+                            >
+                              <span>Advance to Next Stage</span>
+                              <span>→</span>
+                            </button>
+                          ) : (
+                            <div className="flex-1 py-1.5 rounded-lg text-xs font-bold bg-emerald-950/60 border border-emerald-800/40 text-emerald-400 flex items-center justify-center gap-1">
+                              <CheckCircle2 className="w-3.5 h-3.5" />
+                              <span>Dispatched & Verified</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+              </div>
+
+              {/* Mobile Home Indicator Simulation */}
+              {kanbanDevice === 'mobile' && (
+                <div className="pt-2 flex justify-center shrink-0">
+                  <div className="w-28 h-1 rounded-full bg-[#333846]" />
+                </div>
+              )}
+
+            </div>
+
+          </div>
+
+        </div>
+
+        {/* 3 Value Callout Cards for Multi-Device Responsiveness */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-10">
+          <div className="p-5 rounded-xl border border-[#1F232B] bg-[#0E1015] interactive-card cursor-default">
+            <div className="flex items-center gap-2 mb-2 text-[#F84B11]">
+              <Monitor className="w-4 h-4" />
+              <div className="text-[11px] font-semibold uppercase tracking-wider">Ergonomic Specialization</div>
+            </div>
+            <h3 className="text-sm font-bold text-white mb-1">Tailored Per Form Factor</h3>
+            <p className="text-xs text-[#94979E] leading-relaxed">
+              We never cram desktop spreadsheets into a mobile browser. Every screen resolution gets specialized interaction patterns: dense multi-column command hubs on 4K monitors and thumb-friendly vertical feeds on mobile.
+            </p>
+          </div>
+
+          <div className="p-5 rounded-xl border border-[#1F232B] bg-[#0E1015] interactive-card cursor-default">
+            <div className="flex items-center gap-2 mb-2 text-emerald-400">
+              <Barcode className="w-4 h-4" />
+              <div className="text-[11px] font-semibold uppercase tracking-wider">Warehouse Floor Ready</div>
+            </div>
+            <h3 className="text-sm font-bold text-white mb-1">Glove-Friendly Touch Targets</h3>
+            <p className="text-xs text-[#94979E] leading-relaxed">
+              Tablet interfaces feature +30% larger hitboxes designed for industrial operators wearing protective gloves, paired with direct hardware/camera barcode laser integration.
+            </p>
+          </div>
+
+          <div className="p-5 rounded-xl border border-[#1F232B] bg-[#0E1015] interactive-card cursor-default">
+            <div className="flex items-center gap-2 mb-2 text-blue-400">
+              <Zap className="w-4 h-4 fill-current" />
+              <div className="text-[11px] font-semibold uppercase tracking-wider">Sub-Millisecond Edge Sync</div>
+            </div>
+            <h3 className="text-sm font-bold text-white mb-1">&lt; 0.2ms LAN Replication</h3>
+            <p className="text-xs text-[#94979E] leading-relaxed">
+              When a forklift driver advances a pallet on their rugged tablet, the dispatcher's 4K desktop board updates immediately over your local office LAN with zero cloud latency.
             </p>
           </div>
         </div>
