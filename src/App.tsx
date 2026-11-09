@@ -2100,8 +2100,8 @@ export default function App() {
             </div>
           </div>
 
-          {/* Quick Controls: Theme Switcher (Light default) + Priority Filter + Reset */}
-          <div className="flex items-center gap-2 flex-wrap">
+          {/* Quick Controls: Theme Switcher (Light default) */}
+          <div className="flex items-center gap-2">
             {/* Theme Toggle: Light by default / Dark mode option */}
             <div className="inline-flex p-0.5 rounded-lg border border-[#20232B] bg-[#14161D] text-xs font-medium shrink-0">
               <button
@@ -2133,43 +2133,6 @@ export default function App() {
                 <span className="text-[11px]">Dark</span>
               </button>
             </div>
-
-            {/* Priority Filters */}
-            <div className="inline-flex p-0.5 rounded-lg border border-[#20232B] bg-[#14161D] text-xs shrink-0">
-              <button
-                onClick={() => setKanbanFilter('all')}
-                className={`px-2 py-1 rounded transition-colors cursor-pointer ${
-                  kanbanFilter === 'all' ? 'bg-[#1E2129] text-white font-semibold' : 'text-[#717684] hover:text-white'
-                }`}
-              >
-                All ({kanbanTasks.length})
-              </button>
-              <button
-                onClick={() => setKanbanFilter('critical')}
-                className={`px-2 py-1 rounded transition-colors cursor-pointer ${
-                  kanbanFilter === 'critical' ? 'bg-[#1E2129] text-red-400 font-semibold' : 'text-[#717684] hover:text-white'
-                }`}
-              >
-                Critical ({kanbanTasks.filter(t => t.priority === 'Critical' || t.priority === 'High').length})
-              </button>
-              <button
-                onClick={() => setKanbanFilter('standard')}
-                className={`px-2 py-1 rounded transition-colors cursor-pointer ${
-                  kanbanFilter === 'standard' ? 'bg-[#1E2129] text-slate-300 font-semibold' : 'text-[#717684] hover:text-white'
-                }`}
-              >
-                Standard ({kanbanTasks.filter(t => t.priority === 'Standard').length})
-              </button>
-            </div>
-
-            {/* Reset Tasks */}
-            <button
-              onClick={() => setKanbanTasks(initialKanbanTasks)}
-              className="p-1.5 rounded-lg border border-[#20232B] bg-[#14161D] text-[#717684] hover:text-white hover:bg-[#1A1D27] cursor-pointer transition-all shrink-0"
-              title="Reset Tasks"
-            >
-              <RefreshCw className="w-3.5 h-3.5" />
-            </button>
           </div>
         </div>
 
@@ -2330,15 +2293,94 @@ export default function App() {
                   </p>
                 </div>
 
-                {/* Mobile Quick Scan button */}
-                {activeLayoutDevice === 'mobile' && (
-                  <button
-                    onClick={handleScanBarcodeSim}
-                    className="p-1.5 rounded bg-emerald-600 hover:bg-emerald-500 active:scale-[0.96] text-white text-xs flex items-center gap-1 cursor-pointer shadow-xs"
-                    title="Scan SKU Barcode"
-                  >
-                    <Barcode className="w-3.5 h-3.5" />
-                  </button>
+                {/* Priority Filters & Action Toolbar (Relocated to Sub-Header) */}
+                {activeLayoutDevice !== 'mobile' ? (
+                  <div className="flex items-center gap-2 shrink-0">
+                    {/* Priority Filters */}
+                    <div className={`inline-flex p-0.5 rounded-lg border text-xs shrink-0 ${
+                      isKanbanLight 
+                        ? 'border-slate-300 bg-slate-100/90' 
+                        : 'border-[#20232B] bg-[#14161D]'
+                    }`}>
+                      <button
+                        onClick={() => setKanbanFilter('all')}
+                        className={`px-2.5 py-1 rounded text-xs transition-colors cursor-pointer ${
+                          kanbanFilter === 'all' 
+                            ? isKanbanLight 
+                              ? 'bg-white text-slate-900 shadow-xs font-semibold' 
+                              : 'bg-[#1E2129] text-white font-semibold' 
+                            : isKanbanLight 
+                              ? 'text-slate-600 hover:text-slate-900' 
+                              : 'text-[#717684] hover:text-white'
+                        }`}
+                      >
+                        All ({kanbanTasks.length})
+                      </button>
+                      <button
+                        onClick={() => setKanbanFilter('critical')}
+                        className={`px-2.5 py-1 rounded text-xs transition-colors cursor-pointer ${
+                          kanbanFilter === 'critical' 
+                            ? isKanbanLight 
+                              ? 'bg-red-50 text-red-700 border border-red-200 font-semibold' 
+                              : 'bg-[#1E2129] text-red-400 font-semibold' 
+                            : isKanbanLight 
+                              ? 'text-slate-600 hover:text-slate-900' 
+                              : 'text-[#717684] hover:text-white'
+                        }`}
+                      >
+                        Critical ({kanbanTasks.filter(t => t.priority === 'Critical' || t.priority === 'High').length})
+                      </button>
+                      <button
+                        onClick={() => setKanbanFilter('standard')}
+                        className={`px-2.5 py-1 rounded text-xs transition-colors cursor-pointer ${
+                          kanbanFilter === 'standard' 
+                            ? isKanbanLight 
+                              ? 'bg-white text-slate-900 shadow-xs font-semibold' 
+                              : 'bg-[#1E2129] text-slate-300 font-semibold' 
+                            : isKanbanLight 
+                              ? 'text-slate-600 hover:text-slate-900' 
+                              : 'text-[#717684] hover:text-white'
+                        }`}
+                      >
+                        Standard ({kanbanTasks.filter(t => t.priority === 'Standard').length})
+                      </button>
+                    </div>
+
+                    {/* Reset Tasks */}
+                    <button
+                      onClick={() => setKanbanTasks(initialKanbanTasks)}
+                      className={`p-1.5 rounded-lg border cursor-pointer transition-all shrink-0 ${
+                        isKanbanLight 
+                          ? 'border-slate-300 bg-slate-100 text-slate-600 hover:bg-white hover:text-slate-900' 
+                          : 'border-[#20232B] bg-[#14161D] text-[#717684] hover:text-white hover:bg-[#1A1D27]'
+                      }`}
+                      title="Reset Tasks"
+                    >
+                      <RefreshCw className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <button
+                      onClick={() => setKanbanTasks(initialKanbanTasks)}
+                      className={`p-1.5 rounded-lg border cursor-pointer transition-all shrink-0 ${
+                        isKanbanLight 
+                          ? 'border-slate-300 bg-slate-100 text-slate-600 hover:bg-white hover:text-slate-900' 
+                          : 'border-[#20232B] bg-[#14161D] text-[#717684] hover:text-white hover:bg-[#1A1D27]'
+                      }`}
+                      title="Reset Tasks"
+                    >
+                      <RefreshCw className="w-3.5 h-3.5" />
+                    </button>
+
+                    <button
+                      onClick={handleScanBarcodeSim}
+                      className="p-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 active:scale-[0.96] text-white text-xs flex items-center gap-1 cursor-pointer shadow-xs shrink-0"
+                      title="Scan SKU Barcode"
+                    >
+                      <Barcode className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 )}
               </div>
 
