@@ -2043,7 +2043,7 @@ export default function App() {
         </div>
 
         {/* Viewport Simulator Control Bar */}
-        <div className="p-3 sm:p-4 rounded-xl border border-[#1F232B] bg-[#0E1015] mb-6 flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-xl">
+        <div className="p-3 sm:p-4 rounded-xl border border-[#1F232B] bg-[#0E1015] mb-6 flex flex-col xl:flex-row xl:items-center justify-between gap-3 shadow-xl">
           {/* Device Switcher Segmented Control */}
           <div className="flex items-center gap-1.5 flex-wrap">
             <span className="text-xs font-semibold uppercase tracking-wider text-[#717684] mr-1 hidden sm:inline">
@@ -2101,9 +2101,9 @@ export default function App() {
           </div>
 
           {/* Quick Controls: Theme Switcher (Light default) + Priority Filter + Reset */}
-          <div className="flex items-center gap-2.5 flex-wrap">
+          <div className="flex items-center gap-2 flex-wrap">
             {/* Theme Toggle: Light by default / Dark mode option */}
-            <div className="inline-flex p-0.5 rounded-lg border border-[#20232B] bg-[#14161D] text-xs font-medium">
+            <div className="inline-flex p-0.5 rounded-lg border border-[#20232B] bg-[#14161D] text-xs font-medium shrink-0">
               <button
                 type="button"
                 onClick={() => setKanbanTheme('light')}
@@ -2135,7 +2135,7 @@ export default function App() {
             </div>
 
             {/* Priority Filters */}
-            <div className="inline-flex p-0.5 rounded-lg border border-[#20232B] bg-[#14161D] text-xs">
+            <div className="inline-flex p-0.5 rounded-lg border border-[#20232B] bg-[#14161D] text-xs shrink-0">
               <button
                 onClick={() => setKanbanFilter('all')}
                 className={`px-2 py-1 rounded transition-colors cursor-pointer ${
@@ -2165,7 +2165,7 @@ export default function App() {
             {/* Reset Tasks */}
             <button
               onClick={() => setKanbanTasks(initialKanbanTasks)}
-              className="p-1.5 rounded-lg border border-[#20232B] bg-[#14161D] text-[#717684] hover:text-white hover:bg-[#1A1D27] cursor-pointer transition-all"
+              className="p-1.5 rounded-lg border border-[#20232B] bg-[#14161D] text-[#717684] hover:text-white hover:bg-[#1A1D27] cursor-pointer transition-all shrink-0"
               title="Reset Tasks"
             >
               <RefreshCw className="w-3.5 h-3.5" />
@@ -2291,26 +2291,14 @@ export default function App() {
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                     <span className="hidden sm:inline">0.1ms Engine</span>
                   </div>
-
-                  {/* Quick Theme Toggle Icon inside Titlebar */}
-                  <button
-                    onClick={() => setKanbanTheme(isKanbanLight ? 'dark' : 'light')}
-                    className={`p-1 rounded-md transition-colors cursor-pointer ${
-                      isKanbanLight 
-                        ? 'hover:bg-slate-200 text-slate-600' 
-                        : 'hover:bg-[#1E222D] text-[#717684] hover:text-white'
-                    }`}
-                    title={isKanbanLight ? "Switch to Dark Mode" : "Switch to Light Mode"}
-                    aria-label="Toggle Kanban Theme"
-                  >
-                    {isKanbanLight ? <Moon className="w-3.5 h-3.5" /> : <Sun className="w-3.5 h-3.5" />}
-                  </button>
                 </div>
               </div>
             )}
 
             {/* Kanban Inner Workstation Content Canvas */}
-            <div className={`p-3 sm:p-4 transition-colors duration-200 flex flex-col h-[570px] overflow-hidden ${
+            <div className={`p-3 sm:p-4 transition-colors duration-200 flex flex-col ${
+              activeLayoutDevice === 'tablet' ? 'h-[620px]' : 'h-[570px]'
+            } overflow-hidden ${
               isKanbanLight ? 'bg-[#F8FAFC]' : 'bg-[#08090C]'
             } ${
               activeLayoutDevice === 'mobile' ? 'rounded-[26px]' : activeLayoutDevice === 'tablet' ? 'rounded-b-lg' : 'rounded-b-xl'
@@ -2325,12 +2313,12 @@ export default function App() {
                     isKanbanLight ? 'text-slate-900' : 'text-white'
                   }`}>
                     <span>Manufacturing & Fulfillment Pipeline</span>
-                    <span className={`px-1.5 py-0.2 rounded font-mono text-[10px] border ${
+                    <span className={`px-1.5 py-0.5 rounded font-mono text-[10px] border whitespace-nowrap shrink-0 ${
                       isKanbanLight
                         ? 'bg-white text-slate-700 border-slate-300 shadow-2xs font-semibold'
                         : 'bg-[#1E222A] text-zinc-300 border-[#2A2F3D]'
                     }`}>
-                      {filteredKanbanTasks.length} Work Orders
+                      {filteredKanbanTasks.length} {activeLayoutDevice === 'mobile' ? 'Orders' : 'Work Orders'}
                     </span>
                   </h3>
                   <p className={`text-[10px] mt-0.5 ${
@@ -2498,10 +2486,10 @@ export default function App() {
 
               {/* Tablet Mode: Track Pair Selector Switcher */}
               {activeLayoutDevice === 'tablet' && (
-                <div className={`flex items-center justify-between gap-2 pb-2 mb-3 border-b shrink-0 ${
+                <div className={`flex items-center justify-between gap-2 pb-2.5 mb-3 border-b shrink-0 ${
                   isKanbanLight ? 'border-slate-200' : 'border-[#1A1D24]'
                 }`}>
-                  <div className={`inline-flex p-0.5 rounded-lg border text-xs ${
+                  <div className={`inline-flex p-0.5 rounded-lg border text-xs font-semibold ${
                     isKanbanLight ? 'border-slate-200 bg-slate-200/70' : 'border-[#20232B] bg-[#12141C]'
                   }`}>
                     <button
@@ -2512,7 +2500,7 @@ export default function App() {
                           setTabletStagePair('production');
                         }
                       }}
-                      className={`px-3 py-1 rounded transition-all cursor-pointer ${
+                      className={`px-3 py-1.5 rounded transition-all cursor-pointer whitespace-nowrap ${
                         tabletStagePair === 'production'
                           ? isKanbanLight
                             ? 'bg-white text-slate-900 font-bold shadow-xs border border-slate-200/60'
@@ -2522,7 +2510,7 @@ export default function App() {
                             : 'text-[#717684] hover:text-white'
                       }`}
                     >
-                      Track A: Production (Intake & Assembly)
+                      Track A: Intake & Assembly
                     </button>
                     <button
                       onClick={() => setTabletStagePair('fulfillment')}
@@ -2532,7 +2520,7 @@ export default function App() {
                           setTabletStagePair('fulfillment');
                         }
                       }}
-                      className={`px-3 py-1 rounded transition-all cursor-pointer ${
+                      className={`px-3 py-1.5 rounded transition-all cursor-pointer whitespace-nowrap ${
                         tabletStagePair === 'fulfillment'
                           ? isKanbanLight
                             ? 'bg-white text-slate-900 font-bold shadow-xs border border-slate-200/60'
@@ -2542,14 +2530,14 @@ export default function App() {
                             : 'text-[#717684] hover:text-white'
                       }`}
                     >
-                      Track B: Quality & Logistics (QA & Dispatch)
+                      Track B: QA & Dispatch
                     </button>
                   </div>
 
-                  <span className={`text-[11px] font-mono ${
+                  <span className={`text-[11px] font-mono whitespace-nowrap shrink-0 ${
                     isKanbanLight ? 'text-slate-500' : 'text-[#717684]'
                   }`}>
-                    Glove Hitboxes: +30% Padding Active
+                    +30% Glove Hitboxes
                   </span>
                 </div>
               )}
@@ -2703,7 +2691,7 @@ export default function App() {
                                       <Clock3 className={`w-3 h-3 ${isKanbanLight ? 'text-slate-400' : 'text-[#717684]'}`} />
                                       <span>{task.sla}</span>
                                     </span>
-                                    <span className={isKanbanLight ? 'text-slate-700 font-medium font-mono' : 'text-zinc-400 font-mono'}>
+                                    <span className={`whitespace-nowrap shrink-0 ml-1 ${isKanbanLight ? 'text-slate-700 font-medium font-mono' : 'text-zinc-400 font-mono'}`}>
                                       {task.assignee}
                                     </span>
                                   </div>
