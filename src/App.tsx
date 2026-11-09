@@ -185,10 +185,12 @@ export default function App() {
   const workstationRef = useRef<HTMLDivElement>(null);
   const [simulatorAvailableWidth, setSimulatorAvailableWidth] = useState<number>(1152);
   const [workstationRawHeight, setWorkstationRawHeight] = useState<number>(620);
+  const [windowWidth, setWindowWidth] = useState<number>(typeof window !== 'undefined' ? window.innerWidth : 1200);
   const [isFullscreenLandscape, setIsFullscreenLandscape] = useState(false);
 
   useEffect(() => {
     const updateDimensions = () => {
+      setWindowWidth(window.innerWidth);
       if (simulatorWrapperRef.current) {
         setSimulatorAvailableWidth(simulatorWrapperRef.current.clientWidth);
       }
@@ -259,10 +261,12 @@ export default function App() {
   };
 
   const targetDeviceWidth = targetWidthMap[kanbanDevice];
-  const isWidthConstrained = simulatorAvailableWidth > 0 && simulatorAvailableWidth < targetDeviceWidth;
+  // Only mobile screens (< 768px) need scaling and the rotate banner
+  const isMobileScreen = windowWidth < 768;
+  const isWidthConstrained = isMobileScreen && simulatorAvailableWidth > 0 && simulatorAvailableWidth < targetDeviceWidth;
   const scaleRatio = isWidthConstrained ? Math.max(0.2, simulatorAvailableWidth / targetDeviceWidth) : 1;
   const scaledWrapperHeight = isWidthConstrained ? Math.ceil(workstationRawHeight * scaleRatio) : undefined;
-  const showScaledBanner = !isFullscreenLandscape && isWidthConstrained && (kanbanDevice === 'desktop' || kanbanDevice === 'laptop' || kanbanDevice === 'tablet');
+  const showScaledBanner = isMobileScreen && !isFullscreenLandscape && isWidthConstrained && (kanbanDevice === 'desktop' || kanbanDevice === 'laptop');
 
   const fullscreenAvailableWidth = typeof window !== 'undefined' ? window.innerWidth - 32 : 1152;
   const fullscreenScale = Math.min(1, Math.max(0.25, fullscreenAvailableWidth / targetDeviceWidth));
@@ -2263,7 +2267,7 @@ export default function App() {
 
         {/* Mobile Proportional Scale Notification & Rotate Action */}
         {showScaledBanner && (
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 sm:p-3.5 mb-4 rounded-xl border border-[#F84B11]/30 bg-[#F84B11]/10 text-white shadow-lg animate-in fade-in duration-300">
+          <div className="md:hidden flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 sm:p-3.5 mb-4 rounded-xl border border-[#F84B11]/30 bg-[#F84B11]/10 text-white shadow-lg animate-in fade-in duration-300">
             <div className="flex items-center gap-2.5 min-w-0">
               <div className="p-2 rounded-lg bg-[#F84B11]/20 text-[#F84B11] border border-[#F84B11]/30 shrink-0">
                 <Smartphone className="w-4 h-4 rotate-90" />
