@@ -672,15 +672,15 @@ export default function App() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative pt-24 sm:pt-32 pb-20 px-4 sm:px-6 max-w-6xl mx-auto overflow-hidden">
+      <section className="relative min-h-[calc(100svh-4rem)] flex flex-col justify-between py-6 sm:py-8 lg:py-10 xl:py-12 px-4 sm:px-6 max-w-6xl mx-auto overflow-hidden hero-viewport-section">
         {/* Ambient background glow & industrial grid accents */}
         <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-[720px] h-[360px] bg-[#F84B11]/8 rounded-full blur-[160px] pointer-events-none animate-pulse-glow" />
         <div className="absolute top-1/3 left-1/4 w-80 h-80 bg-blue-500/5 rounded-full blur-[140px] pointer-events-none" />
 
-        <div className="max-w-4xl mx-auto text-center relative z-10">
+        <div className="max-w-4xl mx-auto text-center relative z-10 flex flex-col items-center justify-center flex-1 my-auto w-full">
           
           {/* Status Badge */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#2A2E39] bg-[#12141A]/90 text-[#94979E] text-xs font-medium tracking-wide mb-8 hover:border-[#F84B11]/40 transition-colors duration-300 shadow-sm backdrop-blur-md">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#2A2E39] bg-[#12141A]/90 text-[#94979E] text-xs font-medium tracking-wide mb-5 sm:mb-6 lg:mb-8 hero-badge-margin hover:border-[#F84B11]/40 transition-colors duration-300 shadow-sm backdrop-blur-md">
             <span className="w-2 h-2 rounded-full bg-[#F84B11] shrink-0 animate-pulse" />
             <span className="text-[#EDEDED] font-semibold">SOVEREIGN INDUSTRIAL SOFTWARE</span>
             <span className="text-[#585B64]">•</span>
@@ -696,7 +696,7 @@ export default function App() {
           </div>
 
           {/* Main Headline */}
-          <h1 data-build="" className="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-white leading-[1.06] mb-7">
+          <h1 data-build="" className="text-3xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight text-white leading-[1.08] mb-4 sm:mb-5 lg:mb-6 hero-headline">
             Your company's software <br className="hidden sm:inline" />
             should belong to you. <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#F84B11] via-[#ff7444] to-[#ffab91]">
@@ -705,22 +705,22 @@ export default function App() {
           </h1>
 
           {/* Subtitle */}
-          <p data-build="fade" className="max-w-2xl mx-auto text-base sm:text-xl text-[#94979E] leading-relaxed mb-10 font-normal">
+          <p data-build="fade" className="max-w-2xl mx-auto text-sm sm:text-base lg:text-lg text-[#94979E] leading-relaxed mb-6 sm:mb-7 lg:mb-8 font-normal hero-subtitle">
             We architect bespoke operational operating systems for factories, distributors, and logistics operations. Deployed on your local physical servers or private cloud as a capitalized corporate software asset—with zero per-user SaaS subscriptions, sub-millisecond local speed, and complete data sovereignty.
           </p>
 
           {/* Call to Actions */}
-          <div data-build="pop" className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
+          <div data-build="pop" className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-4 sm:mb-6 w-full sm:w-auto">
             <button 
               onClick={handleOpenModal}
-              className="w-full sm:w-auto px-7 py-4 rounded-md bg-[#F84B11] hover:bg-[#ff5d26] active:scale-[0.98] text-white font-semibold text-xs uppercase tracking-wider transition-all duration-200 flex items-center justify-center gap-2 shadow-xl shadow-[#F84B11]/25 hover:shadow-[#F84B11]/40 hover:-translate-y-0.5 cursor-pointer"
+              className="w-full sm:w-auto px-6 sm:px-7 py-3.5 sm:py-4 rounded-md bg-[#F84B11] hover:bg-[#ff5d26] active:scale-[0.98] text-white font-semibold text-xs uppercase tracking-wider transition-all duration-200 flex items-center justify-center gap-2 shadow-xl shadow-[#F84B11]/25 hover:shadow-[#F84B11]/40 hover:-translate-y-0.5 cursor-pointer hero-cta-btn"
             >
               <span>Scope Your Custom Software</span>
               <ArrowRight className="w-4 h-4" />
             </button>
             <a 
               href="#transformation"
-              className="w-full sm:w-auto px-6 py-4 rounded-md border border-[#232731] bg-[#101217] hover:bg-[#161922] active:scale-[0.98] text-[#EDEDED] font-medium text-xs tracking-tight transition-all duration-200 flex items-center justify-center gap-2 hover:-translate-y-0.5 cursor-pointer"
+              className="w-full sm:w-auto px-5 sm:px-6 py-3.5 sm:py-4 rounded-md border border-[#232731] bg-[#101217] hover:bg-[#161922] active:scale-[0.98] text-[#EDEDED] font-medium text-xs tracking-tight transition-all duration-200 flex items-center justify-center gap-2 hover:-translate-y-0.5 cursor-pointer hero-cta-btn"
             >
               <Zap className="w-3.5 h-3.5 text-[#F84B11]" />
               <span>See Interactive Transformation</span>
@@ -728,17 +728,17 @@ export default function App() {
           </div>
 
           {/* Trust Value Signals */}
-          <div data-build="fade" className="flex flex-wrap items-center justify-center gap-y-2 gap-x-6 text-xs text-[#94979E] mb-16">
+          <div data-build="fade" className="flex flex-wrap items-center justify-center gap-y-1.5 gap-x-5 sm:gap-x-6 text-xs text-[#94979E] mb-6 sm:mb-8 lg:mb-10 hero-trust-margin">
             <div className="flex items-center gap-1.5">
-              <Check className="w-3.5 h-3.5 text-emerald-400" />
+              <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
               <span>One-time capital software asset</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <Check className="w-3.5 h-3.5 text-emerald-400" />
+              <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
               <span>100% full source ownership</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <Check className="w-3.5 h-3.5 text-emerald-400" />
+              <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
               <span>Zero cloud latency or lock-in</span>
             </div>
           </div>
@@ -746,41 +746,41 @@ export default function App() {
         </div>
 
         {/* 4 Architectural Fact Blocks */}
-        <div data-build="fade" className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 border-t border-[#1F232B] pt-10 max-w-6xl mx-auto">
-          <div className="p-4 sm:p-5 rounded-xl border border-[#1E222A] bg-[#0E1015] hover:border-[#F84B11]/40 transition-all duration-200 cursor-default group">
-            <div className="flex items-center gap-2 text-[#F84B11] mb-2">
-              <Server className="w-4 h-4" />
-              <div className="text-[11px] font-semibold uppercase tracking-wider text-[#7A7E89]">Deployment</div>
+        <div data-build="fade" className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3 lg:gap-4 border-t border-[#1F232B] pt-4 sm:pt-6 lg:pt-8 w-full max-w-6xl mx-auto hero-fact-grid">
+          <div className="p-3 sm:p-4 rounded-xl border border-[#1E222A] bg-[#0E1015] hover:border-[#F84B11]/40 transition-all duration-200 cursor-default group hero-fact-card">
+            <div className="flex items-center gap-2 text-[#F84B11] mb-1.5">
+              <Server className="w-4 h-4 shrink-0" />
+              <div className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider text-[#7A7E89]">Deployment</div>
             </div>
-            <div className="text-sm sm:text-base font-bold text-white group-hover:text-[#F84B11] transition-colors">100% On-Premise</div>
-            <p className="text-xs text-[#94979E] mt-1 leading-relaxed">Installed on your physical hardware or private corporate cloud</p>
+            <div className="text-xs sm:text-sm lg:text-base font-bold text-white group-hover:text-[#F84B11] transition-colors">100% On-Premise</div>
+            <p className="text-[11px] sm:text-xs text-[#94979E] mt-1 leading-relaxed hero-fact-desc">Installed on your physical hardware or private corporate cloud</p>
           </div>
 
-          <div className="p-4 sm:p-5 rounded-xl border border-[#1E222A] bg-[#0E1015] hover:border-emerald-500/40 transition-all duration-200 cursor-default group">
-            <div className="flex items-center gap-2 text-emerald-400 mb-2">
-              <Building2 className="w-4 h-4" />
-              <div className="text-[11px] font-semibold uppercase tracking-wider text-[#7A7E89]">Financial Model</div>
+          <div className="p-3 sm:p-4 rounded-xl border border-[#1E222A] bg-[#0E1015] hover:border-emerald-500/40 transition-all duration-200 cursor-default group hero-fact-card">
+            <div className="flex items-center gap-2 text-emerald-400 mb-1.5">
+              <Building2 className="w-4 h-4 shrink-0" />
+              <div className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider text-[#7A7E89]">Financial Model</div>
             </div>
-            <div className="text-sm sm:text-base font-bold text-white group-hover:text-emerald-400 transition-colors">Capitalized Asset</div>
-            <p className="text-xs text-[#94979E] mt-1 leading-relaxed">Zero recurring per-user monthly seat tax. Owned forever</p>
+            <div className="text-xs sm:text-sm lg:text-base font-bold text-white group-hover:text-emerald-400 transition-colors">Capitalized Asset</div>
+            <p className="text-[11px] sm:text-xs text-[#94979E] mt-1 leading-relaxed hero-fact-desc">Zero recurring per-user monthly seat tax. Owned forever</p>
           </div>
 
-          <div className="p-4 sm:p-5 rounded-xl border border-[#1E222A] bg-[#0E1015] hover:border-blue-500/40 transition-all duration-200 cursor-default group">
-            <div className="flex items-center gap-2 text-blue-400 mb-2">
-              <Code2 className="w-4 h-4" />
-              <div className="text-[11px] font-semibold uppercase tracking-wider text-[#7A7E89]">Intellectual Property</div>
+          <div className="p-3 sm:p-4 rounded-xl border border-[#1E222A] bg-[#0E1015] hover:border-blue-500/40 transition-all duration-200 cursor-default group hero-fact-card">
+            <div className="flex items-center gap-2 text-blue-400 mb-1.5">
+              <Code2 className="w-4 h-4 shrink-0" />
+              <div className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider text-[#7A7E89]">Intellectual Property</div>
             </div>
-            <div className="text-sm sm:text-base font-bold text-white group-hover:text-blue-400 transition-colors">100% Owned Code</div>
-            <p className="text-xs text-[#94979E] mt-1 leading-relaxed">Full source code delivered, documented, zero vendor lock-in</p>
+            <div className="text-xs sm:text-sm lg:text-base font-bold text-white group-hover:text-blue-400 transition-colors">100% Owned Code</div>
+            <p className="text-[11px] sm:text-xs text-[#94979E] mt-1 leading-relaxed hero-fact-desc">Full source code delivered, documented, zero vendor lock-in</p>
           </div>
 
-          <div className="p-4 sm:p-5 rounded-xl border border-[#1E222A] bg-[#0E1015] hover:border-amber-500/40 transition-all duration-200 cursor-default group">
-            <div className="flex items-center gap-2 text-amber-400 mb-2">
-              <Zap className="w-4 h-4" />
-              <div className="text-[11px] font-semibold uppercase tracking-wider text-[#7A7E89]">Response Time</div>
+          <div className="p-3 sm:p-4 rounded-xl border border-[#1E222A] bg-[#0E1015] hover:border-amber-500/40 transition-all duration-200 cursor-default group hero-fact-card">
+            <div className="flex items-center gap-2 text-amber-400 mb-1.5">
+              <Zap className="w-4 h-4 shrink-0" />
+              <div className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider text-[#7A7E89]">Response Time</div>
             </div>
-            <div className="text-sm sm:text-base font-bold text-white group-hover:text-amber-400 transition-colors">&lt; 0.2ms Perceived</div>
-            <p className="text-xs text-[#94979E] mt-1 leading-relaxed">Instantaneous local reactive memory, zero loading spinners</p>
+            <div className="text-xs sm:text-sm lg:text-base font-bold text-white group-hover:text-amber-400 transition-colors">&lt; 0.2ms Perceived</div>
+            <p className="text-[11px] sm:text-xs text-[#94979E] mt-1 leading-relaxed hero-fact-desc">Instantaneous local reactive memory, zero loading spinners</p>
           </div>
         </div>
 
