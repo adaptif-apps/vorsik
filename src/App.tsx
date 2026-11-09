@@ -794,7 +794,7 @@ export default function App() {
       <section id="transformation" className="py-20 px-4 sm:px-6 max-w-6xl mx-auto border-t border-[#1F232B]">
         
         {/* Section Header */}
-        <div className="mb-10 max-w-3xl">
+        <div className="mb-8 max-w-3xl">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#181B22] border border-[#272B36] text-[11px] font-semibold text-[#F84B11] tracking-wider uppercase mb-3">
             <Zap className="w-3.5 h-3.5 fill-current" />
             <span>Interactive Workflow Transformation</span>
@@ -805,6 +805,35 @@ export default function App() {
           <p className="text-[#94979E] text-sm mt-3 leading-relaxed">
             Most mid-sized businesses run on fragile, color-coded spreadsheets full of formula errors and untracked WhatsApp notes. Watch how Vorsik transforms manual B2B order dispatch into an owned, sub-millisecond custom operational application.
           </p>
+
+          {/* Workflow Transformation Toggle (Before / After) */}
+          <div className="mt-6 inline-flex p-1 rounded-lg border border-[#262A36] bg-[#12141A] text-xs font-medium shadow-md">
+            <button
+              onClick={() => setTransformationMode('spreadsheet')}
+              className={`px-3.5 py-2 rounded-md transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap ${
+                transformationMode === 'spreadsheet'
+                  ? 'bg-[#1E222B] text-white shadow-sm font-semibold border border-[#303644]'
+                  : 'text-[#94979E] hover:text-white hover:bg-[#181A22]'
+              }`}
+            >
+              <FileSpreadsheet className="w-4 h-4 shrink-0 text-amber-400" />
+              <span className="hidden sm:inline">1. Messy Spreadsheet (Before)</span>
+              <span className="sm:hidden inline">1. Spreadsheet</span>
+            </button>
+
+            <button
+              onClick={handleStartTransformation}
+              className={`px-3.5 py-2 rounded-md transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap ${
+                transformationMode === 'vorsik'
+                  ? 'bg-[#F84B11] text-white shadow-md shadow-[#F84B11]/25 font-semibold'
+                  : 'text-[#F84B11] hover:text-[#ff7444] hover:bg-[#F84B11]/10 font-semibold'
+              }`}
+            >
+              <Zap className="w-4 h-4 fill-current shrink-0" />
+              <span className="hidden sm:inline">2. Vorsik Custom OS (After)</span>
+              <span className="sm:hidden inline">2. Vorsik OS</span>
+            </button>
+          </div>
         </div>
 
         {/* Showroom Interactive Shell */}
@@ -817,7 +846,7 @@ export default function App() {
         }`}>
           
           {/* Workstation Frame Header */}
-          <div className={`border-b px-3 sm:px-4 min-h-[56px] py-2 sm:py-0 flex flex-wrap sm:flex-nowrap items-center justify-between gap-2.5 sm:gap-3 transition-colors shrink-0 ${
+          <div className={`border-b px-3 sm:px-4 min-h-[48px] sm:min-h-[52px] py-2 sm:py-0 flex items-center justify-between gap-3 transition-colors shrink-0 ${
             isLight 
               ? 'border-slate-200 bg-slate-100/95' 
               : 'border-[#1F232B] bg-[#0A0C10]'
@@ -839,49 +868,8 @@ export default function App() {
               </span>
             </div>
 
-            {/* View Switcher & Sandbox Theme Toggle */}
-            <div className="flex items-center gap-2 shrink-0 flex-wrap sm:flex-nowrap">
-              <div className={`inline-flex p-0.5 rounded-lg border text-xs font-medium whitespace-nowrap transition-colors ${
-                isLight 
-                  ? 'bg-slate-200/90 border-slate-300' 
-                  : 'bg-[#14161D] border-[#20232B]'
-              }`}>
-                <button
-                  onClick={() => setTransformationMode('spreadsheet')}
-                  className={`px-3 py-1.5 rounded-md transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
-                    transformationMode === 'spreadsheet'
-                      ? isLight
-                        ? 'bg-white text-slate-900 shadow-sm font-semibold'
-                        : 'bg-[#1E2129] text-white shadow-sm'
-                      : isLight
-                        ? 'text-slate-600 hover:text-slate-900'
-                        : 'text-[#94979E] hover:text-white'
-                  }`}
-                >
-                  <FileSpreadsheet className={`w-3.5 h-3.5 shrink-0 ${isLight ? 'text-amber-600' : 'text-amber-400'}`} />
-                  <span className="hidden sm:inline">1. Messy Spreadsheet (Before)</span>
-                  <span className="sm:hidden inline">1. Spreadsheet</span>
-                </button>
-
-                <button
-                  onClick={handleStartTransformation}
-                  className={`px-3 py-1.5 rounded-md transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
-                    transformationMode === 'vorsik'
-                      ? isLight
-                        ? 'bg-white text-slate-900 shadow-sm font-semibold'
-                        : 'bg-[#1E2129] text-white shadow-sm font-semibold'
-                      : isLight
-                        ? 'text-[#F84B11] hover:bg-orange-50 font-semibold'
-                        : 'text-[#F84B11] hover:bg-[#1E2129] font-semibold'
-                  }`}
-                >
-                  <Zap className="w-3.5 h-3.5 text-[#F84B11] fill-current shrink-0" />
-                  <span className="hidden sm:inline">2. Vorsik Custom OS (After)</span>
-                  <span className="sm:hidden inline">2. Vorsik OS</span>
-                </button>
-              </div>
-
-              {/* Theme Toggle: Light Mode by default / Dark Mode option */}
+            {/* Sandbox Theme Toggle */}
+            <div className="flex items-center gap-2 shrink-0">
               <div className={`inline-flex p-0.5 rounded-lg border text-xs font-medium whitespace-nowrap shrink-0 transition-colors ${
                 isLight ? 'bg-slate-200/90 border-slate-300' : 'bg-[#14161D] border-[#20232B]'
               }`}>
