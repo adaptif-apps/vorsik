@@ -2236,35 +2236,6 @@ export default function App() {
           </div>
         </div>
 
-        {/* Viewport Ergonomics Live Indicator Banner */}
-        <div className="flex flex-wrap items-center justify-between text-xs px-3 py-2 rounded-lg bg-[#12141A] border border-[#1E222A] text-[#94979E] mb-6 gap-2">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="font-semibold text-white">
-              {kanbanDevice === 'desktop' && 'Desktop Command Mode • 1440 × 720px'}
-              {kanbanDevice === 'laptop' && 'Compact Laptop Mode • 1024 × 700px'}
-              {kanbanDevice === 'tablet' && 'Rugged Warehouse Tablet • 768 × 760px'}
-              {kanbanDevice === 'mobile' && 'Field Handheld Mobile • 390 × 760px'}
-            </span>
-            <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono uppercase tracking-wider font-semibold ${
-              isKanbanLight ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
-            }`}>
-              {isKanbanLight ? 'Light UI (Contrast Example)' : 'Dark UI'}
-            </span>
-            <span className="text-[10px] px-1.5 py-0.5 rounded font-mono uppercase tracking-wider font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hidden sm:inline-flex items-center gap-1">
-              <GripVertical className="w-2.5 h-2.5" />
-              <span>Drag & Drop Ready</span>
-            </span>
-          </div>
-
-          <div className="text-[11px] font-mono text-[#717684]">
-            {kanbanDevice === 'desktop' && '4-Column Simultaneous View • Mouse & Keyboard Precision'}
-            {kanbanDevice === 'laptop' && '4-Column Balanced View • Field Engineering Density'}
-            {kanbanDevice === 'tablet' && '+30% Touch Hitboxes • Direct Barcode Laser Scanner Trigger'}
-            {kanbanDevice === 'mobile' && 'Single-Thumb Ergonomics • Segmented Stage Switcher'}
-          </div>
-        </div>
-
         {/* Mobile Proportional Scale Notification & Rotate Action */}
         {showScaledBanner && (
           <div className="md:hidden flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 sm:p-3.5 mb-4 rounded-xl border border-[#F84B11]/30 bg-[#F84B11]/10 text-white shadow-lg animate-in fade-in duration-300">
