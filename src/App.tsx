@@ -2308,23 +2308,25 @@ export default function App() {
               <div className={`flex items-center justify-between pb-3 border-b mb-3 shrink-0 ${
                 isKanbanLight ? 'border-slate-200' : 'border-[#1A1D24]'
               }`}>
-                <div>
-                  <h3 className={`text-xs sm:text-sm font-bold flex items-center gap-1.5 ${
-                    isKanbanLight ? 'text-slate-900' : 'text-white'
-                  }`}>
-                    <span>Manufacturing & Fulfillment Pipeline</span>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <h3 className={`text-xs sm:text-sm font-bold truncate ${
+                      isKanbanLight ? 'text-slate-900' : 'text-white'
+                    }`}>
+                      {activeLayoutDevice === 'mobile' ? 'Production Pipeline' : 'Manufacturing & Fulfillment Pipeline'}
+                    </h3>
                     <span className={`px-1.5 py-0.5 rounded font-mono text-[10px] border whitespace-nowrap shrink-0 ${
                       isKanbanLight
                         ? 'bg-white text-slate-700 border-slate-300 shadow-2xs font-semibold'
-                        : 'bg-[#1E222A] text-zinc-300 border-[#2A2F3D]'
+                        : 'bg-[#1E2129] text-zinc-300 border-[#2A2F3D]'
                     }`}>
                       {filteredKanbanTasks.length} {activeLayoutDevice === 'mobile' ? 'Orders' : 'Work Orders'}
                     </span>
-                  </h3>
-                  <p className={`text-[10px] mt-0.5 ${
+                  </div>
+                  <p className={`text-[10px] mt-0.5 truncate ${
                     isKanbanLight ? 'text-slate-500' : 'text-[#717684]'
                   }`}>
-                    Local PostgreSQL event log • Zero-loss offline buffer
+                    {activeLayoutDevice === 'mobile' ? 'Local PostgreSQL log • Zero-loss buffer' : 'Local PostgreSQL event log • Zero-loss offline buffer'}
                   </p>
                 </div>
 
