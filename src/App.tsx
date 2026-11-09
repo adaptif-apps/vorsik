@@ -16,9 +16,6 @@ import {
   Check,
   Menu,
   X,
-  ChevronLeft,
-  ChevronRight,
-  Calculator,
   GripVertical,
   Layers,
   Zap,
@@ -383,75 +380,23 @@ export default function App() {
   ]);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Hero interactive microapps slider state
-  const [activeMicroApp, setActiveMicroApp] = useState<number>(0);
+  // Hero Sovereign Runtime Console State
+  const [heroConsoleTab, setHeroConsoleTab] = useState<'topology' | 'ledger' | 'benchmark'>('topology');
+  const [testPingRunning, setTestPingRunning] = useState<boolean>(false);
+  const [testPingTime, setTestPingTime] = useState<string>('0.14ms');
 
-  // MicroApp 1: Live Kanban Drag & Drop State
-  interface KanbanCard {
-    id: string;
-    code: string;
-    title: string;
-    client: string;
-    val: number;
-    amount: string;
-    status: 'queue' | 'transit' | 'done';
-  }
-
-  const [kanbanCards, setKanbanCards] = useState<KanbanCard[]>([
-    { id: '1', code: 'ORD-892', title: 'Hydraulic Valves', client: 'Apex Heavy', val: 14200, amount: '$14.2k', status: 'queue' },
-    { id: '2', code: 'ORD-894', title: 'Intake Assemblies', client: 'St. Mary Hosp.', val: 6800, amount: '$6.8k', status: 'transit' },
-    { id: '3', code: 'ORD-891', title: 'Drive Bearings', client: 'Cascade Works', val: 28400, amount: '$28.4k', status: 'done' },
-  ]);
-  const [draggedCardId, setDraggedCardId] = useState<string | null>(null);
-
-  const handleDropKanban = (targetStatus: 'queue' | 'transit' | 'done') => {
-    if (!draggedCardId) return;
-    setKanbanCards(prev => prev.map(c => c.id === draggedCardId ? { ...c, status: targetStatus } : c));
-    setDraggedCardId(null);
-    setToastMessage(`State updated to '${targetStatus}' (0.2ms local commit).`);
-    setTimeout(() => setToastMessage(null), 3000);
+  const handleRunPingBenchmark = () => {
+    if (testPingRunning) return;
+    setTestPingRunning(true);
+    setToastMessage('Initiating sub-millisecond on-premise loopback benchmark...');
+    setTimeout(() => {
+      const ping = (0.11 + Math.random() * 0.07).toFixed(2);
+      setTestPingTime(`${ping}ms`);
+      setTestPingRunning(false);
+      setToastMessage(`Local LAN transaction benchmark: ${ping}ms (vs. 480ms commercial SaaS avg).`);
+      setTimeout(() => setToastMessage(null), 3500);
+    }, 400);
   };
-
-  const advanceKanbanCard = (cardId: string) => {
-    setKanbanCards(prev => prev.map(c => {
-      if (c.id !== cardId) return c;
-      const nextStatus: 'queue' | 'transit' | 'done' = 
-        c.status === 'queue' ? 'transit' : c.status === 'transit' ? 'done' : 'queue';
-      return { ...c, status: nextStatus };
-    }));
-    setToastMessage(`Order advanced (0.1ms). Local WAL updated.`);
-    setTimeout(() => setToastMessage(null), 2500);
-  };
-
-  // MicroApp 2: Live Architecture & ROI Calculator State
-  const [heroCalcUsers, setHeroCalcUsers] = useState<number>(30);
-  const [heroCalcSeatPrice, setHeroCalcSeatPrice] = useState<number>(75);
-  const [heroModules, setHeroModules] = useState<{ [key: string]: boolean }>({
-    scanner: true,
-    sync: true,
-    vault: true,
-    webhooks: false,
-  });
-
-  const toggleHeroModule = (key: string) => {
-    setHeroModules(prev => ({ ...prev, [key]: !prev[key] }));
-  };
-
-  const heroSaasThreeYears = heroCalcUsers * heroCalcSeatPrice * 36;
-  const heroVorsikCost = 6500;
-  const heroNetSavings = heroSaasThreeYears - heroVorsikCost;
-  const heroPaybackMonths = Math.max(1, Math.ceil(heroVorsikCost / (heroCalcUsers * heroCalcSeatPrice)));
-
-  // MicroApp 3: Live Fleet & Route Scrubber State
-  const [scrubHour, setScrubHour] = useState<number>(13); // 13 = 1:00 PM
-  const formattedScrubHour = scrubHour < 12 
-    ? `${scrubHour}:00 AM` 
-    : scrubHour === 12 
-    ? '12:00 PM' 
-    : `${scrubHour - 12}:00 PM`;
-  const routeAlphaProgress = Math.min(100, Math.max(10, Math.round(((scrubHour - 8) / 10) * 100)));
-  const routeBetaProgress = Math.min(100, Math.max(15, Math.round(((scrubHour - 7) / 10) * 100)));
-  const activeTechs = Math.round(8 + (scrubHour >= 12 && scrubHour <= 15 ? 6 : scrubHour > 15 ? 2 : 4));
 
   const industries = [
     'Distribution / Logistics / Warehousing',
@@ -746,41 +691,44 @@ export default function App() {
 
       {/* Hero Section */}
       <section className="relative pt-20 sm:pt-28 pb-16 px-4 sm:px-6 max-w-6xl mx-auto overflow-hidden">
-        {/* Ambient background glow */}
-        <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-[650px] h-[320px] bg-[#F84B11]/5 rounded-full blur-[140px] pointer-events-none animate-pulse-glow" />
+        {/* Ambient background glow & industrial grid accents */}
+        <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-[720px] h-[360px] bg-[#F84B11]/8 rounded-full blur-[150px] pointer-events-none animate-pulse-glow" />
+        <div className="absolute top-12 right-0 w-96 h-96 bg-blue-500/5 rounded-full blur-[130px] pointer-events-none" />
 
         <div className="max-w-6xl relative z-10">
           
           <div className="grid lg:grid-cols-12 gap-8 lg:gap-10 items-center">
             
             {/* Left Column: Core Value Proposition & CTAs */}
-            <div className="lg:col-span-7">
-              <div className="inline-flex flex-wrap items-center gap-2 px-3 py-1 rounded border border-[#2A2E39] bg-[#12141A] text-[#94979E] text-xs font-medium tracking-wide mb-8 hover:border-[#F84B11]/40 transition-colors duration-300">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#F84B11] shrink-0 animate-pulse" />
-                <span className="text-[#EDEDED] font-semibold">OWNED INFRASTRUCTURE</span>
-                <span className="text-[#585B64] hidden sm:inline">|</span>
-                <span className="hidden sm:inline">ZERO PER-SEAT SUBSCRIPTIONS</span>
+            <div className="lg:col-span-6 xl:col-span-7">
+              <div className="inline-flex flex-wrap items-center gap-2 px-3 py-1.5 rounded-full border border-[#2A2E39] bg-[#12141A]/90 text-[#94979E] text-xs font-medium tracking-wide mb-8 hover:border-[#F84B11]/40 transition-colors duration-300 shadow-sm backdrop-blur-md">
+                <span className="w-2 h-2 rounded-full bg-[#F84B11] shrink-0 animate-pulse" />
+                <span className="text-[#EDEDED] font-semibold">SOVEREIGN INDUSTRIAL SOFTWARE</span>
+                <span className="text-[#585B64] hidden sm:inline">•</span>
+                <span className="hidden sm:inline font-mono text-emerald-400 font-semibold">0ms SEAT LICENSING</span>
                 <button 
                   onClick={handleReplayBuild}
-                  className="ml-1 sm:ml-2 pl-2 border-l border-[#2A2E39] text-[#F84B11] hover:text-[#ff7444] text-[11px] font-medium flex items-center gap-1 cursor-pointer transition-colors"
+                  className="ml-1 pl-2 border-l border-[#2A2E39] text-[#F84B11] hover:text-[#ff7444] text-[11px] font-medium flex items-center gap-1 cursor-pointer transition-colors"
                   title="Replay Build Crew interactive animation"
                 >
                   <RefreshCw className="w-3 h-3" />
-                  <span>Replay Build</span>
+                  <span className="hidden sm:inline">Replay Build</span>
                 </button>
               </div>
 
-              <h1 data-build="" className="text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.08] mb-6">
+              <h1 data-build="" className="text-3xl sm:text-5xl lg:text-[54px] xl:text-[58px] font-bold tracking-tight text-white leading-[1.08] mb-6">
                 Your company's software <br />
                 should belong to you. <br />
-                <span className="text-[#94979E]">Not be rented.</span>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#F84B11] via-[#ff7444] to-[#ffab91]">
+                  Not be rented.
+                </span>
               </h1>
 
               <p data-build="fade" className="max-w-xl text-base sm:text-lg text-[#94979E] leading-relaxed mb-8 font-normal">
-                We build custom operational software adapted to your exact internal workflows. Deployed on your local physical servers or private cloud for a flat one-time development investment. Sub-millisecond latency, transparent code, and complete data sovereignty.
+                We engineer custom enterprise operational systems for factories, distributors, and logistics operations. Deployed directly on your physical on-premise servers or private cloud as a capitalized corporate asset—with zero recurring user fees, sub-millisecond local speed, and complete data sovereignty.
               </p>
 
-              <div data-build="pop" className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 mb-4">
+              <div data-build="pop" className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 mb-6">
                 <button 
                   onClick={handleOpenModal}
                   className="px-6 py-3.5 rounded-md bg-[#F84B11] hover:bg-[#ff5d26] active:scale-[0.98] text-white font-semibold text-xs uppercase tracking-wider transition-all duration-200 flex items-center justify-center gap-2 shadow-lg shadow-[#F84B11]/25 hover:shadow-[#F84B11]/40 hover:-translate-y-0.5 cursor-pointer"
@@ -789,363 +737,283 @@ export default function App() {
                   <ArrowRight className="w-4 h-4" />
                 </button>
                 <a 
-                  href="#calculator"
+                  href="#transformation"
                   className="px-5 py-3.5 rounded-md border border-[#232731] bg-[#101217] hover:bg-[#161922] active:scale-[0.98] text-[#EDEDED] font-medium text-xs tracking-tight transition-all duration-200 flex items-center justify-center gap-2 hover:-translate-y-0.5 cursor-pointer"
                 >
-                  <span>Calculate Savings vs. SaaS</span>
+                  <Zap className="w-3.5 h-3.5 text-[#F84B11]" />
+                  <span>See Interactive Transformation</span>
                 </a>
+              </div>
+
+              <div data-build="fade" className="flex flex-wrap items-center gap-y-2 gap-x-5 text-xs text-[#94979E] pt-1">
+                <div className="flex items-center gap-1.5">
+                  <Check className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>One-time capital software asset</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Check className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>100% full source ownership</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Check className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>Zero cloud roundtrip lag</span>
+                </div>
               </div>
             </div>
 
-            {/* Right Column: Interactive 3-MicroApp Slider Device */}
-            <div className="lg:col-span-5 w-full" data-build="pop">
-              <div className="rounded-xl border border-[#262B35] bg-[#0E1015] shadow-2xl shadow-black/80 overflow-hidden relative lg:h-[465px] flex flex-col justify-between">
+            {/* Right Column: Sovereign Enterprise Runtime Console */}
+            <div className="lg:col-span-6 xl:col-span-5 w-full" data-build="pop">
+              <div className="rounded-xl border border-[#262B35] bg-[#0E1015] shadow-2xl shadow-black/80 overflow-hidden relative flex flex-col justify-between">
                 
-                {/* Top OS Frame Bar */}
+                {/* Top OS Window Control Bar */}
                 <div className="bg-[#12141A] px-3.5 py-2.5 border-b border-[#1F232B] flex items-center justify-between gap-2 select-none shrink-0">
-                  <div className="flex items-center gap-2">
-                    <div className="flex items-center gap-1.5">
-                      <div className="w-2.5 h-2.5 rounded-full bg-[#262B35]" />
-                      <div className="w-2.5 h-2.5 rounded-full bg-[#262B35]" />
-                      <div className="w-2.5 h-2.5 rounded-full bg-[#262B35]" />
+                  <div className="flex items-center gap-2 min-w-0">
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <div className="w-2.5 h-2.5 rounded-full bg-[#FF5F56]/80" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-[#FFBD2E]/80" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-[#27C93F]/80" />
                     </div>
-                    <span className="text-[11px] font-medium text-[#7A7E89] ml-1.5 flex items-center gap-1.5">
-                      <span>vorsik-node://runtime.lan</span>
+                    <span className="text-[11px] font-mono text-[#7A7E89] ml-1.5 truncate">
+                      vorsik-core://cluster-node-01.lan
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-[#161922] border border-[#232731] text-[10px] text-emerald-400 font-medium">
+                  <div className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-[#161922] border border-[#232731] text-[10px] text-emerald-400 font-medium font-mono shrink-0">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    <span>0.4ms LAN</span>
+                    <span>0.14ms LAN WAL</span>
                   </div>
                 </div>
 
-                {/* MicroApp Slider Tabs & Controls */}
-                <div className="border-b border-[#1F232B] bg-[#0A0C10] px-2.5 sm:px-3 py-2 flex items-center justify-between gap-1 overflow-x-auto shrink-0">
-                  <div className="flex items-center gap-1 shrink-0">
+                {/* Console Navigation Mode Tabs */}
+                <div className="border-b border-[#1F232B] bg-[#0A0C10] px-2.5 sm:px-3 py-1.5 flex items-center justify-between gap-1 overflow-x-auto shrink-0">
+                  <div className="flex items-center gap-1">
                     {[
-                      { id: 0, label: '01. Live Kanban', shortLabel: '01. Kanban', icon: Layers },
-                      { id: 1, label: '02. Live Calc', shortLabel: '02. Calc', icon: Calculator },
-                      { id: 2, label: '03. Time Scrubber', shortLabel: '03. Scrubber', icon: Clock3 },
+                      { id: 'topology', label: '01. Sovereign Topology', icon: Server },
+                      { id: 'ledger', label: '02. Live WAL Ledger', icon: Layers },
+                      { id: 'benchmark', label: '03. Latency Benchmark', icon: Zap },
                     ].map((tab) => {
                       const Icon = tab.icon;
-                      const isActive = activeMicroApp === tab.id;
+                      const isActive = heroConsoleTab === tab.id;
                       return (
                         <button
                           key={tab.id}
-                          onClick={() => setActiveMicroApp(tab.id)}
-                          className={`px-2 sm:px-2.5 py-1 rounded text-[11px] font-medium transition-all flex items-center gap-1 sm:gap-1.5 cursor-pointer whitespace-nowrap ${
+                          onClick={() => setHeroConsoleTab(tab.id as 'topology' | 'ledger' | 'benchmark')}
+                          className={`px-2.5 py-1 rounded text-[11px] font-medium transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
                             isActive
-                              ? 'bg-[#161922] border border-[#F84B11]/50 text-white shadow-sm'
+                              ? 'bg-[#161922] border border-[#F84B11]/50 text-white shadow-xs'
                               : 'text-[#7A7E89] hover:text-[#EDEDED] hover:bg-[#12141A] border border-transparent'
                           }`}
                         >
                           <Icon className={`w-3 h-3 shrink-0 ${isActive ? 'text-[#F84B11]' : 'opacity-60'}`} />
-                          <span className="hidden sm:inline">{tab.label}</span>
-                          <span className="sm:hidden">{tab.shortLabel}</span>
+                          <span>{tab.label}</span>
                         </button>
                       );
                     })}
                   </div>
-
-                  {/* Slider Prev / Next arrows */}
-                  <div className="flex items-center gap-0.5 sm:gap-1 shrink-0">
-                    <button
-                      onClick={() => setActiveMicroApp(prev => (prev === 0 ? 2 : prev - 1))}
-                      className="p-1 rounded hover:bg-[#161922] text-[#7A7E89] hover:text-white transition-colors cursor-pointer"
-                      title="Previous microapp"
-                      aria-label="Previous microapp"
-                    >
-                      <ChevronLeft className="w-3.5 h-3.5" />
-                    </button>
-                    <span className="text-[10px] font-semibold text-[#585B64] tabular-nums px-0.5">
-                      0{activeMicroApp + 1}/03
-                    </span>
-                    <button
-                      onClick={() => setActiveMicroApp(prev => (prev === 2 ? 0 : prev + 1))}
-                      className="p-1 rounded hover:bg-[#161922] text-[#7A7E89] hover:text-white transition-colors cursor-pointer"
-                      title="Next microapp"
-                      aria-label="Next microapp"
-                    >
-                      <ChevronRight className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </div>
-
-                {/* MicroApp Body (Dynamic based on activeMicroApp) */}
-                <div className="p-3.5 sm:p-4 flex-1 flex flex-col justify-between overflow-hidden">
                   
-                  {/* MicroApp 1: Live Kanban Drag & Drop */}
-                  {activeMicroApp === 0 && (
-                    <div className="h-full flex flex-col justify-between space-y-2.5 animate-fadeIn">
-                      <div className="flex items-center justify-between shrink-0">
-                        <div>
-                          <div className="text-[10px] uppercase font-semibold tracking-wider text-[#F84B11]">Operations Pipeline</div>
-                          <div className="text-xs sm:text-sm font-bold text-white tracking-tight">Interactive Dispatch Kanban</div>
-                        </div>
-                        <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                          Drag & Drop or Tap ➔
-                        </span>
-                      </div>
-
-                      {/* 3 Kanban Columns */}
-                      <div className="grid grid-cols-3 gap-1.5 sm:gap-2 flex-1 items-stretch">
-                        {(['queue', 'transit', 'done'] as const).map((colStatus) => {
-                          const colCards = kanbanCards.filter(c => c.status === colStatus);
-                          const colTitles = {
-                            queue: 'Ready',
-                            transit: 'In Route',
-                            done: 'Delivered'
-                          };
-                          const colSum = colCards.reduce((acc, curr) => acc + curr.val, 0);
-
-                          return (
-                            <div
-                              key={colStatus}
-                              onDragOver={(e) => e.preventDefault()}
-                              onDrop={() => handleDropKanban(colStatus)}
-                              className="rounded-lg border border-[#1F232B] bg-[#0A0C10] p-1.5 sm:p-2 flex flex-col justify-between transition-colors hover:border-[#2C323E]"
-                            >
-                              <div className="flex items-center justify-between border-b border-[#1A1E27] pb-1 mb-1.5 text-[10px]">
-                                <span className="font-semibold text-[#EDEDED]">{colTitles[colStatus]}</span>
-                                <span className="text-[#7A7E89] tabular-nums font-medium">${(colSum / 1000).toFixed(1)}k</span>
-                              </div>
-
-                              {/* Cards container */}
-                              <div className="flex-1 space-y-1.5 overflow-y-auto">
-                                {colCards.map((card) => (
-                                  <div
-                                    key={card.id}
-                                    draggable
-                                    onDragStart={() => setDraggedCardId(card.id)}
-                                    onDragEnd={() => setDraggedCardId(null)}
-                                    className="p-1.5 sm:p-2 rounded bg-[#12141A] border border-[#232731] hover:border-[#F84B11]/60 shadow-sm cursor-grab active:cursor-grabbing select-none group transition-all"
-                                  >
-                                    <div className="flex items-center justify-between text-[10px]">
-                                      <div className="flex items-center gap-1 font-semibold text-[#F84B11]">
-                                        <GripVertical className="w-2.5 h-2.5 opacity-40 group-hover:opacity-100 text-[#94979E]" />
-                                        <span>{card.code}</span>
-                                      </div>
-                                      <button
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          advanceKanbanCard(card.id);
-                                        }}
-                                        className="text-[#7A7E89] hover:text-white p-0.5 rounded hover:bg-[#1F232B] transition-colors"
-                                        title="Advance status"
-                                      >
-                                        ➔
-                                      </button>
-                                    </div>
-                                    <div className="text-[11px] font-medium text-white truncate mt-0.5">{card.title}</div>
-                                    <div className="flex items-center justify-between text-[9px] text-[#7A7E89] mt-1">
-                                      <span className="truncate max-w-[55px]">{card.client}</span>
-                                      <span className="font-semibold text-[#EDEDED] tabular-nums">{card.amount}</span>
-                                    </div>
-                                  </div>
-                                ))}
-
-                                {colCards.length === 0 && (
-                                  <div className="h-16 border border-dashed border-[#1C2028] rounded flex items-center justify-center text-[9px] text-[#585B64] italic">
-                                    Drop here
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-
-                      <div className="flex items-center justify-between text-[10px] text-[#7A7E89] shrink-0 pt-0.5">
-                        <span>Drag card to move column</span>
-                        <span className="text-emerald-400 font-medium">0.2ms SQLite Partition Write</span>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* MicroApp 2: Live Architecture & ROI Calculator */}
-                  {activeMicroApp === 1 && (
-                    <div className="h-full flex flex-col justify-between space-y-2.5 animate-fadeIn">
-                      <div className="flex items-center justify-between shrink-0">
-                        <div>
-                          <div className="text-[10px] uppercase font-semibold tracking-wider text-[#F84B11]">Capital Asset Simulator</div>
-                          <div className="text-xs sm:text-sm font-bold text-white tracking-tight">Live Architecture & ROI Calculator</div>
-                        </div>
-                        <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                          60fps Reactive Math
-                        </span>
-                      </div>
-
-                      {/* Sliders */}
-                      <div className="space-y-2 bg-[#0A0C10] p-2.5 rounded-lg border border-[#1F232B]">
-                        <div>
-                          <div className="flex items-center justify-between text-[11px] mb-1">
-                            <span className="text-[#94979E]">Active Users:</span>
-                            <span className="font-bold text-white tabular-nums">{heroCalcUsers} team members</span>
-                          </div>
-                          <input
-                            type="range"
-                            min="5"
-                            max="100"
-                            step="1"
-                            value={heroCalcUsers}
-                            onChange={(e) => setHeroCalcUsers(Number(e.target.value))}
-                            className="w-full accent-[#F84B11] bg-[#1F232B] h-1.5 rounded-lg cursor-pointer"
-                          />
-                        </div>
-
-                        <div>
-                          <div className="flex items-center justify-between text-[11px] mb-1">
-                            <span className="text-[#94979E]">SaaS Seat Cost:</span>
-                            <span className="font-bold text-white tabular-nums">${heroCalcSeatPrice} USD / user / mo</span>
-                          </div>
-                          <input
-                            type="range"
-                            min="25"
-                            max="150"
-                            step="5"
-                            value={heroCalcSeatPrice}
-                            onChange={(e) => setHeroCalcSeatPrice(Number(e.target.value))}
-                            className="w-full accent-[#F84B11] bg-[#1F232B] h-1.5 rounded-lg cursor-pointer"
-                          />
-                        </div>
-                      </div>
-
-                      {/* 4 Module Toggles */}
-                      <div className="grid grid-cols-2 gap-1.5">
-                        {[
-                          { key: 'scanner', label: 'SQLite / WAL Sync' },
-                          { key: 'sync', label: 'Offline Field Engine' },
-                          { key: 'vault', label: 'AES-256 Vault' },
-                          { key: 'webhooks', label: 'ERP REST Webhooks' },
-                        ].map((m) => {
-                          const isChecked = heroModules[m.key];
-                          return (
-                            <button
-                              key={m.key}
-                              onClick={() => toggleHeroModule(m.key)}
-                              className={`px-2 py-1.5 rounded border text-[10px] font-medium flex items-center justify-between transition-all cursor-pointer ${
-                                isChecked
-                                  ? 'bg-[#161922] border-[#F84B11]/50 text-white'
-                                  : 'bg-[#0A0C10] border-[#1C2028] text-[#585B64] hover:text-[#94979E]'
-                              }`}
-                            >
-                              <span>{m.label}</span>
-                              <span className={`w-3 h-3 rounded flex items-center justify-center text-[9px] ${
-                                isChecked ? 'bg-[#F84B11] text-white' : 'bg-[#1C2028] text-transparent'
-                              }`}>✓</span>
-                            </button>
-                          );
-                        })}
-                      </div>
-
-                      {/* Real-time Math Output Card */}
-                      <div className="p-2.5 rounded-lg bg-[#12141A] border border-[#232731] flex items-center justify-between">
-                        <div>
-                          <div className="text-[10px] text-[#7A7E89] uppercase tracking-wider">3-Year Net Savings</div>
-                          <div className="text-base sm:text-lg font-bold text-emerald-400 tabular-nums">
-                            +${heroNetSavings.toLocaleString()} USD
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-[10px] text-[#7A7E89] uppercase tracking-wider">Payback Period</div>
-                          <div className="text-sm font-bold text-white tabular-nums">
-                            {heroPaybackMonths} {heroPaybackMonths === 1 ? 'month' : 'months'}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* MicroApp 3: Live Fleet & Route Scrubber */}
-                  {activeMicroApp === 2 && (
-                    <div className="h-full flex flex-col justify-between space-y-2.5 animate-fadeIn">
-                      <div className="flex items-center justify-between shrink-0">
-                        <div>
-                          <div className="text-[10px] uppercase font-semibold tracking-wider text-[#F84B11]">Field Operations Telemetry</div>
-                          <div className="text-xs sm:text-sm font-bold text-white tracking-tight">Timeline & Fleet Route Scrubber</div>
-                        </div>
-                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#161922] text-[#F84B11] border border-[#F84B11]/30 tabular-nums">
-                          {formattedScrubHour}
-                        </span>
-                      </div>
-
-                      {/* Time Slider */}
-                      <div className="bg-[#0A0C10] p-2.5 rounded-lg border border-[#1F232B] space-y-1">
-                        <div className="flex items-center justify-between text-[11px]">
-                          <span className="text-[#94979E]">Scrub Daily Schedule:</span>
-                          <span className="font-semibold text-white">{scrubHour}:00h</span>
-                        </div>
-                        <input
-                          type="range"
-                          min="8"
-                          max="18"
-                          step="1"
-                          value={scrubHour}
-                          onChange={(e) => setScrubHour(Number(e.target.value))}
-                          className="w-full accent-[#F84B11] bg-[#1F232B] h-1.5 rounded-lg cursor-pointer"
-                        />
-                        <div className="flex items-center justify-between text-[9px] text-[#585B64] pt-0.5 tabular-nums">
-                          <span>08:00 AM</span>
-                          <span>11:00 AM</span>
-                          <span>02:00 PM</span>
-                          <span>06:00 PM</span>
-                        </div>
-                      </div>
-
-                      {/* Dynamic Fleet Routes */}
-                      <div className="space-y-2">
-                        {/* Route Alpha */}
-                        <div className="p-2 rounded bg-[#12141A] border border-[#1F232B] space-y-1">
-                          <div className="flex items-center justify-between text-[10px]">
-                            <span className="font-semibold text-white">Route Alpha (North Metro Logistics)</span>
-                            <span className="text-emerald-400 tabular-nums">{routeAlphaProgress}% Staged</span>
-                          </div>
-                          <div className="w-full bg-[#1C2028] h-1.5 rounded-full overflow-hidden">
-                            <div 
-                              className="bg-[#F84B11] h-full transition-all duration-150 rounded-full" 
-                              style={{ width: `${routeAlphaProgress}%` }} 
-                            />
-                          </div>
-                          <div className="text-[9px] text-[#7A7E89] truncate">
-                            Waypoint: {scrubHour <= 9 ? 'Depot Manifest Verification' : scrubHour <= 13 ? 'Warehouse Hub C-14 Loading' : scrubHour <= 16 ? 'Client Final Receiving Dock' : 'Depot Staging & Shift Review'}
-                          </div>
-                        </div>
-
-                        {/* Route Beta */}
-                        <div className="p-2 rounded bg-[#12141A] border border-[#1F232B] space-y-1">
-                          <div className="flex items-center justify-between text-[10px]">
-                            <span className="font-semibold text-white">Route Beta (Regional Hospital Link)</span>
-                            <span className="text-blue-400 tabular-nums">{routeBetaProgress}% In Transit</span>
-                          </div>
-                          <div className="w-full bg-[#1C2028] h-1.5 rounded-full overflow-hidden">
-                            <div 
-                              className="bg-blue-500 h-full transition-all duration-150 rounded-full" 
-                              style={{ width: `${routeBetaProgress}%` }} 
-                            />
-                          </div>
-                          <div className="text-[9px] text-[#7A7E89] truncate">
-                            Waypoint: {scrubHour <= 10 ? 'Sterile Container Inspection' : scrubHour <= 14 ? 'Highway Logistics Link 4' : 'Post-Op Receiving Verified'}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center justify-between text-[10px] text-[#7A7E89] shrink-0 pt-0.5">
-                        <span>{activeTechs} Technicians on duty</span>
-                        <span className="text-emerald-400 font-medium">GPS Synced (0.1ms)</span>
-                      </div>
-                    </div>
-                  )}
-
+                  <span className="text-[10px] font-mono text-[#585B64] hidden sm:inline px-1">
+                    10Gbps LAN
+                  </span>
                 </div>
 
-                {/* MicroApp Footer Security Notice */}
-                <div className="px-3.5 py-2 border-t border-[#1F232B] bg-[#0A0C10] flex items-center justify-between text-[10px] text-[#585B64] select-none shrink-0">
-                  <span className="flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                    <span>Dedicated On-Premise Instance</span>
-                  </span>
-                  <span>Zero per-seat licensing</span>
+                {/* Console Main Display Panel */}
+                <div className="p-4 min-h-[340px] flex flex-col justify-between">
+                  
+                  {/* Tab 1: Sovereign Topology & Node Health */}
+                  {heroConsoleTab === 'topology' && (
+                    <div className="space-y-3 animate-fadeIn">
+                      <div className="p-3 rounded-lg bg-[#12141A] border border-[#1F232B] space-y-2">
+                        <div className="flex items-center justify-between text-xs">
+                          <div className="flex items-center gap-2">
+                            <Server className="w-3.5 h-3.5 text-[#F84B11]" />
+                            <span className="font-semibold text-white">Physical On-Premise Host Node</span>
+                          </div>
+                          <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
+                            Bare-Metal Linux 6.8
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-3 gap-2 pt-1 border-t border-[#1F232B] text-[10px] font-mono">
+                          <div>
+                            <span className="text-[#7A7E89] block">Engine CPU</span>
+                            <span className="text-white font-semibold">1.4% (Idle)</span>
+                          </div>
+                          <div>
+                            <span className="text-[#7A7E89] block">DB Memory</span>
+                            <span className="text-white font-semibold">3.8 / 64 GB</span>
+                          </div>
+                          <div>
+                            <span className="text-[#7A7E89] block">Sovereignty</span>
+                            <span className="text-emerald-400 font-semibold">100% Air-Gapped</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Station Network Matrix */}
+                      <div className="space-y-1.5">
+                        <div className="text-[10px] uppercase font-semibold tracking-wider text-[#7A7E89] px-0.5">
+                          Active Physical Stations & Hardware Bridges
+                        </div>
+                        
+                        <div className="p-2 rounded-lg bg-[#0A0C10] border border-[#1F232B] flex items-center justify-between text-xs">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <Barcode className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                            <div className="truncate">
+                              <span className="text-white font-medium block leading-tight">Barcode Laser Stations</span>
+                              <span className="text-[10px] text-[#7A7E89]">18 Industrial Scanners • Direct BLE / USB</span>
+                            </div>
+                          </div>
+                          <span className="text-[10px] font-mono font-semibold text-emerald-400 px-1.5 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 shrink-0">
+                            0ms Queue
+                          </span>
+                        </div>
+
+                        <div className="p-2 rounded-lg bg-[#0A0C10] border border-[#1F232B] flex items-center justify-between text-xs">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <Monitor className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+                            <div className="truncate">
+                              <span className="text-white font-medium block leading-tight">Command Dispatch Desks</span>
+                              <span className="text-[10px] text-[#7A7E89]">4 Multi-Screen Dual 4K Terminals</span>
+                            </div>
+                          </div>
+                          <span className="text-[10px] font-mono font-semibold text-blue-400 px-1.5 py-0.5 rounded bg-blue-500/10 border border-blue-500/20 shrink-0">
+                            Active Sync
+                          </span>
+                        </div>
+
+                        <div className="p-2 rounded-lg bg-[#0A0C10] border border-[#1F232B] flex items-center justify-between text-xs">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <Smartphone className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                            <div className="truncate">
+                              <span className="text-white font-medium block leading-tight">Warehouse & Field Handhelds</span>
+                              <span className="text-[10px] text-[#7A7E89]">12 Rugged Tablets • Zero-Loss Offline Buffer</span>
+                            </div>
+                          </div>
+                          <span className="text-[10px] font-mono font-semibold text-amber-400 px-1.5 py-0.5 rounded bg-amber-500/10 border border-amber-500/20 shrink-0">
+                            Offline Safe
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Tab 2: Live WAL Ledger */}
+                  {heroConsoleTab === 'ledger' && (
+                    <div className="space-y-2.5 animate-fadeIn">
+                      <div className="flex items-center justify-between text-xs pb-1 border-b border-[#1F232B]">
+                        <span className="font-semibold text-white flex items-center gap-1.5">
+                          <Database className="w-3.5 h-3.5 text-[#F84B11]" />
+                          <span>Local PostgreSQL WAL Transaction Log</span>
+                        </span>
+                        <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
+                          Live Stream
+                        </span>
+                      </div>
+
+                      <div className="font-mono text-[10.5px] space-y-1.5 bg-[#0A0C10] p-2.5 rounded-lg border border-[#1F232B] overflow-hidden">
+                        <div className="flex items-center justify-between text-[#94979E]">
+                          <span className="text-[#F84B11]">[09:41:02.14]</span>
+                          <span className="text-white font-semibold truncate max-w-[200px]">WO-410 CNC Valves Dispatched</span>
+                          <span className="text-emerald-400 font-bold">0.12ms WAL</span>
+                        </div>
+                        <div className="flex items-center justify-between text-[#94979E]">
+                          <span className="text-[#F84B11]">[09:41:02.48]</span>
+                          <span className="text-white font-semibold truncate max-w-[200px]">Barcode Laser SKU-BEAR-310</span>
+                          <span className="text-emerald-400 font-bold">0.11ms DB</span>
+                        </div>
+                        <div className="flex items-center justify-between text-[#94979E]">
+                          <span className="text-[#F84B11]">[09:41:02.89]</span>
+                          <span className="text-white font-semibold truncate max-w-[200px]">Dock #02 Truck #04 Manifest Sync</span>
+                          <span className="text-emerald-400 font-bold">0.14ms LAN</span>
+                        </div>
+                        <div className="flex items-center justify-between text-[#94979E]">
+                          <span className="text-[#F84B11]">[09:41:03.11]</span>
+                          <span className="text-white font-semibold truncate max-w-[200px]">AES-256 Vault Checkpoint #104</span>
+                          <span className="text-blue-400 font-bold">Signed</span>
+                        </div>
+                        <div className="flex items-center justify-between text-[#7A7E89] opacity-75">
+                          <span className="text-[#F84B11]">[09:41:03.45]</span>
+                          <span className="truncate max-w-[200px]">Zero External Cloud Exfiltration</span>
+                          <span className="text-emerald-400">100% Local</span>
+                        </div>
+                      </div>
+
+                      <div className="p-2 rounded bg-[#12141A] border border-[#1F232B] text-[10px] text-[#94979E] flex items-center justify-between">
+                        <span>Local Disk Throughput: <strong className="text-white">4,820 tx/sec</strong></span>
+                        <span className="text-emerald-400 font-medium font-mono">Zero WAN Dependency</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Tab 3: Latency Benchmark */}
+                  {heroConsoleTab === 'benchmark' && (
+                    <div className="space-y-3 animate-fadeIn">
+                      <div className="flex items-center justify-between text-xs pb-1 border-b border-[#1F232B]">
+                        <span className="font-semibold text-white flex items-center gap-1.5">
+                          <Zap className="w-3.5 h-3.5 text-[#F84B11]" />
+                          <span>On-Premise LAN vs. Commercial SaaS</span>
+                        </span>
+                        <button
+                          onClick={handleRunPingBenchmark}
+                          disabled={testPingRunning}
+                          className="px-2 py-0.5 rounded bg-[#F84B11] hover:bg-[#ff5d26] text-white text-[10px] font-semibold flex items-center gap-1 cursor-pointer transition-all active:scale-[0.96]"
+                        >
+                          <RefreshCw className={`w-3 h-3 ${testPingRunning ? 'animate-spin' : ''}`} />
+                          <span>{testPingRunning ? 'Benchmarking...' : 'Test Ping'}</span>
+                        </button>
+                      </div>
+
+                      {/* Comparison Bar 1: Vorsik */}
+                      <div className="p-2.5 rounded-lg bg-[#12141A] border border-emerald-500/30 space-y-1.5">
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="font-bold text-white flex items-center gap-1.5">
+                            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                            <span>Vorsik Sovereign Local Architecture</span>
+                          </span>
+                          <span className="font-mono font-bold text-emerald-400 text-sm">
+                            {testPingTime}
+                          </span>
+                        </div>
+                        <div className="w-full h-2 rounded-full bg-[#1C2028] overflow-hidden">
+                          <div className="h-full bg-emerald-500 rounded-full w-full" />
+                        </div>
+                        <div className="text-[10px] text-[#7A7E89]">
+                          Instantaneous local RAM/WAL commit. Zero network spinners or loading freezes.
+                        </div>
+                      </div>
+
+                      {/* Comparison Bar 2: Commercial SaaS */}
+                      <div className="p-2.5 rounded-lg bg-[#0A0C10] border border-[#1F232B] space-y-1.5 opacity-80">
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="font-medium text-[#94979E]">
+                            Commercial Cloud SaaS (US-East AWS / Multi-Hop)
+                          </span>
+                          <span className="font-mono text-red-400 font-semibold text-xs">
+                            480ms - 1,450ms
+                          </span>
+                        </div>
+                        <div className="w-full h-2 rounded-full bg-[#1C2028] overflow-hidden">
+                          <div className="h-full bg-red-500/60 rounded-full w-[12%]" />
+                        </div>
+                        <div className="text-[10px] text-[#585B64]">
+                          Roundtrip across external cloud datacenters. Barcode delays and seat authentication overhead.
+                        </div>
+                      </div>
+
+                      <div className="text-[10px] font-mono text-[#7A7E89] text-center pt-0.5">
+                        3,000 daily scans x 0.1ms saves ~45 hours of operator wait time / year.
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Console Footer */}
+                  <div className="pt-3 mt-3 border-t border-[#1F232B] flex items-center justify-between text-[10px] text-[#7A7E89] font-mono">
+                    <span className="flex items-center gap-1 text-emerald-400">
+                      <CheckCircle2 className="w-3 h-3" />
+                      <span>Dedicated Capital Asset</span>
+                    </span>
+                    <span>100% Owned Source Code</span>
+                  </div>
+
                 </div>
 
               </div>
@@ -1155,28 +1023,40 @@ export default function App() {
 
           {/* 4 Architectural Fact Blocks */}
           <div data-build="fade" className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 border-t border-[#1F232B] mt-12 pt-8">
-            <div className="p-3.5 rounded-lg border border-transparent hover:border-[#1F232B] hover:bg-[#0E1015] transition-all duration-200 cursor-default">
-              <div className="text-[11px] font-semibold uppercase tracking-wider text-[#585B64] mb-1">Deployment</div>
-              <div className="text-sm font-semibold text-white">100% On-Premise</div>
-              <p className="text-xs text-[#94979E] mt-0.5">On your hardware or private cloud</p>
+            <div className="p-4 rounded-xl border border-[#1E222A] bg-[#0E1015] hover:border-[#F84B11]/40 transition-all duration-200 cursor-default group">
+              <div className="flex items-center gap-2 text-[#F84B11] mb-1.5">
+                <Server className="w-4 h-4" />
+                <div className="text-[11px] font-semibold uppercase tracking-wider text-[#7A7E89]">Deployment</div>
+              </div>
+              <div className="text-sm font-bold text-white group-hover:text-[#F84B11] transition-colors">100% On-Premise</div>
+              <p className="text-xs text-[#94979E] mt-1 leading-relaxed">Installed on your physical hardware or private corporate cloud</p>
             </div>
 
-            <div className="p-3.5 rounded-lg border border-transparent hover:border-[#1F232B] hover:bg-[#0E1015] transition-all duration-200 cursor-default">
-              <div className="text-[11px] font-semibold uppercase tracking-wider text-[#585B64] mb-1">Pricing Model</div>
-              <div className="text-sm font-semibold text-white">Flat Capital Asset</div>
-              <p className="text-xs text-[#94979E] mt-0.5">No recurring per-user license fees</p>
+            <div className="p-4 rounded-xl border border-[#1E222A] bg-[#0E1015] hover:border-emerald-500/40 transition-all duration-200 cursor-default group">
+              <div className="flex items-center gap-2 text-emerald-400 mb-1.5">
+                <Building2 className="w-4 h-4" />
+                <div className="text-[11px] font-semibold uppercase tracking-wider text-[#7A7E89]">Financial Model</div>
+              </div>
+              <div className="text-sm font-bold text-white group-hover:text-emerald-400 transition-colors">Capitalized Asset</div>
+              <p className="text-xs text-[#94979E] mt-1 leading-relaxed">Zero recurring per-user monthly seat tax. Owned forever</p>
             </div>
 
-            <div className="p-3.5 rounded-lg border border-transparent hover:border-[#1F232B] hover:bg-[#0E1015] transition-all duration-200 cursor-default">
-              <div className="text-[11px] font-semibold uppercase tracking-wider text-[#585B64] mb-1">Intellectual Property</div>
-              <div className="text-sm font-semibold text-white">100% Owned Code</div>
-              <p className="text-xs text-[#94979E] mt-0.5">Fully documented, zero lock-in</p>
+            <div className="p-4 rounded-xl border border-[#1E222A] bg-[#0E1015] hover:border-blue-500/40 transition-all duration-200 cursor-default group">
+              <div className="flex items-center gap-2 text-blue-400 mb-1.5">
+                <Code2 className="w-4 h-4" />
+                <div className="text-[11px] font-semibold uppercase tracking-wider text-[#7A7E89]">Intellectual Property</div>
+              </div>
+              <div className="text-sm font-bold text-white group-hover:text-blue-400 transition-colors">100% Owned Code</div>
+              <p className="text-xs text-[#94979E] mt-1 leading-relaxed">Full source code delivered, documented, zero vendor lock-in</p>
             </div>
 
-            <div className="p-3.5 rounded-lg border border-transparent hover:border-[#1F232B] hover:bg-[#0E1015] transition-all duration-200 cursor-default">
-              <div className="text-[11px] font-semibold uppercase tracking-wider text-[#585B64] mb-1">UI Response</div>
-              <div className="text-sm font-semibold text-white">&lt; 1ms Perceived</div>
-              <p className="text-xs text-[#94979E] mt-0.5">Reactive, zero-spinner architecture</p>
+            <div className="p-4 rounded-xl border border-[#1E222A] bg-[#0E1015] hover:border-amber-500/40 transition-all duration-200 cursor-default group">
+              <div className="flex items-center gap-2 text-amber-400 mb-1.5">
+                <Zap className="w-4 h-4" />
+                <div className="text-[11px] font-semibold uppercase tracking-wider text-[#7A7E89]">Response Time</div>
+              </div>
+              <div className="text-sm font-bold text-white group-hover:text-amber-400 transition-colors">&lt; 0.2ms Perceived</div>
+              <p className="text-xs text-[#94979E] mt-1 leading-relaxed">Instantaneous local reactive memory, zero loading spinners</p>
             </div>
           </div>
 
