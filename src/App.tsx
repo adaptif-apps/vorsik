@@ -32,7 +32,9 @@ import {
   Laptop,
   Tablet,
   Smartphone,
-  Barcode
+  Barcode,
+  Maximize2,
+  RotateCcw
 } from 'lucide-react';
 
 export default function App() {
@@ -170,6 +172,100 @@ export default function App() {
     tablet: '768px',
     mobile: '390px'
   };
+
+  const targetWidthMap: Record<KanbanDevice, number> = {
+    desktop: 1152,
+    laptop: 1024,
+    tablet: 768,
+    mobile: 390
+  };
+
+  // Scaled Mobile Transform & Fullscreen State
+  const simulatorWrapperRef = useRef<HTMLDivElement>(null);
+  const workstationRef = useRef<HTMLDivElement>(null);
+  const [simulatorAvailableWidth, setSimulatorAvailableWidth] = useState<number>(1152);
+  const [workstationRawHeight, setWorkstationRawHeight] = useState<number>(620);
+  const [isFullscreenLandscape, setIsFullscreenLandscape] = useState(false);
+
+  useEffect(() => {
+    const updateDimensions = () => {
+      if (simulatorWrapperRef.current) {
+        setSimulatorAvailableWidth(simulatorWrapperRef.current.clientWidth);
+      }
+      if (workstationRef.current) {
+        setWorkstationRawHeight(workstationRef.current.offsetHeight || 620);
+      }
+    };
+
+    updateDimensions();
+
+    const resizeObserver = new ResizeObserver(() => {
+      updateDimensions();
+    });
+
+    if (simulatorWrapperRef.current) {
+      resizeObserver.observe(simulatorWrapperRef.current);
+    }
+    if (workstationRef.current) {
+      resizeObserver.observe(workstationRef.current);
+    }
+
+    window.addEventListener('resize', updateDimensions);
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener('resize', updateDimensions);
+    };
+  }, [kanbanDevice, activeLayoutDevice, isKanbanLight]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isFullscreenLandscape) {
+        setIsFullscreenLandscape(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isFullscreenLandscape]);
+
+  const handleRotateToFullscreen = async () => {
+    setIsFullscreenLandscape(true);
+    try {
+      if (document.documentElement.requestFullscreen) {
+        await document.documentElement.requestFullscreen();
+      }
+      if (screen.orientation && 'lock' in screen.orientation) {
+        try {
+          await (screen.orientation as any).lock('landscape');
+        } catch (_) {}
+      }
+    } catch (_) {}
+
+    setToastMessage("💡 Tip: Gira tu teléfono a horizontal (Landscape) para ver las 4 columnas al 100%.");
+    setTimeout(() => setToastMessage(null), 4000);
+  };
+
+  const handleExitFullscreen = async () => {
+    setIsFullscreenLandscape(false);
+    try {
+      if (document.fullscreenElement) {
+        await document.exitFullscreen();
+      }
+      if (screen.orientation && 'unlock' in screen.orientation) {
+        try {
+          (screen.orientation as any).unlock();
+        } catch (_) {}
+      }
+    } catch (_) {}
+  };
+
+  const targetDeviceWidth = targetWidthMap[kanbanDevice];
+  const isWidthConstrained = simulatorAvailableWidth > 0 && simulatorAvailableWidth < targetDeviceWidth;
+  const scaleRatio = isWidthConstrained ? Math.max(0.2, simulatorAvailableWidth / targetDeviceWidth) : 1;
+  const scaledWrapperHeight = isWidthConstrained ? Math.ceil(workstationRawHeight * scaleRatio) : undefined;
+  const showScaledBanner = !isFullscreenLandscape && isWidthConstrained && (kanbanDevice === 'desktop' || kanbanDevice === 'laptop' || kanbanDevice === 'tablet');
+
+  const fullscreenAvailableWidth = typeof window !== 'undefined' ? window.innerWidth - 32 : 1152;
+  const fullscreenScale = Math.min(1, Math.max(0.25, fullscreenAvailableWidth / targetDeviceWidth));
 
   const handleSelectDevice = (device: KanbanDevice) => {
     if (device === kanbanDevice) return;
@@ -2052,50 +2148,50 @@ export default function App() {
             <div className="inline-flex p-1 rounded-lg border border-[#20232B] bg-[#14161D] text-xs font-medium">
               <button
                 onClick={() => handleSelectDevice('desktop')}
-                className={`px-3 py-1.5 rounded-md transition-all flex items-center gap-1.5 cursor-pointer ${
+                className={`px-2.5 sm:px-3 py-1.5 rounded-md transition-all flex items-center gap-1.5 cursor-pointer ${
                   kanbanDevice === 'desktop'
                     ? 'bg-[#1E2129] text-white shadow-sm font-semibold'
                     : 'text-[#94979E] hover:text-white'
                 }`}
               >
                 <Monitor className="w-3.5 h-3.5 text-[#F84B11]" />
-                <span>Desktop (1440px)</span>
+                <span>Desktop <span className="hidden sm:inline">(1440px)</span></span>
               </button>
 
               <button
                 onClick={() => handleSelectDevice('laptop')}
-                className={`px-3 py-1.5 rounded-md transition-all flex items-center gap-1.5 cursor-pointer ${
+                className={`px-2.5 sm:px-3 py-1.5 rounded-md transition-all flex items-center gap-1.5 cursor-pointer ${
                   kanbanDevice === 'laptop'
                     ? 'bg-[#1E2129] text-white shadow-sm font-semibold'
                     : 'text-[#94979E] hover:text-white'
                 }`}
               >
                 <Laptop className="w-3.5 h-3.5 text-blue-400" />
-                <span>Laptop (1024px)</span>
+                <span>Laptop <span className="hidden sm:inline">(1024px)</span></span>
               </button>
 
               <button
                 onClick={() => handleSelectDevice('tablet')}
-                className={`px-3 py-1.5 rounded-md transition-all flex items-center gap-1.5 cursor-pointer ${
+                className={`px-2.5 sm:px-3 py-1.5 rounded-md transition-all flex items-center gap-1.5 cursor-pointer ${
                   kanbanDevice === 'tablet'
                     ? 'bg-[#1E2129] text-white shadow-sm font-semibold'
                     : 'text-[#94979E] hover:text-white'
                 }`}
               >
                 <Tablet className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Rugged Tablet (768px)</span>
+                <span><span className="sm:hidden inline">Tablet</span><span className="hidden sm:inline">Rugged Tablet (768px)</span></span>
               </button>
 
               <button
                 onClick={() => handleSelectDevice('mobile')}
-                className={`px-3 py-1.5 rounded-md transition-all flex items-center gap-1.5 cursor-pointer ${
+                className={`px-2.5 sm:px-3 py-1.5 rounded-md transition-all flex items-center gap-1.5 cursor-pointer ${
                   kanbanDevice === 'mobile'
                     ? 'bg-[#1E2129] text-white shadow-sm font-semibold'
                     : 'text-[#94979E] hover:text-white'
                 }`}
               >
                 <Smartphone className="w-3.5 h-3.5 text-amber-400" />
-                <span>Mobile (390px)</span>
+                <span>Mobile <span className="hidden sm:inline">(390px)</span></span>
               </button>
             </div>
           </div>
@@ -2165,13 +2261,107 @@ export default function App() {
           </div>
         </div>
 
+        {/* Mobile Proportional Scale Notification & Rotate Action */}
+        {showScaledBanner && (
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 sm:p-3.5 mb-4 rounded-xl border border-[#F84B11]/30 bg-[#F84B11]/10 text-white shadow-lg animate-in fade-in duration-300">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="p-2 rounded-lg bg-[#F84B11]/20 text-[#F84B11] border border-[#F84B11]/30 shrink-0">
+                <Smartphone className="w-4 h-4 rotate-90" />
+              </div>
+              <div className="min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-xs font-bold text-white tracking-wide">
+                    Scaled {kanbanDevice.toUpperCase()} View ({Math.round(scaleRatio * 100)}%)
+                  </span>
+                  <span className="text-[10px] px-1.5 py-0.2 rounded font-mono font-semibold bg-[#F84B11]/20 text-[#F84B11] border border-[#F84B11]/30">
+                    {kanbanDevice === 'desktop' || kanbanDevice === 'laptop' ? '4-Column Hub' : '2-Column Track'}
+                  </span>
+                </div>
+                <p className="text-[11px] text-[#A6ABB7] mt-0.5 truncate">
+                  Proportionally fitted to mobile width. Rotate for native full screen.
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={handleRotateToFullscreen}
+              className="px-3.5 py-2 rounded-lg bg-[#F84B11] hover:bg-[#ff5d26] active:scale-[0.97] text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-lg shadow-[#F84B11]/20 shrink-0"
+            >
+              <Maximize2 className="w-3.5 h-3.5" />
+              <span>Rotate to Full Screen</span>
+            </button>
+          </div>
+        )}
+
         {/* Scalable Interactive Device Hardware Viewport Container */}
         <div 
-          className="w-full mx-auto transition-[max-width] duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]"
-          style={{ maxWidth: deviceWidthMap[kanbanDevice] }}
+          ref={simulatorWrapperRef}
+          className={`mx-auto transition-all duration-300 ${
+            isFullscreenLandscape 
+              ? 'fixed inset-0 z-50 bg-[#08090C]/98 backdrop-blur-md p-3 sm:p-6 flex flex-col items-center justify-start overflow-y-auto animate-in fade-in duration-200' 
+              : 'w-full relative'
+          }`}
+          style={isFullscreenLandscape ? {
+            width: '100vw',
+            maxWidth: '100vw',
+            height: '100vh',
+            overflowY: 'auto'
+          } : { 
+            maxWidth: deviceWidthMap[kanbanDevice],
+            height: isWidthConstrained ? `${scaledWrapperHeight}px` : 'auto',
+            overflow: isWidthConstrained ? 'hidden' : 'visible'
+          }}
         >
-          {/* Hardware Frame Shell */}
-          <div className={`shadow-2xl transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] flex flex-col overflow-hidden ${
+          {/* Fullscreen Immersion Header (Only visible when isFullscreenLandscape is active) */}
+          {isFullscreenLandscape && (
+            <div className="w-full max-w-7xl flex items-center justify-between gap-3 p-3 rounded-xl border border-[#1F232B] bg-[#0E1015] shrink-0 mb-4 shadow-2xl">
+              <div className="flex items-center gap-2 min-w-0">
+                <div className="w-2.5 h-2.5 rounded-full bg-[#F84B11] animate-pulse shrink-0" />
+                <span className="font-mono text-xs text-white font-bold truncate">
+                  Vorsik Command Hub • Fullscreen Mode ({kanbanDevice.toUpperCase()})
+                </span>
+                <span className="text-[10px] px-2 py-0.5 rounded font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hidden sm:inline-flex items-center gap-1">
+                  <span>0.1ms Engine</span>
+                </span>
+              </div>
+
+              <div className="flex items-center gap-3 shrink-0">
+                <div className="text-[11px] text-[#A6ABB7] hidden md:flex items-center gap-1.5 font-mono">
+                  <RotateCcw className="w-3.5 h-3.5 text-[#F84B11]" />
+                  <span>Rotate device to landscape for full 1152px width</span>
+                </div>
+
+                <button
+                  onClick={handleExitFullscreen}
+                  className="px-3 py-1.5 rounded-lg bg-[#1E2129] hover:bg-[#2A2E39] text-white text-xs font-semibold flex items-center gap-1.5 cursor-pointer border border-[#2D3342] transition-colors"
+                >
+                  <X className="w-3.5 h-3.5" />
+                  <span>Exit Full Screen</span>
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Inner Workstation Transform Element */}
+          <div
+            ref={workstationRef}
+            style={isFullscreenLandscape ? {
+              width: `${targetDeviceWidth}px`,
+              minWidth: `${targetDeviceWidth}px`,
+              transform: `scale(${fullscreenScale})`,
+              transformOrigin: 'top center'
+            } : isWidthConstrained ? {
+              width: `${targetDeviceWidth}px`,
+              minWidth: `${targetDeviceWidth}px`,
+              transform: `scale(${scaleRatio})`,
+              transformOrigin: 'top left'
+            } : {
+              width: '100%'
+            }}
+            className="transition-transform duration-300 ease-out origin-top-left flex flex-col"
+          >
+            {/* Hardware Frame Shell */}
+            <div className={`shadow-2xl transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] flex flex-col overflow-hidden ${
             kanbanDevice === 'mobile'
               ? isKanbanLight
                 ? 'rounded-[38px] border-[5px] border-slate-300 bg-slate-200/90 shadow-slate-900/40 p-2.5 ring-1 ring-slate-400/30'
@@ -2593,7 +2783,7 @@ export default function App() {
                 
                 {/* 1. DESKTOP & LAPTOP: 4 COLUMNS FULL SPREAD */}
                 {(activeLayoutDevice === 'desktop' || activeLayoutDevice === 'laptop') && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 h-full min-h-0">
+                  <div className="grid grid-cols-4 gap-3 h-full min-h-0">
                     {(['intake', 'assembly', 'qa', 'dispatch'] as const).map(stageKey => {
                       const tasksInStage = filteredKanbanTasks.filter(t => t.stage === stageKey);
                       const meta = {
@@ -3251,6 +3441,8 @@ export default function App() {
           </div>
 
         </div>
+
+      </div>
 
         {/* 3 Value Callout Cards for Multi-Device Responsiveness */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-10">
