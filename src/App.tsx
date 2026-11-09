@@ -807,13 +807,13 @@ export default function App() {
           </p>
 
           {/* Workflow Transformation Toggle (Before / After) */}
-          <div className="mt-6 inline-flex p-1 rounded-lg border border-[#262A36] bg-[#12141A] text-xs font-medium shadow-md">
+          <div className="mt-6 inline-flex p-1 rounded-lg border border-[#262A36] bg-[#12141A] text-xs font-semibold shadow-md">
             <button
               onClick={() => setTransformationMode('spreadsheet')}
-              className={`px-3.5 py-2 rounded-md transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap ${
+              className={`px-3.5 py-2 rounded-md border transition-colors duration-150 flex items-center gap-2 cursor-pointer whitespace-nowrap focus:outline-none ${
                 transformationMode === 'spreadsheet'
-                  ? 'bg-[#1E222B] text-white shadow-sm font-semibold border border-[#303644]'
-                  : 'text-[#94979E] hover:text-white hover:bg-[#181A22]'
+                  ? 'border-[#303644] bg-[#1E222B] text-white shadow-sm'
+                  : 'border-transparent text-[#94979E] hover:text-white hover:bg-[#181A22]'
               }`}
             >
               <FileSpreadsheet className="w-4 h-4 shrink-0 text-amber-400" />
@@ -823,10 +823,10 @@ export default function App() {
 
             <button
               onClick={handleStartTransformation}
-              className={`px-3.5 py-2 rounded-md transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap ${
+              className={`px-3.5 py-2 rounded-md border transition-colors duration-150 flex items-center gap-2 cursor-pointer whitespace-nowrap focus:outline-none ${
                 transformationMode === 'vorsik'
-                  ? 'bg-[#F84B11] text-white shadow-md shadow-[#F84B11]/25 font-semibold'
-                  : 'text-[#F84B11] hover:text-[#ff7444] hover:bg-[#F84B11]/10 font-semibold'
+                  ? 'border-[#F84B11] bg-[#F84B11] text-white shadow-md shadow-[#F84B11]/25'
+                  : 'border-transparent text-[#F84B11] hover:text-[#ff7444] hover:bg-[#F84B11]/10'
               }`}
             >
               <Zap className="w-4 h-4 fill-current shrink-0" />
@@ -876,10 +876,10 @@ export default function App() {
                 <button
                   type="button"
                   onClick={() => setSandboxTheme('light')}
-                  className={`px-2 py-1 rounded-md transition-all flex items-center gap-1.5 cursor-pointer ${
+                  className={`px-2 py-1 rounded-md border transition-colors duration-150 flex items-center gap-1.5 cursor-pointer focus:outline-none ${
                     isLight
-                      ? 'bg-white text-slate-900 shadow-xs font-semibold'
-                      : 'text-[#717684] hover:text-white'
+                      ? 'border-transparent bg-white text-slate-900 shadow-xs font-semibold'
+                      : 'border-transparent text-[#717684] hover:text-white font-medium'
                   }`}
                   title="Light mode (Default)"
                   aria-label="Light mode"
@@ -890,10 +890,10 @@ export default function App() {
                 <button
                   type="button"
                   onClick={() => setSandboxTheme('dark')}
-                  className={`px-2 py-1 rounded-md transition-all flex items-center gap-1.5 cursor-pointer ${
+                  className={`px-2 py-1 rounded-md border transition-colors duration-150 flex items-center gap-1.5 cursor-pointer focus:outline-none ${
                     !isLight
-                      ? 'bg-[#1E2129] text-white shadow-xs font-semibold'
-                      : 'text-slate-500 hover:text-slate-900'
+                      ? 'border-transparent bg-[#1E2129] text-white shadow-xs font-semibold'
+                      : 'border-transparent text-slate-500 hover:text-slate-900 font-medium'
                   }`}
                   title="Dark mode"
                   aria-label="Dark mode"
